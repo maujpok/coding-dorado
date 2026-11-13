@@ -1,7 +1,7 @@
 # Arquitectura: calculadora de cambio
 
 > Estado: propuesta · Última actualización: 2026-11-13
-> Documentos relacionados: [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) · [API_RESEARCH.md](API_RESEARCH.md)
+> Documentos relacionados: [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) · [API_RESEARCH.md](API_RESEARCH.md) · [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)
 
 ## 1. Contexto
 
@@ -18,7 +18,7 @@ El diseño de referencia está en `assets/screen_1.jpg` (calculadora), `assets/s
 
 ### Objetivos de la arquitectura
 
-1. **Fidelidad al diseño.** La UI se construye sobre tokens (colores, tipografía, espaciados) extraídos de los mocks.
+1. **Fidelidad al diseño.** La estructura, las medidas y la tipografía salen de los mocks; la paleta es la de El Dorado. Todo vive en un design system de tokens ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)).
 2. **Calidad y mantenibilidad.** Capas con responsabilidades claras. La lógica de negocio es Dart puro y tiene pruebas.
 3. **Escalabilidad.** Agregar un proveedor, una moneda o una funcionalidad no obliga a tocar el resto. Un proveedor nuevo aparece solo como pestaña y en la comparación.
 4. **Independencia de las APIs.** Cada proveedor tiene un mock en el borde HTTP. La app funciona y se prueba sin red, y la fuente se cambia con configuración, no con código.
@@ -42,6 +42,7 @@ Autenticación, ejecución real del cambio (el botón "Cambiar" se simula), pers
 | D9 | Catálogo de monedas local | Pedirlo a las APIs | Ninguna de las dos expone nombres ni símbolos. El catálogo de El Dorado (`/stage/currencies`) marca VES y USDC como deshabilitadas. Un único archivo define las 8 monedas del diseño. |
 | D10 | `get_it` como *composition root*, con una instancia por proveedor (`instanceName`) | Inyección manual, `injectable` | Simple y sin codegen; un solo lugar arma las dependencias según la configuración. |
 | D11 | Textos en ARB (`flutter gen-l10n`), locale `es` | Strings en el código | Permite sumar idiomas sin refactor. |
+| D12 | Design system propio (`core/design_system`): paleta de El Dorado, tokens semánticos como `ThemeExtension` y componentes `Ds*` | Colores y estilos sueltos en cada widget | Un solo lugar define la marca; el contraste se verifica con pruebas; sumar un tema oscuro no toca los widgets. |
 
 ## 3. Vista general
 
@@ -97,9 +98,8 @@ lib/
 │   ├── cache/ttl_cache.dart                    # caché con TTL que comparte la petición en curso
 │   ├── error/failure.dart                      # sealed Failure
 │   ├── error/result.dart                       # sealed Result<T>
-│   ├── bloc/event_transformers.dart            # debounce + restartable
 │   ├── formatting/amount_formatter.dart        # Decimal → "125.00"; porcentajes con signo
-│   └── theme/                                  # app_colors, app_text_styles, app_spacing, app_radius, app_theme
+│   └── design_system/                          # tokens, tema y componentes Ds* (DESIGN_SYSTEM.md)
 ├── l10n/app_es.arb
 └── features/
     ├── home/presentation/
@@ -413,6 +413,7 @@ final class QuoteFailed extends QuoteStatus { Failure failure; }
 | `ExchangeSubmitted` | Botón "Cambiar" | Confirmación simulada (`droppable`: ignora toques repetidos). |
 
 - **Un solo *handler* para cotizar:** todas las cotizaciones pasan por un *handler* interno con `restartable()`. Si llega una petición nueva, la anterior se descarta y nunca se muestra una respuesta obsoleta.
+- **El *debounce* vive en ese mismo *handler*:** el evento interno trae un retardo (300 ms al escribir, 0 al cambiar de par); el *handler* espera y, si mientras tanto llegó otro evento (`emit.isDone`), termina sin consultar. Con un *transformer* de *debounce* separado habría dos *handlers* concurrentes y una respuesta vieja podría pisar a una nueva.
 - **Por qué se mantiene el *debounce*:** con las fuentes actuales la tasa sale de la caché, así que escribir no genera peticiones HTTP. Se mantiene porque, con el API de órdenes, la tasa sí depende del monto.
 
 ```mermaid
@@ -455,7 +456,7 @@ sequenceDiagram
 
 ```
 HomePage                                    # HomeCubit + Map<RateProvider, ExchangeBloc>
-└── Scaffold (fondo #E0F8FA)
+└── Scaffold (fondo: token background)
     └── Stack
         ├── ExchangeBackground              # semicírculo amarillo (CustomPainter)
         └── SafeArea → Column
@@ -494,22 +495,15 @@ Cada selector abre la lista del tipo que tiene su lado en ese momento: si TENGO 
 
 ### 8.5 Sistema de diseño
 
-| Token | Valor | Fuente |
-|---|---|---|
-| `background` | `#E0F8FA` | muestreado de `screen_1.jpg` |
-| `primary` | `#FFB200` | círculo, botón de swap, botón "Cambiar" |
-| `surface` (tarjeta) | `#FAFAFA` | `screen_1.jpg` |
-| `sheetBackground` | `#F8F8FA` | `sheet_1.jpg` |
-| `scrim` | negro al 25 % | `#E0F8FA × 0.75 ≈ #A7B9BB`, el color muestreado bajo el sheet |
-| Colores de texto | por muestrear | Fase 6 del plan |
-| Tipografía | Rubik (por confirmar) | `google_fonts` |
-| Radios | tarjeta ≈ 24, input ≈ 12, botón ≈ 16 | se ajustan contra los mocks |
+Detallado en [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). En resumen:
 
-**Elementos que no están en el diseño** (se construyen con sus tokens):
-- **`ProviderTabs`:** píldora con borde `primary`; la pestaña activa va rellena en `primary` con texto blanco y la inactiva sin relleno, con texto oscuro.
-- **`QuoteComparisonSheet`:** el mismo estilo que los selectores de moneda. La insignia "Mejor opción" va en `primary`.
+- **Tokens** en `core/design_system/tokens`: paleta primitiva de El Dorado (`AppPalette`), roles semánticos (`AppColors`, un `ThemeExtension` que se lee con `context.colors`), tipografía Rubik medida en los mocks (`AppTypography`), espaciados, radios, tamaños, sombras y movimiento.
+- **Regla de marca:** el amarillo (`#FFFF00`) va como relleno con texto y bordes en tinta (`#121211`); nunca como texto ni como borde sobre blanco.
+- **Tema:** `AppTheme.light()` traduce los tokens a `ThemeData` para los widgets de Material.
+- **Componentes `Ds*`:** botón principal, pestañas, insignia, tarjeta, bottom sheet, radio, skeleton.
+- **Elementos que no están en el diseño** (pestañas, comparación): se construyen solo con estos tokens y componentes.
 
-Los mocks miden 804×1748 px, es decir 402×874 pt a @2x (el tamaño lógico del iPhone 16 Pro). Se usa ese tamaño para comparar la UI con el diseño.
+Los mocks miden 804×1748 px, es decir 402×874 pt a @2x. La UI se compara con ellos en *goldens* de ese tamaño.
 
 ## 9. Comparación de cotizaciones
 

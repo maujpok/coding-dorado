@@ -1,7 +1,7 @@
 # Plan de implementación
 
 > Estado: propuesta · Última actualización: 2026-11-13
-> Documentos relacionados: [ARCHITECTURE.md](ARCHITECTURE.md) · [API_RESEARCH.md](API_RESEARCH.md)
+> Documentos relacionados: [ARCHITECTURE.md](ARCHITECTURE.md) · [API_RESEARCH.md](API_RESEARCH.md) · [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)
 
 ## Enfoque
 
@@ -57,16 +57,16 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 **Objetivo:** proyecto Flutter que compila, con el linter y la estructura de carpetas listos.
 
-- [ ] `flutter create . --project-name coding_dorado --org <org> --platforms android,ios,web` en el root.
-- [ ] Revisar con `git diff` que no se hayan sobrescrito `README.md` ni `.gitignore`.
-- [ ] Agregar dependencias:
+- [x] `flutter create . --project-name coding_dorado --org <org> --platforms android,ios,web` en el root.
+- [x] Revisar con `git diff` que no se hayan sobrescrito `README.md` ni `.gitignore`.
+- [x] Agregar dependencias:
   - runtime: `flutter_bloc`, `bloc_concurrency`, `dio`, `get_it`, `equatable`, `decimal`, `intl`, `google_fonts`, `flutter_localizations`
   - dev: `very_good_analysis`, `bloc_test`, `mocktail`
-- [ ] `analysis_options.yaml` con `very_good_analysis`.
-- [ ] En `pubspec.yaml`, registrar **solo** `assets/cripto_currencies/` y `assets/fiat_currencies/`. Los `.jpg` de diseño no se empaquetan.
-- [ ] Configurar l10n: `generate: true`, `l10n.yaml`, `lib/l10n/app_es.arb`.
-- [ ] Crear la estructura de carpetas (ver [Módulos](#módulos)).
-- [ ] Reemplazar el contador de ejemplo por un `App` vacío.
+- [x] `analysis_options.yaml` con `very_good_analysis`.
+- [x] En `pubspec.yaml`, registrar **solo** `assets/cripto_currencies/` y `assets/fiat_currencies/`. Los `.jpg` de diseño no se empaquetan.
+- [x] Configurar l10n: `generate: true`, `l10n.yaml`, `lib/l10n/app_es.arb`.
+- [x] Crear la estructura de carpetas (ver [Módulos](#módulos)).
+- [x] Reemplazar el contador de ejemplo por un `App` vacío.
 
 **Aceptación:** la app abre en iOS, Android y web; `flutter analyze` sin issues.
 **Commit:** `chore: scaffold flutter app`
@@ -75,7 +75,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 **Objetivo:** la infraestructura transversal que usan todas las features.
 
-- [ ] `AppConfig` lee estas claves con sus defaults:
+- [x] `AppConfig` lee estas claves con sus defaults:
 
   | Clave | Default | Uso |
   |---|---|---|
@@ -88,14 +88,13 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   | `ELDORADO_SOURCE` | `prices` | `orderbook` se suma en la Fase 10 |
   | `API_URL` | *(vacío)* | endpoint `recommendations` (Fase 10) |
 
-- [ ] `dio_factory.dart`: crea un `Dio` por proveedor (con su URL base), timeouts de 10 s y `LogInterceptor` solo en debug.
-- [ ] `TtlCache<K, V>` en `core/cache`: TTL por entrada, petición en curso compartida, los errores no se cachean e invalidación con `forceRefresh` ([ARCHITECTURE.md §6.5](ARCHITECTURE.md#65-caché-ttlcache)).
-- [ ] `Failure` (sealed) y `Result<T>` (sealed, con `map` / `fold`).
-- [ ] `AmountFormatter`: `Decimal` → `"125.00"`, con truncado para "Recibirás"; formato de porcentajes para la comparación.
-- [ ] `event_transformers.dart`: `debounceRestartable(Duration)`.
-- [ ] Tokens de tema: `AppColors`, `AppTextStyles` (Rubik), `AppSpacing`, `AppRadius` y `AppTheme`.
+- [x] `dio_factory.dart`: crea un `Dio` por proveedor (con su URL base), timeouts de 10 s y `LogInterceptor` solo en debug.
+- [x] `TtlCache<K, V>` en `core/cache`: TTL por entrada, petición en curso compartida, los errores no se cachean e invalidación con `forceRefresh` ([ARCHITECTURE.md §6.5](ARCHITECTURE.md#65-caché-ttlcache)).
+- [x] `Failure` (sealed) y `Result<T>` (sealed, con `map` / `fold`).
+- [x] `AmountFormatter`: `Decimal` → `"125.00"`, con truncado para "Recibirás"; formato de porcentajes para la comparación.
+- [x] Design system, tokens ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)): `AppPalette` con la paleta de El Dorado, `AppColors` (roles semánticos, `ThemeExtension`), `AppTypography` (Rubik, medida en los mocks), `AppSpacing`, `AppRadius`, `AppSizes`, `AppShadows`, `AppMotion` y `AppTheme`.
 
-**Pruebas:** defaults de `AppConfig`; `AmountFormatter` (redondeo, truncado, ceros, valores grandes, porcentajes con signo); `TtlCache` (vencimiento, petición compartida, error no cacheado, `forceRefresh`).
+**Pruebas:** defaults de `AppConfig`; `AmountFormatter` (redondeo, truncado, ceros, valores grandes, porcentajes con signo); `TtlCache` (vencimiento, petición compartida, error no cacheado, `forceRefresh`); contraste WCAG AA de cada par de tokens texto/fondo.
 **Commit:** `feat(core): config, networking, errors and design tokens`
 
 ## Fase 2: Dominio
@@ -238,7 +237,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 - [ ] `ExchangeBloc` recibe por constructor el `GetExchangeQuote` y el `ExchangeRepository` de su proveedor (este último para `getAvailability()`); no sabe de qué proveedor se trata.
 - [ ] `ExchangeState`, `QuoteStatus` (`Idle`, `Loading(previous)`, `Loaded`, `Failed`) y los eventos de [ARCHITECTURE.md §8.2](ARCHITECTURE.md#82-eventos-y-concurrencia).
 - [ ] Estado inicial: USDT → VES (como en el diseño), monto vacío y `QuoteIdle`. El par inicial vive en una sola constante.
-- [ ] *Debounce* de 300 ms para el monto; cambios de par inmediatos; un único *handler* `restartable` para cotizar.
+- [ ] *Debounce* de 300 ms para el monto; cambios de par inmediatos; un único *handler* `restartable` para cotizar, con el retardo dentro del propio *handler* ([ARCHITECTURE.md §8.2](ARCHITECTURE.md#82-eventos-y-concurrencia)).
   - La tasa sale de la caché, así que escribir no genera peticiones.
   - El *debounce* se mantiene porque en la Fase 10 la tasa sí depende del monto.
 - [ ] Eventos nuevos:
@@ -266,12 +265,12 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 **Objetivo:** el home con las dos pestañas, y la calculadora y los sheets como en `assets/screen_1.jpg`, `sheet_1.jpg` y `sheet_2.jpg`.
 
 - [ ] `HomePage`:
-  - Arriba, un selector de pestañas segmentado ("El Dorado" | "CriptoYa") con el lenguaje del diseño: píldora con borde amarillo y la pestaña activa rellena en `#FFB200`.
+  - Arriba, un selector de pestañas segmentado ("El Dorado" | "CriptoYa") del design system (`DsPillTabs`): píldora en tinta y la pestaña activa rellena en amarillo.
   - `IndexedStack` para mantener el estado de cada pestaña.
   - Provee los dos `ExchangeBloc` y el `HomeCubit`.
 - [ ] `ExchangeView`: la calculadora, idéntica en ambas pestañas.
 - [ ] Debajo de la tarjeta, un texto de fuente: "Fuente: El Dorado · tasa indicativa" o "Fuente: CriptoYa · mediana de N exchanges P2P".
-- [ ] Muestrear los colores de texto pendientes y validar Rubik contra los mocks.
+- [ ] Componentes del design system (`DsPrimaryButton`, `DsPillTabs`, `DsBadge`, `DsCard`, `DsBottomSheet`, `DsRadio`, `DsSkeleton`), documentados en [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
 - [ ] `ExchangeBackground`: el semicírculo amarillo, proporcional a la pantalla, compartido por ambas pestañas.
 - [ ] `ExchangeCard` con la sombra, el radio y el padding del mock.
 - [ ] `CurrencyPairSelector`: la píldora con borde amarillo, las etiquetas TENGO / QUIERO cortando el borde y `SwapButton` superpuesto.
@@ -290,7 +289,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 - "Cambiar" está deshabilitado sin cotización.
 - En CriptoYa no aparece la fila de tiempo.
 
-**Validación visual:** con `USE_MOCK=true`, en la pestaña El Dorado (USDT→VES = 25.00), capturas en el simulador de iPhone 16 Pro (402×874 pt), comparadas lado a lado con los mocks. El selector de pestañas es lo único que el diseño no incluye.
+**Validación visual:** *goldens* a 402×874 pt @2x con las fuentes reales y datos del mock (USDT→VES = 25.00), comparados lado a lado con los mocks. Coinciden la estructura, las medidas y la tipografía; la paleta es la de El Dorado ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md#cambios-respecto-al-mock)).
 **Commit:** `feat(home): tabs per rate provider and exchange calculator ui`
 
 ## Fase 7: Comparación de cotizaciones
@@ -398,6 +397,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 - Ningún `double` para dinero; ningún texto de UI fuera de los ARB.
 - El dominio no importa Flutter ni `dio`; `quote_comparison` solo depende del dominio de `exchange`.
 - La calculadora y los sheets se compararon con los mocks en 402×874 pt.
+- Ningún widget usa colores, tamaños de fuente ni radios sueltos: todo sale de los tokens del design system.
 - Ambas pestañas funcionan contra las APIs reales y con `USE_MOCK=true` en todos los escenarios de cada proveedor.
 - La comparación muestra resultados parciales cuando un proveedor falla.
 - Los pares no disponibles, la falta de ofertas y los montos bajo el mínimo tienen un estado claro, nunca un error genérico.
@@ -412,7 +412,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 | La mediana de CriptoYa es ruidosa (libros invertidos, exchanges en 0) | Media | Se descartan los 0, se usa la mediana y no el mejor precio, y se muestra cuántos exchanges entraron |
 | La comparación mezcla dos cosas distintas (el libro de El Dorado contra la mediana del mercado) | Cierta | Nota al pie en el sheet; ambas se muestran como indicativas |
 | El Dorado no cubre USDC ni la compra de USDT con VES | Cierta | Estado "no disponible", monedas deshabilitadas en sus sheets y acceso directo a la pestaña CriptoYa |
-| El selector de pestañas no está en el diseño | Cierta | Se construye con los mismos tokens (píldora con borde amarillo) y fuera de la tarjeta |
+| El selector de pestañas no está en el diseño | Cierta | Se construye con el design system y fuera de la tarjeta |
 | El API de órdenes no vuelve | Alta | No bloquea la entrega: la Fase 10 es opcional |
 
 ## Comandos útiles

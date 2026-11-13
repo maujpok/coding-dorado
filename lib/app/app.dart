@@ -1,3 +1,4 @@
+import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.light(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: const Scaffold(body: SizedBox.shrink()),

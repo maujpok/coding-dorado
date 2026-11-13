@@ -187,20 +187,23 @@ class _Subject extends StatelessWidget {
     final style = AppTypography.bodyStrong.copyWith(
       color: colors.textSecondary,
     );
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(from, style: style),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-          child: Icon(
-            Icons.arrow_forward_rounded,
-            size: 16,
-            color: colors.textSecondary,
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(from, style: style),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            child: Icon(
+              Icons.arrow_forward_rounded,
+              size: 16,
+              color: colors.textSecondary,
+            ),
           ),
-        ),
-        Text(to, style: style),
-      ],
+          Text(to, style: style),
+        ],
+      ),
     );
   }
 }

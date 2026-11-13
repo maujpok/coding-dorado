@@ -339,19 +339,19 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 ## Fase 8: UX y accesibilidad
 
-- [ ] Skeleton en los valores mientras carga, sin saltos de layout; se conserva el valor anterior atenuado. Lo mismo en las tarjetas de la comparación.
-- [ ] **Monto mínimo (El Dorado):** debajo del campo, "Mínimo 5 USDT" (o su equivalente en fiat) cuando el monto no llega; "Cambiar" queda deshabilitado.
-- [ ] **Par no disponible (El Dorado):**
+- [x] Skeleton en los valores mientras carga, sin saltos de layout; se conserva el valor anterior atenuado. Lo mismo en las tarjetas de la comparación.
+- [x] **Monto mínimo (El Dorado):** debajo del campo, "Mínimo 5 USDT" (o su equivalente en fiat) cuando el monto no llega; "Cambiar" queda deshabilitado.
+- [x] **Par no disponible (El Dorado):**
   - Un mensaje claro ("Este par no está disponible en El Dorado") con dos accesos: elegir otra moneda, o "Ver en CriptoYa" (cambia de pestaña con el mismo par y monto).
   - En los sheets de la pestaña El Dorado, las monedas sin cotización para la dirección actual aparecen deshabilitadas con la etiqueta "No disponible". Se calcula con `getAvailability()`.
-- [ ] **Sin ofertas (CriptoYa):** mensaje y sugerencia de probar otro par.
-- [ ] Error dentro de la tarjeta con "Reintentar" y un mensaje distinto por tipo de `Failure`.
-- [ ] Refrescar los precios al volver la app al primer plano si la caché venció.
-- [ ] Transición suave al cambiar de pestaña; animación de giro en `SwapButton` y vibración ligera.
-- [ ] Tocar fuera del campo cierra el teclado.
-- [ ] Layout responsive: ancho máximo de la tarjeta y del sheet de comparación en tablet y web.
-- [ ] `Semantics` en las pestañas, los selectores, el swap, los valores y la insignia "Mejor opción"; sin *overflow* con `textScaler` hasta 1.3.
-- [ ] Banner "MOCK" en debug cuando `USE_MOCK=true`.
+- [x] **Sin ofertas (CriptoYa):** mensaje y sugerencia de probar otro par.
+- [x] Error dentro de la tarjeta con "Reintentar" y un mensaje distinto por tipo de `Failure`.
+- [x] Refrescar los precios al volver la app al primer plano si la caché venció.
+- [x] Transición suave al cambiar de pestaña; animación de giro en `SwapButton` y vibración ligera.
+- [x] Tocar fuera del campo cierra el teclado.
+- [x] Layout responsive: ancho máximo de la tarjeta y del sheet de comparación en tablet y web.
+- [x] `Semantics` en las pestañas, los selectores, el swap, los valores y la insignia "Mejor opción"; sin *overflow* con `textScaler` hasta 1.3.
+- [x] Banner "MOCK" en debug cuando `USE_MOCK=true`.
 
 **Commit:** `feat: limits, availability, loading and error states`
 

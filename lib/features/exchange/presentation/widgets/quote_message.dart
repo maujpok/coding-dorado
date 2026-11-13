@@ -9,20 +9,32 @@ class QuoteMessageAction {
   final VoidCallback onPressed;
 }
 
+enum QuoteMessageTone {
+  /// Algo falló (red, servidor, respuesta inválida).
+  error,
+
+  /// No es un error: la fuente no cotiza el par o no tiene ofertas.
+  info,
+}
+
 /// Mensaje de error o de aviso dentro de la tarjeta, con acciones opcionales.
 class QuoteMessage extends StatelessWidget {
   const QuoteMessage({
     required this.message,
     this.actions = const [],
+    this.tone = QuoteMessageTone.error,
     super.key,
   });
 
   final String message;
   final List<QuoteMessageAction> actions;
+  final QuoteMessageTone tone;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final isError = tone == QuoteMessageTone.error;
+    final foreground = isError ? colors.error : colors.textPrimary;
     return Semantics(
       liveRegion: true,
       container: true,
@@ -30,7 +42,7 @@ class QuoteMessage extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: colors.errorContainer,
+          color: isError ? colors.errorContainer : colors.surfaceMuted,
           borderRadius: BorderRadius.circular(AppRadius.control),
         ),
         child: Column(
@@ -39,13 +51,19 @@ class QuoteMessage extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline_rounded, size: 18, color: colors.error),
+                Icon(
+                  isError
+                      ? Icons.error_outline_rounded
+                      : Icons.info_outline_rounded,
+                  size: 18,
+                  color: foreground,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     message,
                     style: AppTypography.caption.copyWith(
-                      color: colors.error,
+                      color: foreground,
                       fontSize: 12,
                     ),
                   ),

@@ -40,8 +40,24 @@ class _HomePageState extends State<HomePage> {
         ..add(const ExchangeStarted()),
   };
 
+  late final AppLifecycleListener _lifecycle;
+
+  @override
+  void initState() {
+    super.initState();
+    // Al volver a la app, cada pestaña recotiza si su caché venció.
+    _lifecycle = AppLifecycleListener(
+      onResume: () {
+        for (final bloc in _blocs.values) {
+          bloc.add(const ExchangeAppResumed());
+        }
+      },
+    );
+  }
+
   @override
   void dispose() {
+    _lifecycle.dispose();
     for (final bloc in _blocs.values) {
       bloc.close().ignore();
     }
@@ -76,50 +92,85 @@ class _HomePageState extends State<HomePage> {
       child: BlocBuilder<HomeCubit, RateProvider>(
         builder: (context, active) {
           return Scaffold(
-            body: DsBackground(
-              child: SafeArea(
-                child: LayoutBuilder(
-                  builder: (context, constraints) => Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          AppLayout.horizontalMargin(constraints.maxWidth),
-                          AppSpacing.md,
-                          AppLayout.horizontalMargin(constraints.maxWidth),
-                          0,
-                        ),
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(
-                            maxWidth: AppSizes.contentMaxWidth,
+            body: GestureDetector(
+              // Tocar fuera del campo cierra el teclado.
+              behavior: HitTestBehavior.translucent,
+              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+              child: DsBackground(
+                child: SafeArea(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) => Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            AppLayout.horizontalMargin(constraints.maxWidth),
+                            AppSpacing.md,
+                            AppLayout.horizontalMargin(constraints.maxWidth),
+                            0,
                           ),
-                          child: ProviderTabs(
-                            selected: active,
-                            onChanged: _homeCubit.select,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: AppSizes.contentMaxWidth,
+                            ),
+                            child: ProviderTabs(
+                              selected: active,
+                              onChanged: _homeCubit.select,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: IndexedStack(
-                          index: RateProvider.values.indexOf(active),
-                          children: [
-                            for (final provider in RateProvider.values)
-                              BlocProvider.value(
-                                value: _blocs[provider]!,
-                                child: ExchangeView(
-                                  provider: provider,
-                                  onCompare: _openComparison,
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              for (final provider in RateProvider.values)
+                                _TabContent(
+                                  active: provider == active,
+                                  child: BlocProvider.value(
+                                    value: _blocs[provider]!,
+                                    child: ExchangeView(
+                                      provider: provider,
+                                      onCompare: _openComparison,
+                                      onOpenInProvider: _openInProvider,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Pestaña que conserva su estado aunque no esté visible y aparece con un
+/// fundido. Las inactivas no reciben toques, no animan y no se leen.
+class _TabContent extends StatelessWidget {
+  const _TabContent({required this.active, required this.child});
+
+  final bool active;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: AnimatedOpacity(
+        opacity: active ? 1 : 0,
+        duration: AppMotion.normal,
+        curve: AppMotion.curve,
+        child: IgnorePointer(
+          ignoring: !active,
+          child: ExcludeSemantics(
+            excluding: !active,
+            child: TickerMode(enabled: active, child: child),
+          ),
+        ),
       ),
     );
   }

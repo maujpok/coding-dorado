@@ -142,23 +142,30 @@ class QuoteRow extends StatelessWidget {
       excludeSemantics: true,
       child: SizedBox(
         height: AppSizes.quoteRowHeight,
-        child: Row(
-          children: [
-            Text(
-              label,
-              maxLines: 1,
-              style: AppTypography.body.copyWith(color: colors.textSecondary),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            // El valor ocupa el resto, alineado a la derecha; si no entra
-            // (textos grandes), se achica en lugar de desbordar.
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerRight,
+        child: LayoutBuilder(
+          builder: (context, constraints) => Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.body.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              // El valor queda pegado a la derecha y, con textos grandes, se
+              // achica en lugar de desbordar.
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: constraints.maxWidth * 0.6,
+                ),
                 child: FittedBox(fit: BoxFit.scaleDown, child: trailing),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

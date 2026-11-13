@@ -67,24 +67,55 @@ class ExchangeCard extends StatelessWidget {
             onChanged: onAmountChanged,
             hasError: failure is BelowMinimumFailure,
           ),
+          // El mínimo se muestra junto al campo, que es lo que hay que
+          // corregir; los demás errores van debajo del resumen.
+          AnimatedSize(
+            duration: AppMotion.normal,
+            curve: AppMotion.curve,
+            child: failure is BelowMinimumFailure
+                ? Padding(
+                    padding: const EdgeInsets.only(
+                      top: AppSpacing.xs,
+                      left: AppSpacing.xs,
+                    ),
+                    child: Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        l10n.failureMessage(
+                          failure,
+                          provider: provider,
+                          from: state.pair.from,
+                        ),
+                        style: AppTypography.caption.copyWith(
+                          color: context.colors.error,
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox(width: double.infinity),
+          ),
           const SizedBox(height: AppSpacing.xl),
           QuoteSummary(pair: state.pair, status: status),
           AnimatedSize(
             duration: AppMotion.normal,
             curve: AppMotion.curve,
-            child: failure == null
+            child: failure == null || failure is BelowMinimumFailure
                 ? const SizedBox(width: double.infinity)
                 : Padding(
                     padding: const EdgeInsets.only(top: AppSpacing.md),
                     child: QuoteMessage(
+                      tone:
+                          failure is PairUnavailableFailure ||
+                              failure is NoOffersFailure
+                          ? QuoteMessageTone.info
+                          : QuoteMessageTone.error,
                       message: l10n.failureMessage(
                         failure,
                         provider: provider,
                         from: state.pair.from,
                       ),
                       actions: [
-                        if (failure is! BelowMinimumFailure &&
-                            failure is! PairUnavailableFailure)
+                        if (failure is! PairUnavailableFailure)
                           QuoteMessageAction(
                             label: l10n.retryAction,
                             onPressed: onRetry,

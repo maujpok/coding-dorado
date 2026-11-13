@@ -1,6 +1,6 @@
 # Plan de implementación
 
-> Estado: fases 0–9 implementadas; Fase 10 pendiente · Última actualización: 2026-11-13
+> Estado: fases 0–10 implementadas; la Fase 10 falta verificarla contra el API real (sin URL vigente) · Última actualización: 2026-11-13
 > Documentos relacionados: [ARCHITECTURE.md](ARCHITECTURE.md) · [API_RESEARCH.md](API_RESEARCH.md) · [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)
 
 ## Enfoque
@@ -374,17 +374,17 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 **Qué suma:** la pestaña El Dorado pasa de un precio indicativo a una oferta concreta, con una tasa que depende del monto, el tiempo estimado real (`offerMakerStats.marketMakerOrderTime`) y límites máximos. Se activa con `ELDORADO_SOURCE=orderbook`; la pestaña y la comparación no cambian.
 
-- [ ] `RecommendationResponse` según la forma documentada ([API_RESEARCH.md §2](API_RESEARCH.md#2-forma-del-response-de-recommendations)):
+- [x] `RecommendationResponse` según la forma documentada ([API_RESEARCH.md §2](API_RESEARCH.md#2-forma-del-response-de-recommendations)):
   - HTTP siempre 200.
   - `data: {}` → `NoOffersException`.
   - `error` en el body → `ApiErrorException`.
   - La tasa (`fiatToCryptoExchangeRate`) llega como string.
-- [ ] `OrderbookRateDataSource`: arma `type`, `cryptoCurrencyId`, `fiatCurrencyId`, `amount` y `amountCurrencyId` a partir del `ExchangePair`.
-- [ ] `MockOrderbookInterceptor` con esa misma forma.
-- [ ] `injection.dart`: con `ELDORADO_SOURCE=orderbook`, el repositorio de `RateProvider.eldorado` usa `OrderbookRateDataSource` contra `API_URL`.
-- [ ] Verificar con `curl` ambas direcciones con COP, ARS, PEN, BRL y BOB. Para VES y USDC, esperar `data: {}` (están deshabilitadas en El Dorado).
-- [ ] Guardar las respuestas reales en `test/fixtures/eldorado/recommendation_*.json` y escribir pruebas de contrato.
-- [ ] Decidir con el equipo cuál de las dos fuentes de El Dorado queda por defecto.
+- [x] `OrderbookRateDataSource`: arma `type`, `cryptoCurrencyId`, `fiatCurrencyId`, `amount` y `amountCurrencyId` a partir del `ExchangePair`.
+- [x] `MockOrderbookInterceptor` con esa misma forma.
+- [x] `injection.dart`: con `ELDORADO_SOURCE=orderbook`, el repositorio de `RateProvider.eldorado` usa `OrderbookRateDataSource` contra `API_URL`.
+- [ ] Verificar con `curl` ambas direcciones con COP, ARS, PEN, BRL y BOB. Para VES y USDC, esperar `data: {}` (están deshabilitadas en El Dorado). *Pendiente: el 2026-11-13 la ruta sigue respondiendo 404.*
+- [ ] Guardar las respuestas reales en `test/fixtures/eldorado/recommendation_*.json` y escribir pruebas de contrato. *Parcial: hay fixtures y pruebas con la forma documentada (`recommendation_documented.json`, `_no_offers`, `_invalid_request`); falta reemplazarlos por respuestas reales.*
+- [ ] Decidir con el equipo cuál de las dos fuentes de El Dorado queda por defecto. *Pendiente: hoy el default es `prices`.*
 
 **Aceptación:** todas las pruebas pasan, incluidas las de contrato; verificación manual de las 2 direcciones con al menos 3 fiats.
 **Commit:** `feat(exchange): el dorado orderbook recommendations source`
@@ -417,6 +417,7 @@ Desvíos respecto del plan, todos con el mismo objetivo que la tarea original:
 | `pubspec.lock` | — | Versionado (se quitó del `.gitignore` del template) | Recomendado para aplicaciones: builds reproducibles. |
 | `--org` | `<org>` | `dev.maudev` | Valor por defecto; se cambia con `flutter create --org` o en los proyectos nativos. |
 | Pruebas de widgets | — | El árbol crea y cierra los blocs | En `testWidgets` el tiempo es simulado y `await bloc.close()` no avanza. |
+| Fase 10 | Verificar con la URL real y guardar respuestas reales | Código, mock y pruebas contra la forma documentada; sin URL ni mock vuelve a `/api/prices` | La ruta sigue respondiendo 404; falta una URL vigente del equipo. |
 
 ## Riesgos y mitigaciones
 

@@ -347,7 +347,7 @@ Si el equipo entrega una URL vigente de `recommendations`, `ELDORADO_SOURCE=orde
 - `data: {}` se traduce en `NoOffersException` y `error` en el body en `ApiErrorException`.
 - La forma de la respuesta y los IDs de moneda (`TATUM-TRON-USDT`, `TATUM-MATIC-USDC`) están en [API_RESEARCH.md §2–3](API_RESEARCH.md#2-forma-del-response-de-recommendations). Los IDs viven en `data/eldorado/eldorado_currency_ids.dart`.
 
-La pestaña, el bloc y la comparación no cambian.
+La pestaña, el bloc y la comparación no cambian. Con `USE_MOCK=true` no hace falta `API_URL`, porque responde `MockOrderbookInterceptor`. Sin URL y sin mock, la app vuelve a `/api/prices` y lo avisa en el log.
 
 ## 7. Configuración por entorno
 

@@ -1,0 +1,12 @@
+{
+  "error": {
+    "message": "INVALID_REQUEST: {\"reason\":\"type\",\"message\":\"Invalid request format\"}",
+    "code": "INVALID_REQUEST"
+  },
+  "errors": [
+    {
+      "message": "INVALID_REQUEST: {\"reason\":\"type\",\"message\":\"Invalid request format\"}",
+      "code": "INVALID_REQUEST"
+    }
+  ]
+}

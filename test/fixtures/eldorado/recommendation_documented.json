@@ -1,0 +1,32 @@
+{
+  "data": {
+    "byPrice": {
+      "offerId": "00000000-0000-0000-0000-000000000001",
+      "offerType": 0,
+      "cryptoCurrencyId": "TATUM-TRON-USDT",
+      "chain": "TRON",
+      "fiatCurrencyId": "COP",
+      "fiatToCryptoExchangeRate": "3607.999",
+      "limits": {
+        "crypto": {"minLimit": "1.51", "maxLimit": "495.05"},
+        "fiat": {"minLimit": "7215.998", "maxLimit": "1803999.5"}
+      },
+      "offerMakerStats": {
+        "releaseTime": 1.03,
+        "payTime": 2.65,
+        "responseTime": 2.06,
+        "marketMakerOrderTime": 4.49
+      },
+      "paymentMethods": ["app_nequi_co", "bank_bancolombia"],
+      "user_status": "ONLINE"
+    },
+    "byReputation": {
+      "offerId": "00000000-0000-0000-0000-000000000002",
+      "offerType": 0,
+      "cryptoCurrencyId": "TATUM-TRON-USDT",
+      "fiatCurrencyId": "COP",
+      "fiatToCryptoExchangeRate": "3590",
+      "offerMakerStats": {"marketMakerOrderTime": 3.1}
+    }
+  }
+}

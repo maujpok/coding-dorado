@@ -46,10 +46,13 @@ flutter run --dart-define=USE_MOCK=true        # sin red, con datos del mock
 | `MOCK_SCENARIO_CRIPTOYA` | `success` | `no_offers`, `rate_limited`, `server_error`, `timeout`, `malformed` |
 | `MOCK_LATENCY_MS` | `600` | Latencia simulada |
 | `ELDORADO_API_URL` / `CRIPTOYA_API_URL` | APIs públicas | URL base de cada proveedor |
+| `ELDORADO_SOURCE` | `prices` | `orderbook`: la pestaña El Dorado usa el API de órdenes del enunciado |
+| `API_URL` | *(vacío)* | URL del endpoint `recommendations` (con `USE_MOCK=true` no hace falta) |
 
 ```bash
 flutter run --dart-define=USE_MOCK=true --dart-define=MOCK_SCENARIO_CRIPTOYA=rate_limited
 flutter run --dart-define=USE_MOCK=true --dart-define=MOCK_LATENCY_MS=2000
+flutter run --dart-define=USE_MOCK=true --dart-define=ELDORADO_SOURCE=orderbook   # API de órdenes (mock)
 ```
 
 ### Pruebas
@@ -81,7 +84,7 @@ lib/
 ├── app/                 # App, composition root (get_it)
 ├── core/                # config, red, caché, errores, formateo, design system
 ├── features/
-│   ├── exchange/        # calculadora: domain / data (eldorado, criptoya) / presentation
+│   ├── exchange/        # calculadora: domain / data (eldorado, criptoya, orderbook) / presentation
 │   ├── home/            # pestañas por proveedor
 │   └── quote_comparison/
 └── l10n/                # ARB y textos derivados del dominio
@@ -90,7 +93,7 @@ lib/
 ## Decisiones y limitaciones
 
 - **El endpoint del enunciado ya no existe.** `…/stage/orderbook/public/recommendations` responde `404` (la ruta fue eliminada; el host sigue activo). Por eso la pestaña El Dorado usa el **API público oficial de El Dorado**.
-  - Integrar el endpoint original es la Fase 10 del plan, pendiente de una URL vigente.
+  - El código para el endpoint original está implementado y probado contra su forma documentada y su mock: `--dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>`. Falta verificarlo con una URL vigente.
   - La investigación completa está en [API_RESEARCH.md](API_RESEARCH.md).
 - **Cobertura de El Dorado:** solo cotiza USDT; VES solo se puede vender. Esos pares se muestran como no disponibles, sin inventar tasas.
 - **Precios indicativos:** El Dorado lo aclara en su documentación. CriptoYa es una mediana de mercado; la comparación lo explica en una nota.

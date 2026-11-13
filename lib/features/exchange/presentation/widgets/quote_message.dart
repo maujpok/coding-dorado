@@ -55,17 +55,14 @@ class QuoteMessage extends StatelessWidget {
                   isError
                       ? Icons.error_outline_rounded
                       : Icons.info_outline_rounded,
-                  size: 18,
+                  size: AppSizes.iconMedium,
                   color: foreground,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     message,
-                    style: AppTypography.caption.copyWith(
-                      color: foreground,
-                      fontSize: 12,
-                    ),
+                    style: AppTypography.message.copyWith(color: foreground),
                   ),
                 ),
               ],

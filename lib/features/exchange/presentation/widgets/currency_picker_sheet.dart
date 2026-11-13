@@ -1,9 +1,9 @@
 import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/features/exchange/domain/catalog/currency_catalog.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/currency.dart';
-import 'package:coding_dorado/features/exchange/presentation/l10n/exchange_l10n.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/currency_avatar.dart';
 import 'package:coding_dorado/l10n/gen/app_localizations.dart';
+import 'package:coding_dorado/l10n/l10n_extensions.dart';
 import 'package:flutter/material.dart';
 
 /// Abre el selector de monedas de un tipo y devuelve la elegida.

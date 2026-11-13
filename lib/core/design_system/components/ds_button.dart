@@ -52,7 +52,7 @@ class DsPrimaryButton extends StatelessWidget {
             child: Center(
               child: isLoading
                   ? SizedBox.square(
-                      dimension: 18,
+                      dimension: AppSizes.iconMedium,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: colors.onPrimary,
@@ -106,7 +106,7 @@ class DsLink extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (icon != null) ...[
-                Icon(icon, size: 16, color: color),
+                Icon(icon, size: AppSizes.iconSmall, color: color),
                 const SizedBox(width: AppSpacing.xs),
               ],
               Flexible(

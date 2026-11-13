@@ -5,12 +5,12 @@ import 'package:coding_dorado/features/exchange/domain/catalog/currency_catalog.
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
 import 'package:coding_dorado/features/exchange/presentation/bloc/exchange_bloc.dart';
-import 'package:coding_dorado/features/exchange/presentation/l10n/exchange_l10n.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/currency_picker_sheet.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/exchange_card.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/quote_message.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/source_caption.dart';
 import 'package:coding_dorado/l10n/gen/app_localizations.dart';
+import 'package:coding_dorado/l10n/l10n_extensions.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

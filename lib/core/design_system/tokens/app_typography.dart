@@ -52,6 +52,13 @@ abstract final class AppTypography {
     letterSpacing: 0.2,
   );
 
+  /// Mensajes de error o aviso dentro de la tarjeta.
+  static const message = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    height: 1.35,
+  );
+
   /// Unidades, subtítulos, notas.
   static const caption = TextStyle(
     fontFamily: fontFamily,

@@ -4,12 +4,12 @@ import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/core/formatting/amount_formatter.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
-import 'package:coding_dorado/features/exchange/presentation/l10n/exchange_l10n.dart';
 import 'package:coding_dorado/features/quote_comparison/domain/entities/quote_comparison.dart';
 import 'package:coding_dorado/features/quote_comparison/domain/usecases/compare_quotes.dart';
 import 'package:coding_dorado/features/quote_comparison/presentation/cubit/quote_comparison_cubit.dart';
 import 'package:coding_dorado/features/quote_comparison/presentation/widgets/provider_quote_card.dart';
 import 'package:coding_dorado/l10n/gen/app_localizations.dart';
+import 'package:coding_dorado/l10n/l10n_extensions.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -197,7 +197,7 @@ class _Subject extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
             child: Icon(
               Icons.arrow_forward_rounded,
-              size: 16,
+              size: AppSizes.iconSmall,
               color: colors.textSecondary,
             ),
           ),

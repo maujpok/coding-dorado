@@ -100,7 +100,9 @@ lib/
 │   ├── error/result.dart                       # sealed Result<T>
 │   ├── formatting/amount_formatter.dart        # Decimal → "125.00"; porcentajes con signo
 │   └── design_system/                          # tokens, tema y componentes Ds* (DESIGN_SYSTEM.md)
-├── l10n/app_es.arb
+├── l10n/
+│   ├── app_es.arb
+│   └── l10n_extensions.dart                    # textos derivados del dominio (proveedores, errores)
 └── features/
     ├── home/presentation/
     │   ├── cubit/home_cubit.dart               # pestaña activa (RateProvider)

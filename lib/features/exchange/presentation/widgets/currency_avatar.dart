@@ -55,6 +55,7 @@ class _Initials extends StatelessWidget {
           code.length > 2 ? code.substring(0, 2) : code,
           style: AppTypography.label.copyWith(
             color: colors.onPrimary,
+            // Proporcional al ícono (que sale de AppSizes).
             fontSize: size * 0.42,
             height: 1,
             letterSpacing: 0,

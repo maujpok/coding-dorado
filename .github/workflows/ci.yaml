@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.9
+          channel: stable
+          cache: true
+
+      - name: Dependencias
+        run: flutter pub get
+
+      - name: Formato
+        run: dart format --output=none --set-exit-if-changed lib/app lib/core lib/features lib/main.dart lib/bootstrap.dart test
+
+      - name: Análisis
+        run: flutter analyze
+
+      # Las pruebas `live` (red) y los goldens (dependen del sistema
+      # operativo) se omiten por defecto.
+      - name: Pruebas
+        run: flutter test

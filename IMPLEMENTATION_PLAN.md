@@ -1,6 +1,6 @@
 # Plan de implementación
 
-> Estado: propuesta · Última actualización: 2026-11-13
+> Estado: fases 0–9 implementadas; Fase 10 pendiente · Última actualización: 2026-11-13
 > Documentos relacionados: [ARCHITECTURE.md](ARCHITECTURE.md) · [API_RESEARCH.md](API_RESEARCH.md) · [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)
 
 ## Enfoque
@@ -357,14 +357,14 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 ## Fase 9: Cierre
 
-- [ ] Actualizar `README.md`:
+- [x] Actualizar `README.md`:
   - Cómo ejecutar, las pestañas y sus fuentes, y la comparación.
   - El modo mock y sus escenarios por proveedor.
   - Un resumen de la arquitectura y las decisiones tomadas.
   - Las limitaciones: precios indicativos; El Dorado sin USDC ni VES al comprar; CriptoYa sin mínimos ni tiempo estimado.
   - Capturas.
-- [ ] Opcional: GitHub Actions con `flutter analyze` y `flutter test` (sin las pruebas `live`).
-- [ ] Revisión final contra la *Definition of Done*.
+- [x] Opcional: GitHub Actions con `flutter analyze` y `flutter test` (sin las pruebas `live`).
+- [x] Revisión final contra la *Definition of Done*.
 
 **Commit:** `docs: usage, architecture summary and screenshots`
 
@@ -401,6 +401,22 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 - Ambas pestañas funcionan contra las APIs reales y con `USE_MOCK=true` en todos los escenarios de cada proveedor.
 - La comparación muestra resultados parciales cuando un proveedor falla.
 - Los pares no disponibles, la falta de ofertas y los montos bajo el mínimo tienen un estado claro, nunca un error genérico.
+
+## Notas de implementación
+
+Desvíos respecto del plan, todos con el mismo objetivo que la tarea original:
+
+| Tema | Plan | Implementado | Motivo |
+|---|---|---|---|
+| *Debounce* | `event_transformers.dart` con `debounceRestartable` | Retardo dentro del único *handler* `restartable` | Con dos *handlers* (uno con *debounce*, otro sin) una respuesta vieja podía pisar a una nueva ([ARCHITECTURE.md §8.2](ARCHITECTURE.md#82-eventos-y-concurrencia)). |
+| Catálogo de monedas | `data/catalog` | `domain/catalog`; los IDs de El Dorado en `data/eldorado` | La presentación lo necesita y no debe importar `data`. |
+| Textos derivados del dominio | En la presentación de `exchange` | `lib/l10n/l10n_extensions.dart` | `quote_comparison` los usa y solo puede depender del dominio de `exchange`. |
+| Tipografía | `google_fonts` | Rubik empaquetada en `assets/fonts` (OFL) | Sin red en tiempo de ejecución ni en las pruebas; *goldens* deterministas. |
+| Paleta | Colores del mock | Paleta de El Dorado ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)) | Pedido durante la implementación; la estructura y las medidas siguen al mock. |
+| Validación visual | Simulador de iPhone 16 Pro | *Goldens* a 402×874 pt @2x con fuentes reales | No hay un simulador de ese tamaño en el entorno; los *goldens* son reproducibles. |
+| `pubspec.lock` | — | Versionado (se quitó del `.gitignore` del template) | Recomendado para aplicaciones: builds reproducibles. |
+| `--org` | `<org>` | `dev.maudev` | Valor por defecto; se cambia con `flutter create --org` o en los proyectos nativos. |
+| Pruebas de widgets | — | El árbol crea y cierra los blocs | En `testWidgets` el tiempo es simulado y `await bloc.close()` no avanza. |
 
 ## Riesgos y mitigaciones
 

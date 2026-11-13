@@ -4,8 +4,10 @@ import 'package:coding_dorado/features/exchange/domain/entities/currency.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
 import 'package:coding_dorado/l10n/gen/app_localizations.dart';
 
-/// Textos que dependen de entidades del dominio.
-extension ExchangeL10n on AppLocalizations {
+/// Textos que dependen de entidades del dominio (proveedores, monedas,
+/// errores). Viven a nivel de app para que las features los compartan sin
+/// depender de la presentación de otra feature.
+extension DomainL10n on AppLocalizations {
   String providerName(RateProvider provider) => switch (provider) {
     RateProvider.eldorado => providerEldorado,
     RateProvider.criptoya => providerCriptoya,

@@ -164,7 +164,7 @@ class CurrencySelectorButton extends StatelessWidget {
               const SizedBox(width: AppSpacing.xs),
               Icon(
                 Icons.keyboard_arrow_down_rounded,
-                size: 18,
+                size: AppSizes.iconMedium,
                 color: colors.textPrimary,
               ),
             ],
@@ -226,7 +226,7 @@ class _SwapButtonState extends State<SwapButton> {
               curve: AppMotion.curve,
               child: Icon(
                 Icons.swap_horiz_rounded,
-                size: 22,
+                size: AppSizes.iconLarge,
                 color: colors.onPrimary,
               ),
             ),

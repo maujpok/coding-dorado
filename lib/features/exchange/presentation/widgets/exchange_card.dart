@@ -2,12 +2,12 @@ import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/core/error/failure.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
 import 'package:coding_dorado/features/exchange/presentation/bloc/exchange_bloc.dart';
-import 'package:coding_dorado/features/exchange/presentation/l10n/exchange_l10n.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/amount_field.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/currency_pair_selector.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/quote_message.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/quote_summary.dart';
 import 'package:coding_dorado/l10n/gen/app_localizations.dart';
+import 'package:coding_dorado/l10n/l10n_extensions.dart';
 import 'package:flutter/material.dart';
 
 /// La tarjeta del diseño: selector de par, monto, resumen y "Cambiar".

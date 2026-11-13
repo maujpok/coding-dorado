@@ -5,8 +5,8 @@ import 'package:coding_dorado/core/formatting/amount_formatter.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_quote.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
-import 'package:coding_dorado/features/exchange/presentation/l10n/exchange_l10n.dart';
 import 'package:coding_dorado/l10n/gen/app_localizations.dart';
+import 'package:coding_dorado/l10n/l10n_extensions.dart';
 import 'package:flutter/material.dart';
 
 /// Resultado de un proveedor dentro de la comparación.

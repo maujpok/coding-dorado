@@ -30,6 +30,9 @@ abstract final class AppSizes {
   static const double buttonHeight = 41;
   static const double swapButton = 41;
   static const double tabsHeight = 40;
+  static const double iconSmall = 16;
+  static const double iconMedium = 18;
+  static const double iconLarge = 22;
   static const double currencyIconSmall = 20;
   static const double currencyIconLarge = 24;
   static const double radio = 22;

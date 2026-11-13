@@ -297,22 +297,22 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 **Objetivo:** ver lado a lado lo que se recibe con cada proveedor para el mismo par y monto, y saltar al más conveniente.
 
 **Dominio (`quote_comparison/domain`)**
-- [ ] Entidad `QuoteComparison`:
+- [x] Entidad `QuoteComparison`:
   - `pair` y `amount`.
   - `results: Map<RateProvider, Result<ExchangeQuote>>`.
   - `best: RateProvider?`: el que entrega más de la moneda QUIERO.
   - `difference: Decimal?`: lo que se recibe de más con `best`.
   - `differencePercent: Decimal?`.
-- [ ] Caso de uso `CompareQuotes(pair, amount)`:
+- [x] Caso de uso `CompareQuotes(pair, amount)`:
   - Ejecuta el `GetExchangeQuote` de cada proveedor en paralelo (`Future.wait`), así que un proveedor que falla no bloquea al otro.
   - `best` solo existe si hay al menos un resultado exitoso. `difference` y `differencePercent` solo existen si ambos lo son. Si hay empate, no hay `best`.
   - Las diferencias se calculan con la precisión completa y se truncan solo al mostrarlas.
   - Usa las mismas cachés que las pestañas, así que los números de la comparación coinciden con los de cada calculadora.
 
 **Estado y UI (`quote_comparison/presentation`)**
-- [ ] `QuoteComparisonCubit`: `Loading` → `Loaded(QuoteComparison)`; `refresh()` invalida las cachés.
-- [ ] Punto de entrada: un enlace "Comparar cotizaciones" debajo de la tarjeta, fuera de ella, para no alterar el diseño. Se habilita cuando el monto es válido y toma el par y el monto de la pestaña activa.
-- [ ] `QuoteComparisonSheet`, con el mismo estilo que los selectores de moneda:
+- [x] `QuoteComparisonCubit`: `Loading` → `Loaded(QuoteComparison)`; `refresh()` invalida las cachés.
+- [x] Punto de entrada: un enlace "Comparar cotizaciones" debajo de la tarjeta, fuera de ella, para no alterar el diseño. Se habilita cuando el monto es válido y toma el par y el monto de la pestaña activa.
+- [x] `QuoteComparisonSheet`, con el mismo estilo que los selectores de moneda:
   - Encabezado con lo que se compara, por ejemplo "5.00 USDT → VES".
   - Una `ProviderQuoteCard` por proveedor: nombre, "Recibirás ≈ …", "Tasa ≈ …", el mínimo si existe y una nota de la fuente.
   - Insignia "Mejor opción" en la tarjeta de `best`.

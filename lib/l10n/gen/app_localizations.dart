@@ -321,6 +321,101 @@ abstract class AppLocalizations {
   /// **'Ver en {provider}'**
   String viewInProviderAction(String provider);
 
+  /// No description provided for @compareAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Comparar cotizaciones'**
+  String get compareAction;
+
+  /// No description provided for @compareTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Comparar cotizaciones'**
+  String get compareTitle;
+
+  /// No description provided for @compareSubject.
+  ///
+  /// In es, this message translates to:
+  /// **'{amount} {from} a {to}'**
+  String compareSubject(String amount, String from, String to);
+
+  /// No description provided for @compareRefresh.
+  ///
+  /// In es, this message translates to:
+  /// **'Actualizar cotizaciones'**
+  String get compareRefresh;
+
+  /// No description provided for @compareBestBadge.
+  ///
+  /// In es, this message translates to:
+  /// **'Mejor opción'**
+  String get compareBestBadge;
+
+  /// No description provided for @compareRate.
+  ///
+  /// In es, this message translates to:
+  /// **'Tasa ≈ {rate} {fiat}'**
+  String compareRate(String rate, String fiat);
+
+  /// No description provided for @compareMinimum.
+  ///
+  /// In es, this message translates to:
+  /// **'Mínimo {amount} {code}'**
+  String compareMinimum(String amount, String code);
+
+  /// No description provided for @compareSourceEldorado.
+  ///
+  /// In es, this message translates to:
+  /// **'Libro P2P de El Dorado'**
+  String get compareSourceEldorado;
+
+  /// No description provided for @compareSourceCriptoya.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 exchange P2P} other{Mediana de {count} exchanges P2P}}'**
+  String compareSourceCriptoya(int count);
+
+  /// No description provided for @compareUse.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar {provider}'**
+  String compareUse(String provider);
+
+  /// No description provided for @compareWinner.
+  ///
+  /// In es, this message translates to:
+  /// **'Con {provider} recibes {difference} {code} ({percent})'**
+  String compareWinner(
+    String provider,
+    String difference,
+    String code,
+    String percent,
+  );
+
+  /// No description provided for @compareTie.
+  ///
+  /// In es, this message translates to:
+  /// **'Ambos ofrecen la misma cotización.'**
+  String get compareTie;
+
+  /// No description provided for @compareOnlyOne.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo {provider} tiene cotización para este par.'**
+  String compareOnlyOne(String provider);
+
+  /// No description provided for @compareNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Ningún proveedor tiene cotización para este par.'**
+  String get compareNone;
+
+  /// No description provided for @compareFootnote.
+  ///
+  /// In es, this message translates to:
+  /// **'El Dorado muestra el precio de su propio libro P2P y CriptoYa la mediana de varios exchanges. Ambas tasas son indicativas.'**
+  String get compareFootnote;
+
   /// No description provided for @mockBanner.
   ///
   /// In es, this message translates to:

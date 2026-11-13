@@ -1,16 +1,19 @@
 import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/features/home/presentation/pages/home_page.dart';
+import 'package:coding_dorado/features/quote_comparison/domain/usecases/compare_quotes.dart';
 import 'package:coding_dorado/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {
   const App({
     required this.createExchangeBloc,
+    required this.compareQuotes,
     this.showMockBanner = false,
     super.key,
   });
 
   final ExchangeBlocFactory createExchangeBloc;
+  final CompareQuotes compareQuotes;
 
   /// Banner "MOCK" en debug cuando los datos son simulados.
   final bool showMockBanner;
@@ -24,7 +27,10 @@ class App extends StatelessWidget {
       locale: const Locale('es'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: HomePage(createExchangeBloc: createExchangeBloc),
+      home: HomePage(
+        createExchangeBloc: createExchangeBloc,
+        compareQuotes: compareQuotes,
+      ),
     );
   }
 }

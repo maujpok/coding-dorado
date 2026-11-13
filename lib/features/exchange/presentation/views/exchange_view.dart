@@ -1,19 +1,27 @@
 import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/core/formatting/amount_formatter.dart';
+import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
 import 'package:coding_dorado/features/exchange/presentation/bloc/exchange_bloc.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/currency_picker_sheet.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/exchange_card.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/source_caption.dart';
 import 'package:coding_dorado/l10n/gen/app_localizations.dart';
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// La calculadora de una pestaña. Lee su `ExchangeBloc` del árbol.
+typedef PairAmountCallback = void Function(ExchangePair pair, Decimal amount);
+
 class ExchangeView extends StatelessWidget {
-  const ExchangeView({required this.provider, super.key});
+  const ExchangeView({required this.provider, this.onCompare, super.key});
 
   final RateProvider provider;
+
+  /// Abre la comparación con el par y el monto actuales. La provee quien
+  /// compone la pantalla, así `exchange` no depende de `quote_comparison`.
+  final PairAmountCallback? onCompare;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +70,22 @@ class ExchangeView extends StatelessWidget {
                             provider: provider,
                             quote: state.quote.latestQuote,
                           ),
+                          if (onCompare != null) ...[
+                            const SizedBox(height: AppSpacing.xs),
+                            DsLink(
+                              label: AppLocalizations.of(
+                                context,
+                              ).compareAction,
+                              icon: Icons.compare_arrows_rounded,
+                              onPressed: switch (state.amount) {
+                                final amount? => () => onCompare!(
+                                  state.pair,
+                                  amount,
+                                ),
+                                null => null,
+                              },
+                            ),
+                          ],
                         ],
                       ),
                     ),

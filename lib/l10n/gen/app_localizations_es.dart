@@ -151,5 +151,76 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get compareAction => 'Comparar cotizaciones';
+
+  @override
+  String get compareTitle => 'Comparar cotizaciones';
+
+  @override
+  String compareSubject(String amount, String from, String to) {
+    return '$amount $from a $to';
+  }
+
+  @override
+  String get compareRefresh => 'Actualizar cotizaciones';
+
+  @override
+  String get compareBestBadge => 'Mejor opción';
+
+  @override
+  String compareRate(String rate, String fiat) {
+    return 'Tasa ≈ $rate $fiat';
+  }
+
+  @override
+  String compareMinimum(String amount, String code) {
+    return 'Mínimo $amount $code';
+  }
+
+  @override
+  String get compareSourceEldorado => 'Libro P2P de El Dorado';
+
+  @override
+  String compareSourceCriptoya(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Mediana de $count exchanges P2P',
+      one: '1 exchange P2P',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String compareUse(String provider) {
+    return 'Usar $provider';
+  }
+
+  @override
+  String compareWinner(
+    String provider,
+    String difference,
+    String code,
+    String percent,
+  ) {
+    return 'Con $provider recibes $difference $code ($percent)';
+  }
+
+  @override
+  String get compareTie => 'Ambos ofrecen la misma cotización.';
+
+  @override
+  String compareOnlyOne(String provider) {
+    return 'Solo $provider tiene cotización para este par.';
+  }
+
+  @override
+  String get compareNone => 'Ningún proveedor tiene cotización para este par.';
+
+  @override
+  String get compareFootnote =>
+      'El Dorado muestra el precio de su propio libro P2P y CriptoYa la mediana de varios exchanges. Ambas tasas son indicativas.';
+
+  @override
   String get mockBanner => 'MOCK';
 }

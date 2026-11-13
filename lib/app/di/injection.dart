@@ -10,12 +10,14 @@ import 'package:coding_dorado/features/exchange/data/eldorado/mock/mock_eldorado
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
 import 'package:coding_dorado/features/exchange/domain/repositories/exchange_repository.dart';
 import 'package:coding_dorado/features/exchange/domain/usecases/get_exchange_quote.dart';
+import 'package:coding_dorado/features/quote_comparison/domain/usecases/compare_quotes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 
 /// Composition root: un cliente HTTP, un data source, un repositorio y un
-/// `GetExchangeQuote` por [RateProvider]. Con `USE_MOCK=true`, cada cliente
-/// lleva el interceptor mock de su proveedor.
+/// `GetExchangeQuote` por [RateProvider], y `CompareQuotes` sobre todos.
+/// Con `USE_MOCK=true`, cada cliente lleva el interceptor mock de su
+/// proveedor.
 void configureDependencies(GetIt getIt, AppConfig config) {
   getIt
     ..registerSingleton<AppConfig>(config)
@@ -34,6 +36,9 @@ void configureDependencies(GetIt getIt, AppConfig config) {
       instanceName: provider.name,
     );
   }
+  getIt.registerSingleton<CompareQuotes>(
+    CompareQuotes(getIt.allQuoteUseCases()),
+  );
 }
 
 extension ExchangeDependencies on GetIt {

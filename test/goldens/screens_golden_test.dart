@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:coding_dorado/app/app.dart';
 import 'package:coding_dorado/app/di/injection.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/currency_pair_selector.dart';
+import 'package:coding_dorado/features/quote_comparison/domain/usecases/compare_quotes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -30,7 +31,12 @@ void main() {
     addTearDown(tester.view.reset);
     final getIt = GetIt.asNewInstance();
     configureDependencies(getIt, mockAppConfig());
-    await tester.pumpWidget(App(createExchangeBloc: mockBlocFactory(getIt)));
+    await tester.pumpWidget(
+      App(
+        createExchangeBloc: mockBlocFactory(getIt),
+        compareQuotes: getIt<CompareQuotes>(),
+      ),
+    );
     await tester.pumpAndSettle();
   }
 
@@ -63,6 +69,14 @@ void main() {
     await tester.tap(find.byType(CurrencySelectorButton).first);
     await tester.pumpAndSettle();
     await expectGolden(tester, 'picker_crypto.png');
+  }, skip: !enabled);
+
+  testWidgets('comparación de cotizaciones', (tester) async {
+    await pumpHome(tester);
+    await typeAmount(tester, '5.00');
+    await tester.tap(find.text('Comparar cotizaciones').hitTestable());
+    await tester.pumpAndSettle();
+    await expectGolden(tester, 'comparison.png');
   }, skip: !enabled);
 
   testWidgets('calculadora CriptoYa: 5.00 USDT → VES', (tester) async {

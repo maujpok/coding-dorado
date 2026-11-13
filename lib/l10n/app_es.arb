@@ -1,60 +1,219 @@
 {
   "@@locale": "es",
   "appTitle": "Calculadora de cambio",
-  "@appTitle": {"description": "Título de la app."},
-
+  "@appTitle": {
+    "description": "Título de la app."
+  },
   "providerEldorado": "El Dorado",
   "providerCriptoya": "CriptoYa",
   "providerTabsLabel": "Fuente de la tasa",
-  "@providerTabsLabel": {"description": "Etiqueta de accesibilidad del selector de pestañas."},
-
+  "@providerTabsLabel": {
+    "description": "Etiqueta de accesibilidad del selector de pestañas."
+  },
   "haveLabel": "TENGO",
   "wantLabel": "QUIERO",
   "selectorSemantics": "{side}: {code}. Cambiar moneda",
-  "@selectorSemantics": {"placeholders": {"side": {"type": "String"}, "code": {"type": "String"}}},
+  "@selectorSemantics": {
+    "placeholders": {
+      "side": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "swapSemantics": "Invertir monedas",
   "amountSemantics": "Monto a cambiar en {code}",
-  "@amountSemantics": {"placeholders": {"code": {"type": "String"}}},
+  "@amountSemantics": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "amountHint": "0.00",
-
   "estimatedRateLabel": "Tasa estimada",
   "receiveLabel": "Recibirás",
   "estimatedTimeLabel": "Tiempo estimado",
   "minutesUnit": "Min",
   "approxValueSemantics": "{label}: aproximadamente {value} {unit}",
-  "@approxValueSemantics": {"placeholders": {"label": {"type": "String"}, "value": {"type": "String"}, "unit": {"type": "String"}}},
+  "@approxValueSemantics": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "emptyValue": "—",
-
   "exchangeButton": "Cambiar",
   "exchangeConfirmation": "Simulación: cambiarías {amount} {from} por ≈ {receive} {to}.",
-  "@exchangeConfirmation": {"placeholders": {"amount": {"type": "String"}, "from": {"type": "String"}, "receive": {"type": "String"}, "to": {"type": "String"}}},
-
+  "@exchangeConfirmation": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      },
+      "receive": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
   "pickerTitleFiat": "FIAT",
   "pickerTitleCrypto": "Cripto",
   "currencySubtitle": "{name} ({symbol})",
-  "@currencySubtitle": {"placeholders": {"name": {"type": "String"}, "symbol": {"type": "String"}}},
+  "@currencySubtitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
   "unavailableLabel": "No disponible",
-
   "sourceEldorado": "Fuente: El Dorado · tasa indicativa",
   "sourceCriptoya": "Fuente: CriptoYa · {count, plural, =1{1 exchange P2P} other{mediana de {count} exchanges P2P}}",
-  "@sourceCriptoya": {"placeholders": {"count": {"type": "int"}}},
+  "@sourceCriptoya": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sourceCriptoyaGeneric": "Fuente: CriptoYa · mediana de exchanges P2P",
-
   "errorNetwork": "Sin conexión. Revisa tu internet.",
   "errorTimeout": "El servicio tardó demasiado. Intenta de nuevo.",
   "errorRateLimited": "Demasiadas consultas. Espera un momento.",
   "errorServer": "No pudimos obtener la tasa.",
   "errorPairUnavailable": "Este par no está disponible en {provider}.",
-  "@errorPairUnavailable": {"placeholders": {"provider": {"type": "String"}}},
+  "@errorPairUnavailable": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
   "errorNoOffers": "No hay ofertas para este par. Prueba con otro par o monto.",
   "errorParsing": "Recibimos una respuesta inesperada.",
   "errorBelowMinimum": "Mínimo {amount} {code}",
-  "@errorBelowMinimum": {"placeholders": {"amount": {"type": "String"}, "code": {"type": "String"}}},
+  "@errorBelowMinimum": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "errorUnknown": "Algo salió mal. Intenta de nuevo.",
   "retryAction": "Reintentar",
   "chooseCurrencyAction": "Elegir otra moneda",
   "viewInProviderAction": "Ver en {provider}",
-  "@viewInProviderAction": {"placeholders": {"provider": {"type": "String"}}},
-
+  "@viewInProviderAction": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "compareAction": "Comparar cotizaciones",
+  "compareTitle": "Comparar cotizaciones",
+  "compareSubject": "{amount} {from} a {to}",
+  "@compareSubject": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "compareRefresh": "Actualizar cotizaciones",
+  "compareBestBadge": "Mejor opción",
+  "compareRate": "Tasa ≈ {rate} {fiat}",
+  "@compareRate": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      },
+      "fiat": {
+        "type": "String"
+      }
+    }
+  },
+  "compareMinimum": "Mínimo {amount} {code}",
+  "@compareMinimum": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "compareSourceEldorado": "Libro P2P de El Dorado",
+  "compareSourceCriptoya": "{count, plural, =1{1 exchange P2P} other{Mediana de {count} exchanges P2P}}",
+  "@compareSourceCriptoya": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareUse": "Usar {provider}",
+  "@compareUse": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "compareWinner": "Con {provider} recibes {difference} {code} ({percent})",
+  "@compareWinner": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      },
+      "difference": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "compareTie": "Ambos ofrecen la misma cotización.",
+  "compareOnlyOne": "Solo {provider} tiene cotización para este par.",
+  "@compareOnlyOne": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "compareNone": "Ningún proveedor tiene cotización para este par.",
+  "compareFootnote": "El Dorado muestra el precio de su propio libro P2P y CriptoYa la mediana de varios exchanges. Ambas tasas son indicativas.",
   "mockBanner": "MOCK"
 }

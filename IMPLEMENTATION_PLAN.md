@@ -101,13 +101,13 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 **Objetivo:** las reglas de negocio en Dart puro, con pruebas completas.
 
-- [ ] Entidades `Currency`, `CurrencyType`, `ExchangeDirection`, `ExchangePair`, `ExchangeRate` y `ExchangeQuote`.
-- [ ] `RateProvider` (`eldorado`, `criptoya`): identifica la fuente. `ExchangeQuote` incluye el `provider` que la produjo.
-- [ ] `ExchangeRate` tiene `fiatPerCrypto`, `minAmount` (`Decimal?`, en la moneda de TENGO), `estimatedTime` (`Duration?`) y `sampleSize` (`int?`, para CriptoYa).
-- [ ] `PairAvailability`: indica si un par existe en la fuente; `PairAvailability.unknown()` habilita todos.
-- [ ] Invariante de `ExchangePair`: siempre crypto↔fiat. Incluye `swapped()`, `withFrom()` y `withTo()`.
-- [ ] Interfaz `ExchangeRepository` con `getRate(pair, amount, {forceRefresh})` y `getAvailability()`; habrá una implementación por `RateProvider` ([ARCHITECTURE.md §5.2](ARCHITECTURE.md#52-reglas-de-conversión-getexchangequote)).
-- [ ] `GetExchangeQuote`:
+- [x] Entidades `Currency`, `CurrencyType`, `ExchangeDirection`, `ExchangePair`, `ExchangeRate` y `ExchangeQuote`.
+- [x] `RateProvider` (`eldorado`, `criptoya`): identifica la fuente. `ExchangeQuote` incluye el `provider` que la produjo.
+- [x] `ExchangeRate` tiene `fiatPerCrypto`, `minAmount` (`Decimal?`, en la moneda de TENGO), `estimatedTime` (`Duration?`) y `sampleSize` (`int?`, para CriptoYa).
+- [x] `PairAvailability`: indica si un par existe en la fuente; `PairAvailability.unknown()` habilita todos.
+- [x] Invariante de `ExchangePair`: siempre crypto↔fiat. Incluye `swapped()`, `withFrom()` y `withTo()`.
+- [x] Interfaz `ExchangeRepository` con `getRate(pair, amount, {forceRefresh})` y `getAvailability()`; habrá una implementación por `RateProvider` ([ARCHITECTURE.md §5.2](ARCHITECTURE.md#52-reglas-de-conversión-getexchangequote)).
+- [x] `GetExchangeQuote`:
   - Convierte en ambas direcciones, con 8 decimales de precisión.
   - Si la tasa es `≤ 0`, devuelve `InvalidRateFailure`.
   - Si el monto es menor que `minAmount`, devuelve `BelowMinimumFailure(minAmount)`.

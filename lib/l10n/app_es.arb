@@ -1,0 +1,7 @@
+{
+  "@@locale": "es",
+  "appTitle": "Calculadora de cambio",
+  "@appTitle": {
+    "description": "Título de la app."
+  }
+}

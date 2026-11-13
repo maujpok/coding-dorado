@@ -1,0 +1,47 @@
+name: coding_dorado
+description: Calculadora de cambio crypto ↔ fiat con tasas de El Dorado y CriptoYa.
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  bloc: ^9.2.1
+  bloc_concurrency: ^0.3.0
+  decimal: ^3.2.6
+  dio: ^5.11.1
+  equatable: ^3.0.0
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  flutter_localizations:
+    sdk: flutter
+  get_it: ^9.3.0
+  intl: any
+
+dev_dependencies:
+  bloc_test: ^10.0.0
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.5
+  very_good_analysis: ^10.2.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  # Solo los íconos de monedas; las imágenes de diseño (*.jpg) no se empaquetan.
+  assets:
+    - assets/cripto_currencies/
+    - assets/fiat_currencies/
+
+  fonts:
+    - family: Rubik
+      fonts:
+        - asset: assets/fonts/Rubik-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Rubik-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Rubik-SemiBold.ttf
+          weight: 600

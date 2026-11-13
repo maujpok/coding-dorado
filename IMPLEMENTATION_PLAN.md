@@ -193,20 +193,20 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 **Objetivo:** el proveedor de la pestaña CriptoYa, con la misma interfaz que El Dorado.
 
-- [ ] Fixtures en `test/fixtures/criptoya/`, capturados con `curl`:
+- [x] Fixtures en `test/fixtures/criptoya/`, capturados con `curl`:
   - `usdt_ves_1.json` (varios exchanges).
   - `usdc_bob_1.json` (con exchanges en `ask: 0`).
   - Un caso con todos los valores en 0.
   - Un caso "invertido" (`bid > ask`).
-- [ ] DTO `CriptoYaResponse`: `exchange → { ask, totalAsk, bid, totalBid, time }`. Ignora las entradas que no tengan esa forma.
-- [ ] `CriptoYaRateDataSource`:
+- [x] DTO `CriptoYaResponse`: `exchange → { ask, totalAsk, bid, totalBid, time }`. Ignora las entradas que no tengan esa forma.
+- [x] `CriptoYaRateDataSource`:
   - `GET {CRIPTOYA_API_URL}/{coin}/{fiat}/1`, con `coin` y `fiat` en minúsculas.
   - Tasa: mediana de `totalBid` (crypto→fiat) o de `totalAsk` (fiat→crypto) entre los exchanges con valor mayor que 0.
   - Sin valores válidos → `NoOffersException`.
   - Devuelve `ExchangeRateModel(rate, minAmount = null, estimatedTime = null)`, más `sampleSize` (cuántos exchanges entraron en la mediana) para mostrarlo en la UI.
-- [ ] `TtlCache` por par (`coin`, `fiat`) con TTL de 30 s, el mismo que indica `cache-control: max-age=30`.
-- [ ] `CriptoYaExchangeRepository.getAvailability()` devuelve `PairAvailability.unknown()`; la falta de ofertas se informa al cotizar.
-- [ ] `MockCriptoYaInterceptor`:
+- [x] `TtlCache` por par (`coin`, `fiat`) con TTL de 30 s, el mismo que indica `cache-control: max-age=30`.
+- [x] `CriptoYaExchangeRepository.getAvailability()` devuelve `PairAvailability.unknown()`; la falta de ofertas se informa al cotizar.
+- [x] `MockCriptoYaInterceptor`:
   - Responde a `GET …/{coin}/{fiat}/{volumen}` con 4 exchanges: tres alrededor del valor objetivo y uno en 0.
   - Valores objetivo (mediana):
     - `bid` = `SELL` de El Dorado × 1.01: CriptoYa conviene al **vender** USDT.
@@ -215,8 +215,8 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
     - USDC = USDT × 0.998.
   - Así la comparación muestra un ganador distinto según la dirección.
   - Aplica la latencia y el escenario de `MOCK_SCENARIO_CRIPTOYA`: `success`, `no_offers`, `rate_limited` (429), `server_error`, `timeout` o `malformed`.
-- [ ] `CriptoYaExchangeRepository`: `NoOffersException` → `NoOffersFailure`; HTTP 429 → `ServerFailure(429)`, con su propio mensaje ("Demasiadas consultas, espera un momento").
-- [ ] `injection.dart`: registra un `ExchangeRepository` por `RateProvider` (get_it con `instanceName`) y un `GetExchangeQuote` para cada uno. Con `USE_MOCK=true` instala ambos interceptores.
+- [x] `CriptoYaExchangeRepository`: `NoOffersException` → `NoOffersFailure`; HTTP 429 → `ServerFailure(429)`, con su propio mensaje ("Demasiadas consultas, espera un momento").
+- [x] `injection.dart`: registra un `ExchangeRepository` por `RateProvider` (get_it con `instanceName`) y un `GetExchangeQuote` para cada uno. Con `USE_MOCK=true` instala ambos interceptores.
 
 **Pruebas:**
 - Mediana: número de valores impar y par, valores en 0 descartados, caso invertido, todos en 0 → `NoOffersException`.

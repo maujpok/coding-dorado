@@ -1,0 +1,5 @@
+tags:
+  # Pruebas de contrato contra las APIs reales. No corren por defecto:
+  # flutter test --dart-define=LIVE_TESTS=true --tags live
+  live:
+    timeout: 30s

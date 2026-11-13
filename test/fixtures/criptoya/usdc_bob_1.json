@@ -1,0 +1,37 @@
+{
+  "bitgetp2p": {
+    "ask": 0,
+    "bid": 11.99,
+    "time": 1794600019,
+    "totalAsk": 0,
+    "totalBid": 11.99
+  },
+  "bybitp2p": {
+    "ask": 0,
+    "bid": 11.8,
+    "time": 1794600028,
+    "totalAsk": 0,
+    "totalBid": 11.8
+  },
+  "mexcp2p": {
+    "ask": 0,
+    "bid": 10.51,
+    "time": 1794600028,
+    "totalAsk": 0,
+    "totalBid": 10.51
+  },
+  "vibrant": {
+    "ask": 11.963,
+    "bid": 11.733,
+    "time": 1794600049,
+    "totalAsk": 11.963,
+    "totalBid": 11.733
+  },
+  "vitawallet": {
+    "ask": 11.9596,
+    "bid": 11.7099,
+    "time": 1794600049,
+    "totalAsk": 11.9596,
+    "totalBid": 11.7099
+  }
+}

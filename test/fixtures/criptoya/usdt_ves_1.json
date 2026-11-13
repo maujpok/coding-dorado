@@ -1,0 +1,51 @@
+{
+  "binancep2p": {
+    "ask": 1047.999,
+    "bid": 1055,
+    "time": 1794600014,
+    "totalAsk": 1047.999,
+    "totalBid": 1055
+  },
+  "bingxp2p": {
+    "ask": 1070,
+    "bid": 1030.005,
+    "time": 1794600029,
+    "totalAsk": 1070,
+    "totalBid": 1030.005
+  },
+  "bitgetp2p": {
+    "ask": 1069,
+    "bid": 1068,
+    "time": 1794600028,
+    "totalAsk": 1069,
+    "totalBid": 1068
+  },
+  "bybitp2p": {
+    "ask": 1059,
+    "bid": 1052,
+    "time": 1794600045,
+    "totalAsk": 1059,
+    "totalBid": 1052
+  },
+  "mexcp2p": {
+    "ask": 1079.99,
+    "bid": 1035,
+    "time": 1794600040,
+    "totalAsk": 1079.99,
+    "totalBid": 1035
+  },
+  "okexp2p": {
+    "ask": 1060,
+    "bid": 1050,
+    "time": 1794600042,
+    "totalAsk": 1060,
+    "totalBid": 1050
+  },
+  "saldo": {
+    "ask": 1089.1621,
+    "bid": 1048.4846,
+    "time": 1794600050,
+    "totalAsk": 1089.1621,
+    "totalBid": 1048.4846
+  }
+}

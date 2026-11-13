@@ -131,7 +131,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 **Objetivo:** el proveedor de la pestaña El Dorado, contra el API real y contra el mock con el mismo código.
 
-- [ ] `CurrencyCatalog` con los datos de los sheets de diseño y la cobertura de cada proveedor:
+- [x] `CurrencyCatalog` con los datos de los sheets de diseño y la cobertura de cada proveedor:
 
   | Código | ID El Dorado | Nombre (símbolo) | Ícono | El Dorado `/api/prices` | CriptoYa |
   |---|---|---|---|---|---|
@@ -147,25 +147,25 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   ¹ El mock dice "Boliviano (R$)", lo que parece un error de copia; el símbolo correcto es `Bs`.
   ² ID del catálogo de El Dorado ([API_RESEARCH.md §3](API_RESEARCH.md#3-ids-de-monedas-get-stagecurrencies)). Ni `/api/prices` ni CriptoYa lo usan (se identifican por código); se conserva para la Fase 10.
 
-- [ ] Fixtures en `test/fixtures/eldorado/`:
+- [x] Fixtures en `test/fixtures/eldorado/`:
   - `prices.json`: respuesta real capturada con `curl -s https://api.eldorado.io/api/prices`.
   - `prices_empty.json`: `{"SELL": {}, "BUY": {}}`.
   - `prices_malformed.json`.
-- [ ] DTO `PricesResponse`: `side → fiat → { price, limits.in.min, limits.out.min }`.
+- [x] DTO `PricesResponse`: `side → fiat → { price, limits.in.min, limits.out.min }`.
   - `price` acepta string o número; `limits` es opcional.
   - Si el lado o la fiat no existen → `UnsupportedPairException`.
   - Si la estructura es inválida → `ParsingException`.
-- [ ] `EldoradoPricesDataSource`:
+- [x] `EldoradoPricesDataSource`:
   - `GET {ELDORADO_API_URL}/prices`.
   - Elige `SELL` para crypto→fiat y `BUY` para fiat→crypto.
   - Si la crypto no es USDT → `UnsupportedPairException`.
   - Devuelve `ExchangeRateModel(price, minAmount = limits.in.min, estimatedTime = 10 min)`. Los 10 min son el valor del diseño: `/api/prices` no informa el tiempo.
   - La respuesta de `/prices` se guarda en un `TtlCache` con TTL de 60 s; se invalida con "Reintentar" o al volver a la app (`forceRefresh`).
-- [ ] `EldoradoExchangeRepository.getAvailability()` calcula los pares disponibles con la respuesta cacheada; los sheets la usan para marcar las monedas no disponibles (Fase 8).
-- [ ] `MockEldoradoPricesInterceptor`:
+- [x] `EldoradoExchangeRepository.getAvailability()` calcula los pares disponibles con la respuesta cacheada; los sheets la usan para marcar las monedas no disponibles (Fase 8).
+- [x] `MockEldoradoPricesInterceptor`:
   - Responde a `GET …/prices` con la forma real y **la misma cobertura**: sin USDC y sin VES en `BUY`.
   - Aplica la latencia y el escenario de `MOCK_SCENARIO_ELDORADO`: `success`, `empty`, `server_error`, `timeout` o `malformed`.
-- [ ] `mock_prices.dart` con precios **ficticios**, en fiat por 1 USDT, cerca del mercado del 2026-11-13:
+- [x] `mock_prices.dart` con precios **ficticios**, en fiat por 1 USDT, cerca del mercado del 2026-11-13:
 
   | Fiat | `SELL` (USDT→fiat) | `BUY` (fiat→USDT) | Mínimo |
   |---|---|---|---|
@@ -178,7 +178,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
   `BUY = SELL × 1.02`. En `BUY`, `limits.in.min` va en fiat (5 × precio), como en el API real.
 
-- [ ] `EldoradoExchangeRepository`: convierte las excepciones en `Failure`, según [ARCHITECTURE.md §6.4](ARCHITECTURE.md#64-repositorio-y-errores). `UnsupportedPairException` → `PairUnavailableFailure`.
+- [x] `EldoradoExchangeRepository`: convierte las excepciones en `Failure`, según [ARCHITECTURE.md §6.4](ARCHITECTURE.md#64-repositorio-y-errores). `UnsupportedPairException` → `PairUnavailableFailure`.
 
 **Pruebas:**
 - DTO contra los fixtures: el real, el vacío y el roto; precio como string y como número; sin `limits`.

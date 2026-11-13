@@ -3,9 +3,9 @@ library;
 
 import 'package:coding_dorado/core/config/app_config.dart';
 import 'package:coding_dorado/core/network/dio_factory.dart';
-import 'package:coding_dorado/features/exchange/data/catalog/currency_catalog.dart';
 import 'package:coding_dorado/features/exchange/data/criptoya/criptoya_rate_data_source.dart';
 import 'package:coding_dorado/features/exchange/data/criptoya/criptoya_response.dart';
+import 'package:coding_dorado/features/exchange/domain/catalog/currency_catalog.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';

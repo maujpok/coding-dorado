@@ -108,16 +108,16 @@ lib/
     │   └── widgets/provider_tabs.dart          # una pestaña por RateProvider.values
     ├── exchange/
     │   ├── domain/
+    │   │   ├── catalog/currency_catalog.dart   # las 8 monedas del diseño (regla de negocio)
     │   │   ├── entities/                       # currency, exchange_pair, exchange_rate, exchange_quote,
     │   │   │                                   # rate_provider, pair_availability
     │   │   ├── repositories/exchange_repository.dart
     │   │   └── usecases/get_exchange_quote.dart
     │   ├── data/
-    │   │   ├── catalog/currency_catalog.dart   # 8 monedas + IDs de El Dorado (Fase 10)
     │   │   ├── common/                         # exchange_rate_data_source, exchange_rate_model,
     │   │   │                                   # data_exceptions, map_data_exception
     │   │   ├── eldorado/                       # eldorado_prices_data_source, prices_response,
-    │   │   │   │                               # eldorado_exchange_repository
+    │   │   │   │                               # eldorado_exchange_repository, eldorado_currency_ids
     │   │   │   └── mock/                       # mock_eldorado_prices_interceptor, mock_prices
     │   │   ├── criptoya/                       # criptoya_rate_data_source, criptoya_response,
     │   │   │   │                               # criptoya_exchange_repository
@@ -343,7 +343,7 @@ Si el equipo entrega una URL vigente de `recommendations`, `ELDORADO_SOURCE=orde
 - La tasa pasa a ser una oferta concreta que depende del monto.
 - El tiempo estimado sale de `offerMakerStats.marketMakerOrderTime`.
 - `data: {}` se traduce en `NoOffersException` y `error` en el body en `ApiErrorException`.
-- La forma de la respuesta y los IDs de moneda (`TATUM-TRON-USDT`, `TATUM-MATIC-USDC`) están en [API_RESEARCH.md §2–3](API_RESEARCH.md#2-forma-del-response-de-recommendations). Los IDs viven en `currency_catalog.dart`.
+- La forma de la respuesta y los IDs de moneda (`TATUM-TRON-USDT`, `TATUM-MATIC-USDC`) están en [API_RESEARCH.md §2–3](API_RESEARCH.md#2-forma-del-response-de-recommendations). Los IDs viven en `data/eldorado/eldorado_currency_ids.dart`.
 
 La pestaña, el bloc y la comparación no cambian.
 

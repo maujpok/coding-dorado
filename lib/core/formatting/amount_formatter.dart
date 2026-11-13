@@ -49,6 +49,10 @@ abstract final class AmountFormatter {
   /// Fracción → porcentaje (`0.0125` → `1.25`).
   static Decimal toPercent(Decimal fraction) => fraction * _hundred;
 
+  /// Monto → texto editable del campo, sin separador de miles y con hasta 2
+  /// decimales ("33660", "5.5").
+  static String editable(Decimal value) => value.round(scale: 2).toString();
+
   /// Texto del campo de monto → [Decimal]. Acepta coma o punto decimal.
   /// Devuelve `null` si está vacío, es inválido o no es mayor que cero.
   static Decimal? tryParsePositive(String text) {

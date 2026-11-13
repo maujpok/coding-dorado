@@ -1,7 +1,7 @@
 import 'package:coding_dorado/app/di/injection.dart';
 import 'package:coding_dorado/core/config/app_config.dart';
 import 'package:coding_dorado/core/error/failure.dart';
-import 'package:coding_dorado/features/exchange/data/catalog/currency_catalog.dart';
+import 'package:coding_dorado/features/exchange/domain/catalog/currency_catalog.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
 import 'package:flutter_test/flutter_test.dart';

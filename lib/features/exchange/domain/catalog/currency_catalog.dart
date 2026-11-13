@@ -63,16 +63,6 @@ abstract final class CurrencyCatalog {
   static const List<Currency> cryptos = [usdt, usdc];
   static const List<Currency> fiats = [ves, cop, ars, pen, brl, bob];
 
-  /// IDs del catálogo de El Dorado (`/stage/currencies`), que usa el API de
-  /// órdenes. Las fiat usan su código.
-  static const _eldoradoCryptoIds = {
-    'USDT': 'TATUM-TRON-USDT',
-    'USDC': 'TATUM-MATIC-USDC',
-  };
-
-  static String eldoradoIdOf(Currency currency) =>
-      _eldoradoCryptoIds[currency.code] ?? currency.code;
-
   static List<Currency> ofType(CurrencyType type) =>
       type == CurrencyType.crypto ? cryptos : fiats;
 }

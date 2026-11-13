@@ -234,18 +234,18 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 **Objetivo:** `ExchangeBloc` (una instancia por pestaña) y `HomeCubit`, probados.
 
-- [ ] `ExchangeBloc` recibe por constructor el `GetExchangeQuote` y el `ExchangeRepository` de su proveedor (este último para `getAvailability()`); no sabe de qué proveedor se trata.
-- [ ] `ExchangeState`, `QuoteStatus` (`Idle`, `Loading(previous)`, `Loaded`, `Failed`) y los eventos de [ARCHITECTURE.md §8.2](ARCHITECTURE.md#82-eventos-y-concurrencia).
-- [ ] Estado inicial: USDT → VES (como en el diseño), monto vacío y `QuoteIdle`. El par inicial vive en una sola constante.
-- [ ] *Debounce* de 300 ms para el monto; cambios de par inmediatos; un único *handler* `restartable` para cotizar, con el retardo dentro del propio *handler* ([ARCHITECTURE.md §8.2](ARCHITECTURE.md#82-eventos-y-concurrencia)).
+- [x] `ExchangeBloc` recibe por constructor el `GetExchangeQuote` y el `ExchangeRepository` de su proveedor (este último para `getAvailability()`); no sabe de qué proveedor se trata.
+- [x] `ExchangeState`, `QuoteStatus` (`Idle`, `Loading(previous)`, `Loaded`, `Failed`) y los eventos de [ARCHITECTURE.md §8.2](ARCHITECTURE.md#82-eventos-y-concurrencia).
+- [x] Estado inicial: USDT → VES (como en el diseño), monto vacío y `QuoteIdle`. El par inicial vive en una sola constante.
+- [x] *Debounce* de 300 ms para el monto; cambios de par inmediatos; un único *handler* `restartable` para cotizar, con el retardo dentro del propio *handler* ([ARCHITECTURE.md §8.2](ARCHITECTURE.md#82-eventos-y-concurrencia)).
   - La tasa sale de la caché, así que escribir no genera peticiones.
   - El *debounce* se mantiene porque en la Fase 10 la tasa sí depende del monto.
-- [ ] Eventos nuevos:
+- [x] Eventos nuevos:
   - `ExchangeRatesRefreshed`: invalida la caché y vuelve a cotizar.
   - `ExchangePrefilled(pair, amount)`: lo usa la comparación para llevar el par y el monto a la otra pestaña.
-- [ ] `ExchangeSubmitted` como `droppable`, con confirmación simulada.
-- [ ] `HomeCubit`: la pestaña activa (`RateProvider`). Es un Cubit porque es estado trivial, sin concurrencia.
-- [ ] Cada pestaña conserva su estado al cambiar de una a otra: los blocs viven en `HomePage`, no en la vista de la pestaña.
+- [x] `ExchangeSubmitted` como `droppable`, con confirmación simulada.
+- [x] `HomeCubit`: la pestaña activa (`RateProvider`). Es un Cubit porque es estado trivial, sin concurrencia.
+- [x] Cada pestaña conserva su estado al cambiar de una a otra: los blocs viven en `HomePage`, no en la vista de la pestaña.
 
 **Pruebas (`bloc_test`):**
 - Varios `AmountChanged` seguidos producen una sola cotización.

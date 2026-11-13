@@ -3,3 +3,7 @@ tags:
   # flutter test --dart-define=LIVE_TESTS=true --tags live
   live:
     timeout: 30s
+  # Capturas a 402×874 pt para comparar con los mocks. Dependen del sistema
+  # operativo; no corren por defecto:
+  # flutter test --dart-define=GOLDENS=true --tags golden [--update-goldens]
+  golden:

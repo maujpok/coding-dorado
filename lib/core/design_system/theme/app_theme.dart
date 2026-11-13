@@ -61,7 +61,7 @@ abstract final class AppTheme {
         constraints: const BoxConstraints(maxWidth: AppSizes.sheetMaxWidth),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AppRadius.xl),
+            top: Radius.circular(AppRadius.sheet),
           ),
         ),
       ),
@@ -72,7 +72,7 @@ abstract final class AppTheme {
           color: colors.onInverseSurface,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppRadius.control),
         ),
       ),
     );

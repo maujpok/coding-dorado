@@ -1,6 +1,3 @@
-import 'package:coding_dorado/app/app.dart';
-import 'package:flutter/widgets.dart';
+import 'package:coding_dorado/bootstrap.dart';
 
-void main() {
-  runApp(const App());
-}
+void main() => bootstrap();

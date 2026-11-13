@@ -1,6 +1,6 @@
 # Design system
 
-> Estado: tokens implementados · Última actualización: 2026-11-13
+> Estado: tokens y componentes implementados · Última actualización: 2026-11-13
 > Código: [`lib/core/design_system/`](lib/core/design_system/) · Documentos relacionados: [ARCHITECTURE.md](ARCHITECTURE.md) · [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
 
 Un design system mínimo para la calculadora: tokens, un tema de Material construido sobre ellos y un puñado de componentes reutilizables.
@@ -53,6 +53,7 @@ Un design system mínimo para la calculadora: tokens, un tema de Material constr
 | `textDisabled` | `grey500` | Texto deshabilitado (exento de AA) |
 | `outline` | `ink` | Bordes con peso: selector de monedas, botones, campo en foco |
 | `outlineSubtle` | `grey300` | Divisores, borde de tarjetas |
+| `handle` | `grey400` (`#BDBDB7`) | Handle de los bottom sheets |
 | `fieldBorder` | `grey700` | Borde de campos en reposo |
 | `inverseSurface` / `onInverseSurface` | `ink` / `grey50` | Selector de pestañas |
 | `success` / `successContainer` | `greenInk` / `greenTint` | Diferencia a favor en la comparación |
@@ -92,8 +93,9 @@ Fuente **Rubik** (OFL), empaquetada en `assets/fonts/` para no depender de la re
 | Grupo | Valores |
 |---|---|
 | `AppSpacing` | `xxs` 2 · `xs` 4 · `sm` 8 · `md` 12 · `lg` 16 · `xl` 20 · `xxl` 24 · `xxxl` 32 · `huge` 40 |
-| `AppRadius` | `xs` 4 (insignias) · `sm` 6 (íconos) · `md` 10 (campos) · `lg` 12 (botones) · `xl` 20 (sheets) · `xxl` 24 (tarjetas) · `pill` |
-| `AppSizes` | selector 34 · campo 40 · botón 44 · swap 41 · pestañas 40 · íconos 20/24 · radio 22 · fila de lista 62 · ancho máximo 400 (contenido) y 520 (sheets) |
+| `AppRadius` | `badge` 4 · `icon` 5 · `control` 10 (campos y botones) · `card` 17 · `sheet` 20 · `pill` |
+| `AppSizes` | selector 33 · campo 38 · botón 41 · swap 41 · pestañas 40 · íconos 20/24 · radio 22 (anillo 2, punto 8) · fila de lista 62 · fila del resumen 28 · handle 62×4 · ancho máximo 400 (contenido) y 520 (sheets) · selector de monedas al 70 % de la pantalla |
+| `AppLayout` | margen lateral 48 pt desde 380 pt de ancho (tarjeta de ~306 pt en el teléfono del mock), 16 pt en pantallas angostas |
 | `AppShadows` | `card` (ambiente suave + borde inferior marcado, como el mock) · `raised` (botón de swap) |
 | `AppMotion` | `fast` 150 ms · `normal` 250 ms · `slow` 400 ms · curva `easeOutCubic` |
 
@@ -103,7 +105,29 @@ Fuente **Rubik** (OFL), empaquetada en `assets/fonts/` para no depender de la re
 
 ## Componentes
 
-*Se agregan en la Fase 6 del plan.*
+Viven en [`lib/core/design_system/components/`](lib/core/design_system/components/) y solo usan tokens. Se importan todos con `design_system.dart`.
+
+| Componente | Qué es | Estados y accesibilidad |
+|---|---|---|
+| `DsBackground` | Fondo con el semicírculo del mock (centro en 1.945·ancho, 0.378·alto; radio 1.403·ancho, ajustado con error < 1 px) | — |
+| `DsCard` | Superficie con radio `card`, borde `outlineSubtle` y sombra `card` | `elevated` (con o sin sombra), `highlighted` (borde en tinta) |
+| `DsPrimaryButton` | Acción principal: amarillo, texto y borde en tinta | Deshabilitado (`onPressed: null`) en `surfaceMuted`; `isLoading` con indicador; `Semantics(button, enabled)` |
+| `DsLink` | Enlace en tinta con subrayado, como los de eldorado.io | Deshabilitado en `textDisabled`; `Semantics(link)` |
+| `DsPillTabs<T>` | Pestañas segmentadas: píldora en tinta y la activa en amarillo, con indicador animado | `Semantics(selected, button, inMutuallyExclusiveGroup)` por pestaña |
+| `DsBadge` | Etiqueta amarilla con texto en tinta | Estilo de texto configurable (prefijo del monto, "Mejor opción") |
+| `DsRadio` | Indicador de selección: anillo `fieldBorder`; seleccionado, anillo en tinta, relleno amarillo y punto | `enabled`; es visual: la fila entera es el control |
+| `DsSkeleton` | Bloque que pulsa mientras carga | Excluido de la semántica |
+| `showDsBottomSheet` / `DsSheetScaffold` | Sheet con handle, título centrado y contenido; alto fijo (`heightFactor`) o ajustado al contenido | Título como `header`; ancho máximo 520; acción opcional junto al título |
+
+Los widgets propios de la calculadora (selector de par, campo de monto, filas del resumen, ícono de moneda) están en la feature `exchange` y se construyen con estos componentes y tokens.
+
+## Validación visual
+
+Los *goldens* de [`test/goldens/`](test/goldens/) renderizan la app a 402×874 pt @2x, con Rubik y los íconos reales y con datos del mock HTTP, para compararlos con los mocks. Dependen del sistema operativo, así que no corren por defecto:
+
+```bash
+flutter test --dart-define=GOLDENS=true --tags golden [--update-goldens]
+```
 
 ## Cambios respecto al mock
 

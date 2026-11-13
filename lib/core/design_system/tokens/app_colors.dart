@@ -22,6 +22,7 @@ final class AppColors extends ThemeExtension<AppColors> {
     required this.textDisabled,
     required this.outline,
     required this.outlineSubtle,
+    required this.handle,
     required this.fieldBorder,
     required this.inverseSurface,
     required this.onInverseSurface,
@@ -46,6 +47,7 @@ final class AppColors extends ThemeExtension<AppColors> {
     textDisabled: AppPalette.grey500,
     outline: AppPalette.ink,
     outlineSubtle: AppPalette.grey300,
+    handle: AppPalette.grey400,
     fieldBorder: AppPalette.grey700,
     inverseSurface: AppPalette.ink,
     onInverseSurface: AppPalette.grey50,
@@ -86,6 +88,9 @@ final class AppColors extends ThemeExtension<AppColors> {
   /// Bordes y divisores discretos.
   final Color outlineSubtle;
 
+  /// Handle de los bottom sheets.
+  final Color handle;
+
   /// Borde de los campos en reposo; en foco se usa [outline].
   final Color fieldBorder;
 
@@ -116,6 +121,7 @@ final class AppColors extends ThemeExtension<AppColors> {
     Color? textDisabled,
     Color? outline,
     Color? outlineSubtle,
+    Color? handle,
     Color? fieldBorder,
     Color? inverseSurface,
     Color? onInverseSurface,
@@ -139,6 +145,7 @@ final class AppColors extends ThemeExtension<AppColors> {
       textDisabled: textDisabled ?? this.textDisabled,
       outline: outline ?? this.outline,
       outlineSubtle: outlineSubtle ?? this.outlineSubtle,
+      handle: handle ?? this.handle,
       fieldBorder: fieldBorder ?? this.fieldBorder,
       inverseSurface: inverseSurface ?? this.inverseSurface,
       onInverseSurface: onInverseSurface ?? this.onInverseSurface,
@@ -171,6 +178,7 @@ final class AppColors extends ThemeExtension<AppColors> {
       textDisabled: mix(textDisabled, other.textDisabled),
       outline: mix(outline, other.outline),
       outlineSubtle: mix(outlineSubtle, other.outlineSubtle),
+      handle: mix(handle, other.handle),
       fieldBorder: mix(fieldBorder, other.fieldBorder),
       inverseSurface: mix(inverseSurface, other.inverseSurface),
       onInverseSurface: mix(onInverseSurface, other.onInverseSurface),

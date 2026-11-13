@@ -1,7 +1,60 @@
 {
   "@@locale": "es",
   "appTitle": "Calculadora de cambio",
-  "@appTitle": {
-    "description": "Título de la app."
-  }
+  "@appTitle": {"description": "Título de la app."},
+
+  "providerEldorado": "El Dorado",
+  "providerCriptoya": "CriptoYa",
+  "providerTabsLabel": "Fuente de la tasa",
+  "@providerTabsLabel": {"description": "Etiqueta de accesibilidad del selector de pestañas."},
+
+  "haveLabel": "TENGO",
+  "wantLabel": "QUIERO",
+  "selectorSemantics": "{side}: {code}. Cambiar moneda",
+  "@selectorSemantics": {"placeholders": {"side": {"type": "String"}, "code": {"type": "String"}}},
+  "swapSemantics": "Invertir monedas",
+  "amountSemantics": "Monto a cambiar en {code}",
+  "@amountSemantics": {"placeholders": {"code": {"type": "String"}}},
+  "amountHint": "0.00",
+
+  "estimatedRateLabel": "Tasa estimada",
+  "receiveLabel": "Recibirás",
+  "estimatedTimeLabel": "Tiempo estimado",
+  "minutesUnit": "Min",
+  "approxValueSemantics": "{label}: aproximadamente {value} {unit}",
+  "@approxValueSemantics": {"placeholders": {"label": {"type": "String"}, "value": {"type": "String"}, "unit": {"type": "String"}}},
+  "emptyValue": "—",
+
+  "exchangeButton": "Cambiar",
+  "exchangeConfirmation": "Simulación: cambiarías {amount} {from} por ≈ {receive} {to}.",
+  "@exchangeConfirmation": {"placeholders": {"amount": {"type": "String"}, "from": {"type": "String"}, "receive": {"type": "String"}, "to": {"type": "String"}}},
+
+  "pickerTitleFiat": "FIAT",
+  "pickerTitleCrypto": "Cripto",
+  "currencySubtitle": "{name} ({symbol})",
+  "@currencySubtitle": {"placeholders": {"name": {"type": "String"}, "symbol": {"type": "String"}}},
+  "unavailableLabel": "No disponible",
+
+  "sourceEldorado": "Fuente: El Dorado · tasa indicativa",
+  "sourceCriptoya": "Fuente: CriptoYa · {count, plural, =1{1 exchange P2P} other{mediana de {count} exchanges P2P}}",
+  "@sourceCriptoya": {"placeholders": {"count": {"type": "int"}}},
+  "sourceCriptoyaGeneric": "Fuente: CriptoYa · mediana de exchanges P2P",
+
+  "errorNetwork": "Sin conexión. Revisa tu internet.",
+  "errorTimeout": "El servicio tardó demasiado. Intenta de nuevo.",
+  "errorRateLimited": "Demasiadas consultas. Espera un momento.",
+  "errorServer": "No pudimos obtener la tasa.",
+  "errorPairUnavailable": "Este par no está disponible en {provider}.",
+  "@errorPairUnavailable": {"placeholders": {"provider": {"type": "String"}}},
+  "errorNoOffers": "No hay ofertas para este par. Prueba con otro par o monto.",
+  "errorParsing": "Recibimos una respuesta inesperada.",
+  "errorBelowMinimum": "Mínimo {amount} {code}",
+  "@errorBelowMinimum": {"placeholders": {"amount": {"type": "String"}, "code": {"type": "String"}}},
+  "errorUnknown": "Algo salió mal. Intenta de nuevo.",
+  "retryAction": "Reintentar",
+  "chooseCurrencyAction": "Elegir otra moneda",
+  "viewInProviderAction": "Ver en {provider}",
+  "@viewInProviderAction": {"placeholders": {"provider": {"type": "String"}}},
+
+  "mockBanner": "MOCK"
 }

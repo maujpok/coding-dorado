@@ -13,36 +13,48 @@ abstract final class AppSpacing {
   static const double huge = 40;
 }
 
-/// Radios de esquina.
+/// Radios de esquina, medidos en los mocks.
 abstract final class AppRadius {
-  static const double xs = 4; // insignias, chips
-  static const double sm = 6; // íconos de moneda
-  static const double md = 10; // campos de texto
-  static const double lg = 12; // botones
-  static const double xl = 20; // bottom sheets
-  static const double xxl = 24; // tarjetas
+  static const double badge = 4; // insignias, prefijo del monto
+  static const double icon = 5; // íconos de moneda
+  static const double control = 10; // campos y botones
+  static const double card = 17; // tarjeta de la calculadora
+  static const double sheet = 20; // bottom sheets
   static const double pill = 999;
 }
 
-/// Tamaños de controles, medidos en los mocks.
+/// Tamaños de controles, medidos en los mocks (402×874 pt).
 abstract final class AppSizes {
-  static const double pillHeight = 34;
-  static const double fieldHeight = 40;
-  static const double buttonHeight = 44;
+  static const double pillHeight = 33;
+  static const double fieldHeight = 38;
+  static const double buttonHeight = 41;
   static const double swapButton = 41;
   static const double tabsHeight = 40;
   static const double currencyIconSmall = 20;
   static const double currencyIconLarge = 24;
   static const double radio = 22;
+  static const double radioDot = 8;
   static const double listTileHeight = 62;
+  static const double quoteRowHeight = 28;
   static const double sheetHandleWidth = 62;
   static const double sheetHandleHeight = 4;
   static const double borderThin = 1;
   static const double borderStrong = 1.5;
+  static const double ringWidth = 2;
 
   /// Ancho máximo del contenido en tablet y web.
   static const double contentMaxWidth = 400;
   static const double sheetMaxWidth = 520;
+
+  /// Fracción de la pantalla que ocupa el selector de monedas.
+  static const double pickerSheetHeightFactor = 0.7;
+}
+
+/// Reglas de layout responsive.
+abstract final class AppLayout {
+  /// Margen lateral del contenido: 48 pt en teléfonos como el del mock
+  /// (402 pt → tarjeta de ~306 pt) y 16 pt en pantallas angostas.
+  static double horizontalMargin(double width) => width >= 380 ? 48 : 16;
 }
 
 /// Sombras.

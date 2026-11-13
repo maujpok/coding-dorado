@@ -18,6 +18,7 @@ abstract final class AppPalette {
   static const grey100 = Color(0xFFF1F1F0);
   static const grey200 = Color(0xFFE6E6E4); // --fondo-gris
   static const grey300 = Color(0xFFDADAD7);
+  static const grey400 = Color(0xFFBDBDB7); // handle de los sheets
   static const grey500 = Color(0xFF8E8E88);
   static const grey700 = Color(0xFF5B5B55); // --gris-bordes
   static const white = Color(0xFFFFFFFF);

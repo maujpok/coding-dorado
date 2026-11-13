@@ -264,23 +264,23 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 **Objetivo:** el home con las dos pestañas, y la calculadora y los sheets como en `assets/screen_1.jpg`, `sheet_1.jpg` y `sheet_2.jpg`.
 
-- [ ] `HomePage`:
+- [x] `HomePage`:
   - Arriba, un selector de pestañas segmentado ("El Dorado" | "CriptoYa") del design system (`DsPillTabs`): píldora en tinta y la pestaña activa rellena en amarillo.
   - `IndexedStack` para mantener el estado de cada pestaña.
   - Provee los dos `ExchangeBloc` y el `HomeCubit`.
-- [ ] `ExchangeView`: la calculadora, idéntica en ambas pestañas.
-- [ ] Debajo de la tarjeta, un texto de fuente: "Fuente: El Dorado · tasa indicativa" o "Fuente: CriptoYa · mediana de N exchanges P2P".
-- [ ] Componentes del design system (`DsPrimaryButton`, `DsPillTabs`, `DsBadge`, `DsCard`, `DsBottomSheet`, `DsRadio`, `DsSkeleton`), documentados en [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
-- [ ] `ExchangeBackground`: el semicírculo amarillo, proporcional a la pantalla, compartido por ambas pestañas.
-- [ ] `ExchangeCard` con la sombra, el radio y el padding del mock.
-- [ ] `CurrencyPairSelector`: la píldora con borde amarillo, las etiquetas TENGO / QUIERO cortando el borde y `SwapButton` superpuesto.
-- [ ] `CurrencySelectorButton`: ícono, código y chevron.
-- [ ] `AmountField`: prefijo amarillo con el código, teclado decimal y como máximo 2 decimales.
-- [ ] `QuoteSummary` / `QuoteRow`: "≈", el valor y la unidad en un tamaño menor. Si `estimatedTime` es `null` (CriptoYa), la fila de tiempo se oculta.
-- [ ] `PrimaryButton` "Cambiar", con estado deshabilitado.
-- [ ] `CurrencyPickerSheet`: handle, título, `CurrencyListTile` con radio y el scrim negro al 25 %.
-- [ ] `CurrencyAvatar`: asset o iniciales.
-- [ ] Textos en `app_es.arb`.
+- [x] `ExchangeView`: la calculadora, idéntica en ambas pestañas.
+- [x] Debajo de la tarjeta, un texto de fuente: "Fuente: El Dorado · tasa indicativa" o "Fuente: CriptoYa · mediana de N exchanges P2P".
+- [x] Componentes del design system (`DsPrimaryButton`, `DsPillTabs`, `DsBadge`, `DsCard`, `DsBottomSheet`, `DsRadio`, `DsSkeleton`), documentados en [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
+- [x] `ExchangeBackground`: el semicírculo amarillo, proporcional a la pantalla, compartido por ambas pestañas.
+- [x] `ExchangeCard` con la sombra, el radio y el padding del mock.
+- [x] `CurrencyPairSelector`: la píldora con borde amarillo, las etiquetas TENGO / QUIERO cortando el borde y `SwapButton` superpuesto.
+- [x] `CurrencySelectorButton`: ícono, código y chevron.
+- [x] `AmountField`: prefijo amarillo con el código, teclado decimal y como máximo 2 decimales.
+- [x] `QuoteSummary` / `QuoteRow`: "≈", el valor y la unidad en un tamaño menor. Si `estimatedTime` es `null` (CriptoYa), la fila de tiempo se oculta.
+- [x] `PrimaryButton` "Cambiar", con estado deshabilitado.
+- [x] `CurrencyPickerSheet`: handle, título, `CurrencyListTile` con radio y el scrim negro al 25 %.
+- [x] `CurrencyAvatar`: asset o iniciales.
+- [x] Textos en `app_es.arb`.
 
 **Pruebas (widgets):**
 - Cambiar de pestaña conserva el monto escrito en cada una.

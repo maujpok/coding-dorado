@@ -10,12 +10,19 @@ import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.da
 import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Contrato contra `GET https://api.eldorado.io/api/prices`. Avisa si El
-/// Dorado cambia la forma de la respuesta o la cobertura que la app asume.
+/// Contrato contra `GET {ELDORADO_API_URL}/prices`, con la URL del `.env`.
+/// Avisa si El Dorado cambia la forma de la respuesta o la cobertura que la
+/// app asume.
 void main() {
   const enabled = bool.fromEnvironment('LIVE_TESTS');
 
-  final dio = createDio(baseUrl: AppConfig.defaultEldoradoApiUrl);
+  final config = AppConfig.fromEnvironment();
+  // Si se piden las pruebas live sin el .env, fallan con un mensaje claro.
+  setUpAll(() {
+    if (enabled) config.ensureComplete();
+  });
+
+  final dio = createDio(baseUrl: config.eldoradoApiUrl);
   final dataSource = EldoradoPricesDataSource(dio);
 
   test('la respuesta tiene SELL y BUY con precios parseables', () async {

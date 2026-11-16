@@ -364,14 +364,14 @@ La pestaña, el bloc y la comparación no cambian. Sin `API_URL`, la app vuelve 
 
 ## 7. Configuración por entorno
 
-Se lee con `String.fromEnvironment` en `AppConfig`. Se puede pasar con `--dart-define` o con `--dart-define-from-file=config/<entorno>.json`.
+`AppConfig` la lee con `String.fromEnvironment`. Los valores viven en `.env` (no versionado; las claves están en `.env.example`) y se pasan con `--dart-define-from-file=.env`; un `--dart-define` suelto pisa el valor del archivo. El código no tiene URLs: `bootstrap` llama a `AppConfig.ensureComplete()`, que lanza `MissingConfigException` con las claves que faltan si la app se ejecuta sin el `.env`. Las pruebas no lo necesitan: usan URLs de mentira y APIs falsas.
 
-| Clave | Default | Efecto |
+| Clave | Obligatoria | Efecto |
 |---|---|---|
-| `ELDORADO_API_URL` | `https://api.eldorado.io/api` | URL base de `/prices` |
-| `CRIPTOYA_API_URL` | `https://criptoya.com/api` | URL base de CriptoYa |
-| `ELDORADO_SOURCE` | `prices` | `orderbook` para usar el API de órdenes (Fase 10) |
-| `API_URL` | *(vacío)* | endpoint `recommendations` (Fase 10) |
+| `ELDORADO_API_URL` | Sí | URL base de `/prices` |
+| `CRIPTOYA_API_URL` | Sí | URL base de CriptoYa |
+| `ELDORADO_SOURCE` | No (`prices`) | `orderbook` para usar el API de órdenes (Fase 10) |
+| `API_URL` | No | endpoint `recommendations` (Fase 10) |
 
 Cómo arma `injection.dart` cada proveedor:
 
@@ -383,8 +383,8 @@ Cómo arma `injection.dart` cada proveedor:
 Cada repositorio y su `GetExchangeQuote` se registran con `instanceName: provider.name`. `CompareQuotes` recibe un `Map<RateProvider, GetExchangeQuote>` con todos.
 
 ```bash
-flutter run                                                     # APIs reales
-flutter run --dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>   # Fase 10
+flutter run --dart-define-from-file=.env                        # APIs reales
+flutter run --dart-define-from-file=.env --dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>   # Fase 10
 ```
 
 ## 8. Presentación
@@ -611,7 +611,7 @@ sequenceDiagram
 | Unitarias: datos | DTOs contra fixtures reales y casos borde; selección de `SELL`/`BUY`; mediana de CriptoYa (valores en 0, libro invertido); `TtlCache` (TTL, petición en curso compartida, `forceRefresh`); cada escenario de las APIs falsas; mapeo de errores | `test`, APIs falsas en `test/helpers/fake_apis` |
 | Bloc | *debounce*, descarte de respuestas obsoletas, swap, selección, `ExchangePrefilled`, `ExchangeReset`, mínimo, par no disponible, reintento; `HomeCubit`; `QuoteComparisonCubit`; `CheckoutCubit` (éxito, error y reintento, duración mínima) | `bloc_test` |
 | Widgets | Cambiar de pestaña conserva el estado; título sobre la tarjeta y fondo por pestaña; selector FIAT por país; la tarjeta muestra la cotización; los sheets ocultan las monedas no disponibles y se ajustan a la lista; la comparación marca la "Mejor opción" y "Usar {proveedor}" cambia de pestaña con el mismo par y monto; la confirmación edita las tres filas, bloquea "Confirmar" sin cotización vigente y "Cancelar" no confirma; proceso (pasos, sin salida), comprobante (datos, ID copiable), error con reintento; flujo completo con reinicio de la pestaña | `flutter_test` |
-| Contrato (`live`) | La forma real de `/api/prices` y de CriptoYa. Excluidas por defecto; se corren con `--dart-define=LIVE_TESTS=true --tags live` | `flutter_test` |
+| Contrato (`live`) | La forma real de `/api/prices` y de CriptoYa. Excluidas por defecto; se corren con `--dart-define-from-file=.env --dart-define=LIVE_TESTS=true --tags live` | `flutter_test` |
 | Visual (opcional) | *Goldens* de ambas pestañas, los selectores, la comparación, la confirmación, el proceso y el comprobante | `flutter_test` |
 
 ## 12. Cómo escala

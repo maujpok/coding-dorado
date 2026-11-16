@@ -31,6 +31,16 @@ extension PumpApp on WidgetTester {
   );
 }
 
+/// URLs de mentira: en las pruebas responden las APIs falsas, sin red.
+const testEldoradoApiUrl = 'https://eldorado.test/api';
+const testCriptoyaApiUrl = 'https://criptoya.test/api';
+
+/// Configuración de las pruebas; las reales viven en `.env`.
+const testAppConfig = AppConfig(
+  eldoradoApiUrl: testEldoradoApiUrl,
+  criptoyaApiUrl: testCriptoyaApiUrl,
+);
+
 /// Dependencias reales de la app con las APIs de ambos proveedores
 /// reemplazadas por [FakeEldoradoPricesApi] y [FakeCriptoYaApi] (o
 /// [FakeOrderbookApi] si [config] usa el API de órdenes): sin red.
@@ -38,7 +48,7 @@ GetIt fakeApiDependencies({
   EldoradoPricesScenario eldorado = EldoradoPricesScenario.success,
   CriptoYaScenario criptoya = CriptoYaScenario.success,
   OrderbookScenario orderbook = OrderbookScenario.success,
-  AppConfig config = const AppConfig.defaults(),
+  AppConfig config = testAppConfig,
 }) {
   final getIt = GetIt.asNewInstance();
   configureDependencies(

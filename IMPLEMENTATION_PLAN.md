@@ -75,7 +75,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 **Objetivo:** la infraestructura transversal que usan todas las features.
 
-- [x] `AppConfig` lee estas claves con sus defaults:
+- [x] `AppConfig` lee estas claves con sus defaults (*desde la Fase 12 no hay URLs en el código: las obligatorias vienen del `.env`*):
 
   | Clave | Default | Uso |
   |---|---|---|
@@ -427,6 +427,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   - [x] `configureDependencies` recibe `httpInterceptors` por proveedor; `fakeApiDependencies()` arma la app completa sobre las APIs falsas en las pruebas.
   - [x] `ELDORADO_SOURCE=orderbook` necesita `API_URL`; sin ella vuelve a `/api/prices`.
   - [x] Se quita `mocktail`, que no se usaba.
+- [x] Configuración en `.env`: las URLs de las APIs salen del código. `.env.example` (versionado) lista las claves y `.env` (ignorado) tiene los valores; se pasa con `--dart-define-from-file=.env`, también desde `.vscode/launch.json`. Sin las claves obligatorias la app falla al inicio con `MissingConfigException`; las pruebas usan URLs de mentira y las `live` leen el `.env`.
 - [x] QUIERO arranca en BOB: el par inicial (y el del reinicio tras un cambio) pasa a USDT → BOB en ambas pestañas.
 - [x] Las diferencias de los *goldens* fallidos (`test/goldens/failures/`) dejan de versionarse.
 
@@ -467,6 +468,7 @@ Desvíos respecto del plan, todos con el mismo objetivo que la tarea original:
 | Modo mock (Fases 1–10) | `USE_MOCK` con escenarios, latencia y banner | Retirado en la Fase 12; los interceptores pasaron a `test/helpers/fake_apis` como APIs falsas | Pedido posterior: la app solo debe usar datos reales. |
 | Monedas no disponibles (Fase 8) | Deshabilitadas con "No disponible" | Ocultas en los selectores (la elegida se muestra siempre) | Pedido posterior. |
 | Par inicial | USDT → VES, como el diseño | USDT → BOB | Pedido posterior. |
+| URLs de las APIs (Fase 1) | Defaults en `AppConfig` | Solo en `.env`; sin ellas la app no arranca | Pedido posterior: ninguna URL de API en el código. |
 | Posición de la calculadora | Centrada en vertical | Anclada arriba a una distancia fija | Pedido posterior: el título y la tarjeta deben verse en el mismo lugar en ambas pestañas. |
 
 ## Riesgos y mitigaciones
@@ -485,9 +487,9 @@ Desvíos respecto del plan, todos con el mismo objetivo que la tarea original:
 ## Comandos útiles
 
 ```bash
-flutter run                                                    # APIs reales: El Dorado y CriptoYa
-flutter run --dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>             # Fase 10
+flutter run --dart-define-from-file=.env                       # APIs reales: El Dorado y CriptoYa
+flutter run --dart-define-from-file=.env --dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>   # Fase 10
 flutter test                                                   # pruebas, sin red (APIs falsas)
-flutter test --dart-define=LIVE_TESTS=true --tags live         # contrato contra las APIs reales
+flutter test --dart-define-from-file=.env --dart-define=LIVE_TESTS=true --tags live   # contrato contra las APIs reales
 flutter test --coverage                                        # pruebas + cobertura
 ```

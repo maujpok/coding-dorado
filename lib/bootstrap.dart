@@ -7,10 +7,11 @@ import 'package:coding_dorado/features/quote_comparison/domain/usecases/compare_
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 
-/// Lee la configuración, arma las dependencias y arranca la app.
+/// Lee la configuración, arma las dependencias y arranca la app. Sin el
+/// `.env` falla al inicio con [MissingConfigException].
 void bootstrap() {
   WidgetsFlutterBinding.ensureInitialized();
-  final config = AppConfig.fromEnvironment();
+  final config = AppConfig.fromEnvironment()..ensureComplete();
   final getIt = GetIt.instance;
   configureDependencies(getIt, config);
 

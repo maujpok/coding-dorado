@@ -243,8 +243,8 @@ void main() {
 
   group('ELDORADO_SOURCE=orderbook', () {
     const orderbookConfig = AppConfig(
-      eldoradoApiUrl: AppConfig.defaultEldoradoApiUrl,
-      criptoyaApiUrl: AppConfig.defaultCriptoyaApiUrl,
+      eldoradoApiUrl: testEldoradoApiUrl,
+      criptoyaApiUrl: testCriptoyaApiUrl,
       eldoradoSource: EldoradoSource.orderbook,
       orderbookApiUrl: endpoint,
     );
@@ -267,11 +267,11 @@ void main() {
       final getIt = GetIt.asNewInstance();
       configureDependencies(
         getIt,
+        // Sin orderbookApiUrl (API_URL vacía).
         const AppConfig(
-          eldoradoApiUrl: AppConfig.defaultEldoradoApiUrl,
-          criptoyaApiUrl: AppConfig.defaultCriptoyaApiUrl,
+          eldoradoApiUrl: testEldoradoApiUrl,
+          criptoyaApiUrl: testCriptoyaApiUrl,
           eldoradoSource: EldoradoSource.orderbook,
-          orderbookApiUrl: '',
         ),
         // Solo responde GET …/prices; cualquier otra ruta da 404.
         httpInterceptors: {

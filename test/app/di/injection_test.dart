@@ -24,11 +24,11 @@ void main() {
     expect(getIt.allQuoteUseCases().keys, RateProvider.values);
   });
 
-  test('con la configuración por defecto arma todo sin pedir nada', () {
+  test('sin interceptores arma todo sin hacer peticiones', () {
     final real = GetIt.asNewInstance();
-    configureDependencies(real, const AppConfig.defaults());
+    configureDependencies(real, testAppConfig);
 
-    expect(real<AppConfig>(), const AppConfig.defaults());
+    expect(real<AppConfig>(), testAppConfig);
     expect(real.allQuoteUseCases().keys, RateProvider.values);
   });
 

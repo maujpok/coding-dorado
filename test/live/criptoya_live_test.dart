@@ -10,11 +10,21 @@ import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.da
 import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Contrato contra `GET https://criptoya.com/api/{coin}/{fiat}/1`.
+/// Contrato contra `GET {CRIPTOYA_API_URL}/{coin}/{fiat}/1`, con la URL del
+/// `.env`:
+///
+/// flutter test --dart-define-from-file=.env --dart-define=LIVE_TESTS=true
+///   --tags live
 void main() {
   const enabled = bool.fromEnvironment('LIVE_TESTS');
 
-  final dio = createDio(baseUrl: AppConfig.defaultCriptoyaApiUrl);
+  final config = AppConfig.fromEnvironment();
+  // Si se piden las pruebas live sin el .env, fallan con un mensaje claro.
+  setUpAll(() {
+    if (enabled) config.ensureComplete();
+  });
+
+  final dio = createDio(baseUrl: config.criptoyaApiUrl);
   final dataSource = CriptoYaRateDataSource(dio);
 
   test('la respuesta es un objeto de exchanges con bid/ask', () async {

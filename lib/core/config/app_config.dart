@@ -9,48 +9,51 @@ enum EldoradoSource {
   orderbook,
 }
 
-/// Configuración de entorno, leída de `--dart-define`.
+/// Configuración de entorno. Los valores viven en `.env` (ver `.env.example`)
+/// y llegan con `--dart-define-from-file=.env`: el código no tiene URLs.
 final class AppConfig extends Equatable {
   const AppConfig({
     required this.eldoradoApiUrl,
     required this.criptoyaApiUrl,
-    required this.eldoradoSource,
-    required this.orderbookApiUrl,
+    this.eldoradoSource = EldoradoSource.prices,
+    this.orderbookApiUrl = '',
   });
 
-  /// Valores por defecto: las APIs públicas de cada proveedor.
-  const AppConfig.defaults()
-    : eldoradoApiUrl = defaultEldoradoApiUrl,
-      criptoyaApiUrl = defaultCriptoyaApiUrl,
-      eldoradoSource = EldoradoSource.prices,
-      orderbookApiUrl = '';
+  factory AppConfig.fromEnvironment() => AppConfig(
+    eldoradoApiUrl: const String.fromEnvironment('ELDORADO_API_URL'),
+    criptoyaApiUrl: const String.fromEnvironment('CRIPTOYA_API_URL'),
+    eldoradoSource: parseEldoradoSource(
+      const String.fromEnvironment('ELDORADO_SOURCE'),
+    ),
+    // El analizador evalúa fromEnvironment sin el .env (vacío) y lo toma
+    // como el valor por defecto.
+    // ignore: avoid_redundant_argument_values
+    orderbookApiUrl: const String.fromEnvironment('API_URL'),
+  );
 
-  factory AppConfig.fromEnvironment() {
-    return AppConfig(
-      eldoradoApiUrl: const String.fromEnvironment(
-        'ELDORADO_API_URL',
-        defaultValue: defaultEldoradoApiUrl,
-      ),
-      criptoyaApiUrl: const String.fromEnvironment(
-        'CRIPTOYA_API_URL',
-        defaultValue: defaultCriptoyaApiUrl,
-      ),
-      eldoradoSource: parseEldoradoSource(
-        const String.fromEnvironment('ELDORADO_SOURCE'),
-      ),
-      orderbookApiUrl: const String.fromEnvironment('API_URL'),
-    );
-  }
-
-  static const defaultEldoradoApiUrl = 'https://api.eldorado.io/api';
-  static const defaultCriptoyaApiUrl = 'https://criptoya.com/api';
-
+  /// URL base de `/prices` (`ELDORADO_API_URL`). Obligatoria.
   final String eldoradoApiUrl;
+
+  /// URL base de CriptoYa (`CRIPTOYA_API_URL`). Obligatoria.
   final String criptoyaApiUrl;
+
+  /// `ELDORADO_SOURCE`; `prices` si falta.
   final EldoradoSource eldoradoSource;
 
-  /// URL completa del endpoint `recommendations` (Fase 10).
+  /// URL completa del endpoint `recommendations` (`API_URL`, Fase 10).
   final String orderbookApiUrl;
+
+  /// Claves obligatorias que faltan o están vacías.
+  List<String> get missingKeys => [
+    if (eldoradoApiUrl.trim().isEmpty) 'ELDORADO_API_URL',
+    if (criptoyaApiUrl.trim().isEmpty) 'CRIPTOYA_API_URL',
+  ];
+
+  /// Lanza [MissingConfigException] si falta alguna clave obligatoria.
+  void ensureComplete() {
+    final missing = missingKeys;
+    if (missing.isNotEmpty) throw MissingConfigException(missing);
+  }
 
   /// Valores desconocidos o vacíos vuelven a [EldoradoSource.prices].
   static EldoradoSource parseEldoradoSource(String raw) {
@@ -67,4 +70,17 @@ final class AppConfig extends Equatable {
     eldoradoSource,
     orderbookApiUrl,
   ];
+}
+
+/// Falta configuración obligatoria: la app se ejecutó sin el `.env`.
+final class MissingConfigException implements Exception {
+  const MissingConfigException(this.keys);
+
+  final List<String> keys;
+
+  @override
+  String toString() =>
+      'MissingConfigException: faltan ${keys.join(', ')}. Copia .env.example '
+      'a .env, completa los valores y ejecuta con '
+      '--dart-define-from-file=.env.';
 }

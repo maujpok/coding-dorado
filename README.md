@@ -40,29 +40,35 @@ Requisitos: Flutter 3.41 (Dart 3.11).
 
 ```bash
 flutter pub get
-flutter run                                    # APIs reales: El Dorado y CriptoYa
+cp .env.example .env                           # y completar los valores (ver abajo)
+flutter run --dart-define-from-file=.env       # APIs reales: El Dorado y CriptoYa
 ```
 
-La app siempre consulta las APIs reales: no tiene modo de datos simulados.
+La app siempre consulta las APIs reales: no tiene modo de datos simulados. En VS Code, la configuración de `.vscode/launch.json` ya pasa el `.env`.
 
-### Configuración (`--dart-define`)
+### Configuración (`.env`)
 
-| Clave | Default | Uso |
+Las URLs de las APIs no están en el código: viven en `.env`, que no se versiona. [`.env.example`](.env.example) lista las claves. Sin las obligatorias, la app no arranca y lo explica con `MissingConfigException`.
+
+| Clave | Obligatoria | Uso |
 |---|---|---|
-| `ELDORADO_API_URL` / `CRIPTOYA_API_URL` | APIs públicas | URL base de cada proveedor |
-| `ELDORADO_SOURCE` | `prices` | `orderbook`: la pestaña El Dorado usa el API de órdenes del enunciado |
-| `API_URL` | *(vacío)* | URL del endpoint `recommendations`; sin ella, `orderbook` vuelve a `/api/prices` |
+| `ELDORADO_API_URL` | Sí | URL base del API público de precios de El Dorado (`{ELDORADO_API_URL}/prices`) |
+| `CRIPTOYA_API_URL` | Sí | URL base de CriptoYa (`{CRIPTOYA_API_URL}/{coin}/{fiat}/{volumen}`) |
+| `ELDORADO_SOURCE` | No (`prices`) | `orderbook`: la pestaña El Dorado usa el API de órdenes del enunciado |
+| `API_URL` | No | URL del endpoint `recommendations`; sin ella, `orderbook` vuelve a `/prices` |
+
+Los valores de las URLs públicas están en [API_RESEARCH.md](API_RESEARCH.md). Una clave pasada con `--dart-define` pisa la del archivo:
 
 ```bash
-flutter run --dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>   # API de órdenes
+flutter run --dart-define-from-file=.env --dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>
 ```
 
 ### Pruebas
 
 ```bash
 flutter analyze
-flutter test                                               # unitarias, bloc y widgets, sin red (APIs falsas)
-flutter test --dart-define=LIVE_TESTS=true --tags live     # contrato contra las APIs reales
+flutter test                                               # unitarias, bloc y widgets, sin red ni .env (APIs falsas)
+flutter test --dart-define-from-file=.env --dart-define=LIVE_TESTS=true --tags live   # contrato contra las APIs reales
 flutter test --dart-define=GOLDENS=true --tags golden      # capturas a 402×874 pt (macOS)
 ```
 

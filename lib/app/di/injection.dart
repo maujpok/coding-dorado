@@ -1,5 +1,8 @@
 import 'package:coding_dorado/core/config/app_config.dart';
 import 'package:coding_dorado/core/network/dio_factory.dart';
+import 'package:coding_dorado/features/checkout/data/simulated_transaction_repository.dart';
+import 'package:coding_dorado/features/checkout/domain/repositories/transaction_repository.dart';
+import 'package:coding_dorado/features/checkout/domain/usecases/submit_exchange.dart';
 import 'package:coding_dorado/features/exchange/data/common/exchange_rate_data_source.dart';
 import 'package:coding_dorado/features/exchange/data/criptoya/criptoya_exchange_repository.dart';
 import 'package:coding_dorado/features/exchange/data/criptoya/criptoya_rate_data_source.dart';
@@ -17,9 +20,9 @@ import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 
 /// Composition root: un cliente HTTP, un data source, un repositorio y un
-/// `GetExchangeQuote` por [RateProvider], y `CompareQuotes` sobre todos.
-/// Con `USE_MOCK=true`, cada cliente lleva el interceptor mock de su
-/// proveedor.
+/// `GetExchangeQuote` por [RateProvider], `CompareQuotes` sobre todos y
+/// `SubmitExchange` sobre la ejecución simulada. Con `USE_MOCK=true`, cada
+/// cliente lleva el interceptor mock de su proveedor.
 void configureDependencies(GetIt getIt, AppConfig config) {
   getIt
     ..registerSingleton<AppConfig>(config)
@@ -38,9 +41,15 @@ void configureDependencies(GetIt getIt, AppConfig config) {
       instanceName: provider.name,
     );
   }
-  getIt.registerSingleton<CompareQuotes>(
-    CompareQuotes(getIt.allQuoteUseCases()),
-  );
+  getIt
+    ..registerSingleton<CompareQuotes>(CompareQuotes(getIt.allQuoteUseCases()))
+    // Ninguna API pública ejecuta cambios: siempre es simulado.
+    ..registerSingleton<TransactionRepository>(
+      SimulatedTransactionRepository(),
+    )
+    ..registerSingleton<SubmitExchange>(
+      SubmitExchange(getIt<TransactionRepository>()),
+    );
 }
 
 extension ExchangeDependencies on GetIt {

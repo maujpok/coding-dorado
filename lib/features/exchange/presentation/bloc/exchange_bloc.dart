@@ -29,9 +29,9 @@ class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
     required ExchangeRepository repository,
     ExchangePair? initialPair,
     this.quoteDebounce = const Duration(milliseconds: 300),
-    this.submitDelay = const Duration(milliseconds: 800),
   }) : _getQuote = getQuote,
        _repository = repository,
+       _initialPair = initialPair ?? defaultPair(),
        super(ExchangeState(pair: initialPair ?? defaultPair())) {
     on<ExchangeStarted>(_onStarted);
     on<ExchangeAmountChanged>(_onAmountChanged);
@@ -41,7 +41,7 @@ class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
     on<ExchangePrefilled>(_onPrefilled);
     on<ExchangeRatesRefreshed>(_onRefreshed);
     on<ExchangeAppResumed>(_onResumed);
-    on<ExchangeSubmitted>(_onSubmitted, transformer: droppable());
+    on<ExchangeReset>(_onReset);
     on<_QuoteRequested>(_onQuoteRequested, transformer: restartable());
   }
 
@@ -50,9 +50,9 @@ class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
       ExchangePair(from: CurrencyCatalog.usdt, to: CurrencyCatalog.ves);
 
   final Duration quoteDebounce;
-  final Duration submitDelay;
   final GetExchangeQuote _getQuote;
   final ExchangeRepository _repository;
+  final ExchangePair _initialPair;
 
   Future<void> _onStarted(
     ExchangeStarted event,
@@ -133,6 +133,13 @@ class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
     if (state.amount != null) add(const _QuoteRequested());
   }
 
+  /// Conserva la disponibilidad (no depende del par) y cancela cualquier
+  /// cotización en curso.
+  void _onReset(ExchangeReset event, Emitter<ExchangeState> emit) {
+    emit(ExchangeState(pair: _initialPair, availability: state.availability));
+    add(const _QuoteRequested());
+  }
+
   Future<void> _onQuoteRequested(
     _QuoteRequested event,
     Emitter<ExchangeState> emit,
@@ -172,21 +179,5 @@ class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
       if (emit.isDone) return;
       emit(state.copyWith(availability: availability));
     }
-  }
-
-  Future<void> _onSubmitted(
-    ExchangeSubmitted event,
-    Emitter<ExchangeState> emit,
-  ) async {
-    if (!state.canSubmit) return;
-    emit(state.copyWith(isSubmitting: true));
-    await Future<void>.delayed(submitDelay);
-    if (emit.isDone) return;
-    emit(
-      state.copyWith(
-        isSubmitting: false,
-        submissionCount: state.submissionCount + 1,
-      ),
-    );
   }
 }

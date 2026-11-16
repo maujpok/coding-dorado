@@ -1,5 +1,8 @@
 import 'package:coding_dorado/core/design_system/design_system.dart';
+import 'package:coding_dorado/features/checkout/domain/usecases/submit_exchange.dart';
+import 'package:coding_dorado/features/checkout/presentation/pages/checkout_processing_page.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
+import 'package:coding_dorado/features/exchange/domain/entities/exchange_quote.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
 import 'package:coding_dorado/features/exchange/presentation/bloc/exchange_bloc.dart';
 import 'package:coding_dorado/features/exchange/presentation/views/exchange_view.dart';
@@ -18,15 +21,27 @@ typedef ExchangeBlocFactory = ExchangeBloc Function(RateProvider provider);
 ///
 /// Hay dos blocs del mismo tipo, así que no se buscan por tipo en el árbol:
 /// cada pestaña recibe el suyo con `BlocProvider.value`.
+///
+/// También compone las features: comparación de cotizaciones y ejecución
+/// del cambio confirmado (`checkout`).
 class HomePage extends StatefulWidget {
   const HomePage({
     required this.createExchangeBloc,
     required this.compareQuotes,
+    required this.submitExchange,
     super.key,
   });
 
   final ExchangeBlocFactory createExchangeBloc;
   final CompareQuotes compareQuotes;
+  final SubmitExchange submitExchange;
+
+  /// Color del semicírculo de fondo de cada pestaña, para distinguirlas.
+  static Color decorationColorOf(RateProvider provider, AppColors colors) =>
+      switch (provider) {
+        RateProvider.eldorado => colors.backgroundDecoration,
+        RateProvider.criptoya => colors.backgroundDecorationSecondary,
+      };
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -85,6 +100,21 @@ class _HomePageState extends State<HomePage> {
     _blocs[provider]!.add(ExchangePrefilled(pair: pair, amount: amount));
   }
 
+  /// Procesa el cambio confirmado en pantalla completa y muestra el
+  /// comprobante. Si se completó, la calculadora de esa pestaña vuelve a
+  /// empezar: al regresar del comprobante está lista para otro cambio.
+  Future<void> _startCheckout(ExchangeQuote quote) async {
+    final transaction = await Navigator.of(context).push(
+      CheckoutProcessingPage.route(
+        quote: quote,
+        submitExchange: widget.submitExchange,
+      ),
+    );
+    if (transaction != null) {
+      _blocs[transaction.quote.provider]?.add(const ExchangeReset());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -97,6 +127,10 @@ class _HomePageState extends State<HomePage> {
               behavior: HitTestBehavior.translucent,
               onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
               child: DsBackground(
+                decorationColor: HomePage.decorationColorOf(
+                  active,
+                  context.colors,
+                ),
                 child: SafeArea(
                   child: LayoutBuilder(
                     builder: (context, constraints) => Column(
@@ -130,6 +164,8 @@ class _HomePageState extends State<HomePage> {
                                       provider: provider,
                                       onCompare: _openComparison,
                                       onOpenInProvider: _openInProvider,
+                                      onConfirmed: (quote) =>
+                                          _startCheckout(quote).ignore(),
                                     ),
                                   ),
                                 ),

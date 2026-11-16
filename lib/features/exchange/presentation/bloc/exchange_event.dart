@@ -67,9 +67,9 @@ final class ExchangeAppResumed extends ExchangeEvent {
   const ExchangeAppResumed();
 }
 
-/// Botón "Cambiar" (simulado).
-final class ExchangeSubmitted extends ExchangeEvent {
-  const ExchangeSubmitted();
+/// El cambio se completó: vuelve al par inicial y sin monto.
+final class ExchangeReset extends ExchangeEvent {
+  const ExchangeReset();
 }
 
 /// Evento interno: todas las cotizaciones pasan por acá.

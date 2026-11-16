@@ -4,6 +4,10 @@
   "@appTitle": {
     "description": "Título de la app."
   },
+  "calculatorTitle": "Calculadora",
+  "@calculatorTitle": {
+    "description": "Título encima de la tarjeta de la calculadora."
+  },
   "providerEldorado": "El Dorado",
   "providerCriptoya": "CriptoYa",
   "providerTabsLabel": "Fuente de la tasa",
@@ -51,10 +55,34 @@
       }
     }
   },
+  "valueSemantics": "{label}: {value} {unit}",
+  "@valueSemantics": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "emptyValue": "—",
-  "exchangeButton": "Cambiar",
-  "exchangeConfirmation": "Simulación: cambiarías {amount} {from} por ≈ {receive} {to}.",
-  "@exchangeConfirmation": {
+  "exchangeButton": "Simular",
+  "confirmTitle": "Confirma tu cambio",
+  "confirmSubtitle": "Revisa los datos antes de confirmar. Puedes editar el monto y las monedas.",
+  "confirmFromLabel": "Moneda que entregas",
+  "confirmToLabel": "Moneda que recibes",
+  "confirmAmountLabel": "Cantidad",
+  "swapAction": "Invertir",
+  "sourceLabel": "Fuente",
+  "confirmAction": "Confirmar",
+  "cancelAction": "Cancelar",
+  "simulationNote": "Operación simulada: no se mueve dinero real.",
+  "exchangeSubject": "{amount} {from} a {to}",
+  "@exchangeSubject": {
     "placeholders": {
       "amount": {
         "type": "String"
@@ -62,14 +90,78 @@
       "from": {
         "type": "String"
       },
-      "receive": {
-        "type": "String"
-      },
       "to": {
         "type": "String"
       }
     }
   },
+  "processingTitle": "Procesando tu cambio",
+  "processingStepValidate": "Validando la cotización",
+  "processingStepExchange": "Ejecutando el cambio",
+  "processingStepConfirm": "Confirmando la transacción",
+  "processingStepDone": "{step}: listo",
+  "@processingStepDone": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "processingStepActive": "{step}: en curso",
+  "@processingStepActive": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "processingStepPending": "{step}: pendiente",
+  "@processingStepPending": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "processingFailedTitle": "No pudimos completar el cambio",
+  "backAction": "Volver",
+  "successTitle": "¡Cambio exitoso!",
+  "successSubtitle": "Tu transacción se completó correctamente.",
+  "receiptReceived": "Recibiste",
+  "receiptSent": "por {amount} {code}",
+  "@receiptSent": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptRate": "Tasa",
+  "receiptRateValue": "1 {crypto} = {rate} {fiat}",
+  "@receiptRateValue": {
+    "placeholders": {
+      "crypto": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "fiat": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptDate": "Fecha",
+  "receiptTime": "Hora",
+  "receiptId": "ID de transacción",
+  "receiptStatus": "Estado",
+  "receiptStatusCompleted": "Completada",
+  "copyIdAction": "Copiar ID",
+  "idCopied": "ID copiado",
+  "successDone": "Volver al inicio",
   "pickerTitleFiat": "FIAT",
   "pickerTitleCrypto": "Cripto",
   "currencySubtitle": "{name} ({symbol})",

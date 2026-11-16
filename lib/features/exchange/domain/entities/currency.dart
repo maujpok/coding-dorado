@@ -11,6 +11,7 @@ final class Currency extends Equatable {
     required this.symbol,
     required this.type,
     this.iconAsset,
+    this.country,
   });
 
   /// Código ISO o ticker: 'USDT', 'VES'.
@@ -26,6 +27,10 @@ final class Currency extends Equatable {
 
   /// Ruta del ícono; `null` muestra un avatar con iniciales.
   final String? iconAsset;
+
+  /// País de una fiat ('Venezuela'); ordena el selector FIAT. `null` en las
+  /// crypto.
+  final String? country;
 
   bool get isCrypto => type == CurrencyType.crypto;
   bool get isFiat => type == CurrencyType.fiat;

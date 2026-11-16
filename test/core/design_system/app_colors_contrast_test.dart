@@ -22,6 +22,24 @@ void main() {
       'textSecondary / background': (c.textSecondary, c.background),
       'onPrimary / primary': (c.onPrimary, c.primary),
       'onPrimary / primaryPressed': (c.onPrimary, c.primaryPressed),
+      'onPrimarySecondary / primary': (c.onPrimarySecondary, c.primary),
+      // El título y los textos de pie cruzan el semicírculo del fondo.
+      'textPrimary / backgroundDecoration': (
+        c.textPrimary,
+        c.backgroundDecoration,
+      ),
+      'textSecondary / backgroundDecoration': (
+        c.textSecondary,
+        c.backgroundDecoration,
+      ),
+      'textPrimary / backgroundDecorationSecondary': (
+        c.textPrimary,
+        c.backgroundDecorationSecondary,
+      ),
+      'textSecondary / backgroundDecorationSecondary': (
+        c.textSecondary,
+        c.backgroundDecorationSecondary,
+      ),
       'onInverseSurface / inverseSurface': (
         c.onInverseSurface,
         c.inverseSurface,
@@ -47,6 +65,13 @@ void main() {
         expect(contrast(fg, bg), greaterThanOrEqualTo(3));
       });
     }
+
+    test('los fondos de las pestañas se distinguen entre sí', () {
+      expect(
+        c.backgroundDecorationSecondary,
+        isNot(c.backgroundDecoration),
+      );
+    });
 
     test('el amarillo de marca no sirve como texto sobre superficie', () {
       // Documenta la regla: amarillo solo como relleno.

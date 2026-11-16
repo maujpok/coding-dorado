@@ -4,14 +4,14 @@ import 'package:coding_dorado/core/design_system/tokens/app_typography.dart';
 import 'package:flutter/material.dart';
 
 /// Abre un bottom sheet del design system: handle, título centrado y
-/// contenido. Con [heightFactor] ocupa esa fracción de la pantalla (los
-/// selectores de moneda usan 0.7, como el mock); sin él, se ajusta al
-/// contenido.
+/// contenido. El alto se ajusta al contenido; con [maxHeightFactor] no pasa
+/// de esa fracción de la pantalla y el contenido hace scroll (los selectores
+/// de moneda usan 0.7, el alto del mock).
 Future<T?> showDsBottomSheet<T>({
   required BuildContext context,
   required String title,
   required WidgetBuilder builder,
-  double? heightFactor,
+  double? maxHeightFactor,
   Widget? trailing,
 }) {
   return showModalBottomSheet<T>(
@@ -22,12 +22,23 @@ Future<T?> showDsBottomSheet<T>({
       final sheet = DsSheetScaffold(
         title: title,
         trailing: trailing,
-        expand: heightFactor != null,
         child: builder(context),
       );
-      return heightFactor == null
-          ? sheet
-          : FractionallySizedBox(heightFactor: heightFactor, child: sheet);
+      // Con un campo enfocado, el sheet sube por encima del teclado.
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: maxHeightFactor == null
+            ? sheet
+            : ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight:
+                      MediaQuery.sizeOf(context).height * maxHeightFactor,
+                ),
+                child: sheet,
+              ),
+      );
     },
   );
 }
@@ -38,7 +49,6 @@ class DsSheetScaffold extends StatelessWidget {
     required this.title,
     required this.child,
     this.trailing,
-    this.expand = false,
     super.key,
   });
 
@@ -47,9 +57,6 @@ class DsSheetScaffold extends StatelessWidget {
 
   /// Acción opcional a la derecha del título.
   final Widget? trailing;
-
-  /// Si el contenido ocupa todo el alto disponible.
-  final bool expand;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +68,7 @@ class DsSheetScaffold extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Column(
-        mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: AppSpacing.lg),
@@ -100,7 +107,8 @@ class DsSheetScaffold extends StatelessWidget {
               ],
             ),
           ),
-          if (expand) Expanded(child: content) else Flexible(child: content),
+          // El contenido se ajusta a su alto; si no entra, hace scroll.
+          Flexible(child: content),
         ],
       ),
     );

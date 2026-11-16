@@ -5,8 +5,8 @@ import 'dart:io';
 
 import 'package:coding_dorado/app/app.dart';
 import 'package:coding_dorado/app/di/injection.dart';
+import 'package:coding_dorado/features/checkout/presentation/pages/checkout_processing_page.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/currency_pair_selector.dart';
-import 'package:coding_dorado/features/quote_comparison/domain/usecases/compare_quotes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -31,12 +31,7 @@ void main() {
     addTearDown(tester.view.reset);
     final getIt = GetIt.asNewInstance();
     configureDependencies(getIt, mockAppConfig());
-    await tester.pumpWidget(
-      App(
-        createExchangeBloc: mockBlocFactory(getIt),
-        compareQuotes: getIt<CompareQuotes>(),
-      ),
-    );
+    await tester.pumpWidget(mockApp(getIt));
     await tester.pumpAndSettle();
   }
 
@@ -77,6 +72,42 @@ void main() {
     await tester.tap(find.text('Comparar cotizaciones').hitTestable());
     await tester.pumpAndSettle();
     await expectGolden(tester, 'comparison.png');
+  }, skip: !enabled);
+
+  Future<void> openConfirmation(WidgetTester tester) async {
+    await pumpHome(tester);
+    await typeAmount(tester, '5.00');
+    await tester.tap(find.text('Simular').hitTestable());
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('confirmación del cambio', (tester) async {
+    await openConfirmation(tester);
+    await expectGolden(tester, 'confirmation.png');
+  }, skip: !enabled);
+
+  testWidgets('procesando el cambio (segundo paso en curso)', (tester) async {
+    await openConfirmation(tester);
+    await tester.tap(find.text('Confirmar'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1300));
+    // La animación es infinita: sin pumpAndSettle.
+    await expectLater(
+      find.byType(App),
+      matchesGoldenFile('screens/processing.png'),
+    );
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+  }, skip: !enabled);
+
+  testWidgets('cambio exitoso', (tester) async {
+    await openConfirmation(tester);
+    await tester.tap(find.text('Confirmar'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(CheckoutProcessingPage.successHold);
+    await tester.pumpAndSettle();
+    await expectGolden(tester, 'success.png');
   }, skip: !enabled);
 
   testWidgets('calculadora CriptoYa: 5.00 USDT → VES', (tester) async {

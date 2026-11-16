@@ -49,8 +49,9 @@ abstract final class AppSizes {
   static const double contentMaxWidth = 400;
   static const double sheetMaxWidth = 520;
 
-  /// Fracción de la pantalla que ocupa el selector de monedas.
-  static const double pickerSheetHeightFactor = 0.7;
+  /// Alto máximo del selector de monedas, como fracción de la pantalla. Con
+  /// pocas monedas el sheet se ajusta a la lista.
+  static const double pickerSheetMaxHeightFactor = 0.7;
 }
 
 /// Reglas de layout responsive.

@@ -21,6 +21,7 @@ abstract final class CurrencyCatalog {
     name: 'Bolívares',
     symbol: 'Bs',
     type: CurrencyType.fiat,
+    country: 'Venezuela',
     iconAsset: 'assets/fiat_currencies/VES.png',
   );
   static const cop = Currency(
@@ -28,6 +29,7 @@ abstract final class CurrencyCatalog {
     name: 'Pesos Colombianos',
     symbol: r'COL$',
     type: CurrencyType.fiat,
+    country: 'Colombia',
     iconAsset: 'assets/fiat_currencies/COP.png',
   );
   static const ars = Currency(
@@ -35,12 +37,14 @@ abstract final class CurrencyCatalog {
     name: 'Pesos Argentinos',
     symbol: r'ARS$',
     type: CurrencyType.fiat,
+    country: 'Argentina',
   );
   static const pen = Currency(
     code: 'PEN',
     name: 'Soles Peruanos',
     symbol: 'S/',
     type: CurrencyType.fiat,
+    country: 'Perú',
     iconAsset: 'assets/fiat_currencies/PEN.png',
   );
   static const brl = Currency(
@@ -48,6 +52,7 @@ abstract final class CurrencyCatalog {
     name: 'Real Brasileño',
     symbol: r'R$',
     type: CurrencyType.fiat,
+    country: 'Brasil',
     iconAsset: 'assets/fiat_currencies/BRL.png',
   );
 
@@ -58,10 +63,32 @@ abstract final class CurrencyCatalog {
     name: 'Boliviano',
     symbol: 'Bs',
     type: CurrencyType.fiat,
+    country: 'Bolivia',
   );
 
   static const List<Currency> cryptos = [usdt, usdc];
-  static const List<Currency> fiats = [ves, cop, ars, pen, brl, bob];
+
+  /// Ordenadas alfabéticamente por país, como las muestra el selector FIAT:
+  /// Argentina, Bolivia, Brasil, Colombia, Perú, Venezuela.
+  static final List<Currency> fiats = List.unmodifiable(
+    <Currency>[ves, cop, ars, pen, brl, bob]..sort(compareByCountry),
+  );
+
+  /// Compara por país sin distinguir mayúsculas ni tildes ("Perú" = "Peru").
+  static int compareByCountry(Currency a, Currency b) =>
+      _sortKey(a.country ?? a.name).compareTo(_sortKey(b.country ?? b.name));
+
+  static String _sortKey(String text) {
+    const accented = 'áéíóúüñ';
+    const plain = 'aeiouun';
+    final lower = text.toLowerCase();
+    return String.fromCharCodes(
+      lower.runes.map((rune) {
+        final index = accented.indexOf(String.fromCharCode(rune));
+        return index < 0 ? rune : plain.codeUnitAt(index);
+      }),
+    );
+  }
 
   static List<Currency> ofType(CurrencyType type) =>
       type == CurrencyType.crypto ? cryptos : fiats;

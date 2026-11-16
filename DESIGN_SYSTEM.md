@@ -32,7 +32,7 @@ Un design system mínimo para la calculadora: tokens, un tema de Material constr
 | `grey300` | `#DADAD7` | divisores |
 | `grey500` | `#8E8E88` | derivado, para texto deshabilitado |
 | `grey700` | `#5B5B55` | `--gris-bordes` |
-| `green` / `blue` | `#5DFF85` / `#4F4FEB` | acentos del sitio, solo como fondo |
+| `green` / `blue` | `#5DFF85` / `#4F4FEB` | acentos del sitio, solo como fondo (el verde distingue la pestaña de CriptoYa) |
 | `greenInk` / `greenTint` | `#0B6B2E` / `#E3FFE9` | derivados legibles para éxito |
 | `redInk` / `redTint` | `#B3261E` / `#FDECEA` | derivados legibles para error |
 
@@ -43,11 +43,13 @@ Un design system mínimo para la calculadora: tokens, un tema de Material constr
 | Rol | Valor | Uso |
 |---|---|---|
 | `background` | `grey200` | Fondo de pantalla |
-| `backgroundDecoration` | `yellow` | Semicírculo del fondo |
+| `backgroundDecoration` | `yellow` | Semicírculo del fondo (pestaña El Dorado, comprobante) |
+| `backgroundDecorationSecondary` | `green` | Semicírculo del fondo en la pestaña de CriptoYa |
 | `surface` | `grey50` | Tarjeta, bottom sheets |
 | `surfaceMuted` | `grey100` | Skeletons, botones deshabilitados |
 | `primary` / `primaryPressed` | `yellow` / `yellowDeep` | Botón principal, botón de swap, insignias, pestaña activa |
 | `onPrimary` | `ink` | Texto e íconos sobre `primary` |
+| `onPrimarySecondary` | `grey700` | Texto secundario sobre `primary` (pasos pendientes del proceso) |
 | `textPrimary` | `ink` | Texto principal |
 | `textSecondary` | `grey700` | Etiquetas, subtítulos, notas |
 | `textDisabled` | `grey500` | Texto deshabilitado (exento de AA) |
@@ -56,7 +58,7 @@ Un design system mínimo para la calculadora: tokens, un tema de Material constr
 | `handle` | `grey400` (`#BDBDB7`) | Handle de los bottom sheets |
 | `fieldBorder` | `grey700` | Borde de campos en reposo |
 | `inverseSurface` / `onInverseSurface` | `ink` / `grey50` | Selector de pestañas |
-| `success` / `successContainer` | `greenInk` / `greenTint` | Diferencia a favor en la comparación |
+| `success` / `successContainer` | `greenInk` / `greenTint` | Diferencia a favor en la comparación, estado "Completada" |
 | `error` / `errorContainer` | `redInk` / `redTint` | Errores, monto bajo el mínimo |
 | `scrim` | negro al 25 % | Velo detrás de los sheets (igual que el mock) |
 
@@ -68,6 +70,9 @@ Un design system mínimo para la calculadora: tokens, un tema de Material constr
 | `textSecondary` / `surface` | 6.7:1 | 4.5 |
 | `textSecondary` / `background` | 5.5:1 | 4.5 |
 | `onPrimary` / `primary` | 17.5:1 | 4.5 |
+| `onPrimarySecondary` / `primary` | 6.4:1 | 4.5 |
+| `textSecondary` / `backgroundDecoration` (textos que cruzan el semicírculo) | 6.4:1 | 4.5 |
+| `textSecondary` / `backgroundDecorationSecondary` | 5.2:1 | 4.5 |
 | `primary` / `inverseSurface` (pestaña activa) | 17.5:1 | 4.5 |
 | `error` / `errorContainer` | 5.7:1 | 4.5 |
 | `success` / `successContainer` | 6.3:1 | 4.5 |
@@ -79,6 +84,7 @@ Fuente **Rubik** (OFL), empaquetada en `assets/fonts/` para no depender de la re
 
 | Estilo | Tamaño / peso | Uso |
 |---|---|---|
+| `display` | 26 / 600 | Títulos de pantalla ("Calculadora", "Procesando tu cambio", "¡Cambio exitoso!") y el monto del comprobante |
 | `title` | 20 / 400 | Título de bottom sheets |
 | `headline` | 18 / 500 | Monto destacado en la comparación |
 | `body` | 14 / 400 | Etiquetas del resumen, valores, monto ingresado |
@@ -95,7 +101,7 @@ Fuente **Rubik** (OFL), empaquetada en `assets/fonts/` para no depender de la re
 |---|---|
 | `AppSpacing` | `xxs` 2 · `xs` 4 · `sm` 8 · `md` 12 · `lg` 16 · `xl` 20 · `xxl` 24 · `xxxl` 32 · `huge` 40 |
 | `AppRadius` | `badge` 4 · `icon` 5 · `control` 10 (campos y botones) · `card` 17 · `sheet` 20 · `pill` |
-| `AppSizes` | selector 33 · campo 38 · botón 41 · swap 41 · pestañas 40 · íconos de UI 16/18/22 · íconos de moneda 20/24 · radio 22 (anillo 2, punto 8) · fila de lista 62 · fila del resumen 28 · handle 62×4 · ancho máximo 400 (contenido) y 520 (sheets) · selector de monedas al 70 % de la pantalla |
+| `AppSizes` | selector 33 · campo 38 · botón 41 · swap 41 · pestañas 40 · íconos de UI 16/18/22 · íconos de moneda 20/24 · radio 22 (anillo 2, punto 8) · fila de lista 62 · fila del resumen 28 · handle 62×4 · ancho máximo 400 (contenido) y 520 (sheets) · selector de monedas: alto según la lista, hasta el 70 % de la pantalla |
 | `AppLayout` | margen lateral 48 pt desde 380 pt de ancho (tarjeta de ~306 pt en el teléfono del mock), 16 pt en pantallas angostas |
 | `AppShadows` | `card` (ambiente suave + borde inferior marcado, como el mock) · `raised` (botón de swap) |
 | `AppMotion` | `fast` 150 ms · `normal` 250 ms · `slow` 400 ms · curva `easeOutCubic` |
@@ -110,15 +116,17 @@ Viven en [`lib/core/design_system/components/`](lib/core/design_system/component
 
 | Componente | Qué es | Estados y accesibilidad |
 |---|---|---|
-| `DsBackground` | Fondo con el semicírculo del mock (centro en 1.945·ancho, 0.378·alto; radio 1.403·ancho, ajustado con error < 1 px) | — |
+| `DsBackground` | Fondo con el semicírculo del mock (centro en 1.945·ancho, 0.378·alto; radio 1.403·ancho, ajustado con error < 1 px) | `decorationColor` opcional (una pestaña por color); el cambio de color se anima |
 | `DsCard` | Superficie con radio `card`, borde `outlineSubtle` y sombra `card` | `elevated` (con o sin sombra), `highlighted` (borde en tinta) |
 | `DsPrimaryButton` | Acción principal: amarillo, texto y borde en tinta | Deshabilitado (`onPressed: null`) en `surfaceMuted`; `isLoading` con indicador; `Semantics(button, enabled)` |
+| `DsTextButton` | Acción secundaria: texto en tinta sin relleno, mismo alto y ancho que `DsPrimaryButton` ("Cancelar") | Deshabilitado en `textDisabled`; `Semantics(button, enabled)` |
 | `DsLink` | Enlace en tinta con subrayado, como los de eldorado.io | Deshabilitado en `textDisabled`; `Semantics(link)` |
 | `DsPillTabs<T>` | Pestañas segmentadas: píldora en tinta y la activa en amarillo, con indicador animado | `Semantics(selected, button, inMutuallyExclusiveGroup)` por pestaña |
-| `DsBadge` | Etiqueta amarilla con texto en tinta | Estilo de texto configurable (prefijo del monto, "Mejor opción") |
+| `DsBadge` | Etiqueta amarilla con texto en tinta, o en tono de éxito (`DsBadgeTone.success`) | Estilo de texto configurable (prefijo del monto, "Mejor opción", "Completada") |
+| `DsConversionText` | "5.00 USDT → VES" con la flecha como ícono (Rubik no trae el glifo) | Se achica en lugar de desbordar; el lector usa una frase propia |
 | `DsRadio` | Indicador de selección: anillo `fieldBorder`; seleccionado, anillo en tinta, relleno amarillo y punto | `enabled`; es visual: la fila entera es el control |
 | `DsSkeleton` | Bloque que pulsa mientras carga | Excluido de la semántica |
-| `showDsBottomSheet` / `DsSheetScaffold` | Sheet con handle, título centrado y contenido; alto fijo (`heightFactor`) o ajustado al contenido | Título como `header`; ancho máximo 520; acción opcional junto al título |
+| `showDsBottomSheet` / `DsSheetScaffold` | Sheet con handle, título centrado y contenido; alto ajustado al contenido, con tope opcional (`maxHeightFactor`) y scroll | Título como `header`; ancho máximo 520; sube con el teclado; acción opcional junto al título |
 
 Los widgets propios de la calculadora (selector de par, campo de monto, filas del resumen, ícono de moneda) están en la feature `exchange` y se construyen con estos componentes y tokens.
 
@@ -136,8 +144,11 @@ flutter test --dart-define=GOLDENS=true --tags golden [--update-goldens]
 |---|---|---|
 | Fondo | celeste `#E0F8FA` | gris de El Dorado `#E6E6E4` |
 | Semicírculo, botones, swap | ámbar `#FFB200` | amarillo de El Dorado `#FFFF00` |
-| Texto del botón "Cambiar" | blanco | tinta (blanco sobre amarillo no se lee) |
+| Botón principal de la tarjeta | "Cambiar", texto blanco | "Simular" (la operación es simulada), texto en tinta (blanco sobre amarillo no se lee) |
 | Bordes del selector y del campo | ámbar | tinta y `--gris-bordes` (el amarillo no se ve sobre blanco) |
 | Prefijo del monto ("USDT") | texto ámbar | código en tinta sobre amarillo |
+| Selector de monedas | 70 % de la pantalla | alto según la lista (tope del 70 %) |
+| Título | — | "Calculadora" encima de la tarjeta, alineado con su borde |
+| Orden del selector FIAT | VES, COP, ARS, PEN, BRL, BOB | alfabético por país: ARS, BOB, BRL, COP, PEN, VES |
 
 La estructura, las medidas y la tipografía no cambian.

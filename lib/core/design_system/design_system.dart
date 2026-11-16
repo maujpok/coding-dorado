@@ -7,6 +7,7 @@ export 'components/ds_badge.dart';
 export 'components/ds_bottom_sheet.dart';
 export 'components/ds_button.dart';
 export 'components/ds_card.dart';
+export 'components/ds_conversion_text.dart';
 export 'components/ds_pill_tabs.dart';
 export 'components/ds_radio.dart';
 export 'components/ds_skeleton.dart';

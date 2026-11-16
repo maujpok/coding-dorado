@@ -55,8 +55,6 @@ final class ExchangeState extends Equatable {
     this.amount,
     this.quote = const QuoteIdle(),
     this.availability = const PairAvailability.unknown(),
-    this.isSubmitting = false,
-    this.submissionCount = 0,
   });
 
   final ExchangePair pair;
@@ -72,11 +70,6 @@ final class ExchangeState extends Equatable {
   /// Para deshabilitar monedas sin cotización en los sheets.
   final PairAvailability availability;
 
-  final bool isSubmitting;
-
-  /// Cambios confirmados; la UI muestra la confirmación cuando aumenta.
-  final int submissionCount;
-
   /// La cotización vigente, solo si corresponde al par y al monto actuales.
   ExchangeQuote? get currentQuote {
     final status = quote;
@@ -86,7 +79,8 @@ final class ExchangeState extends Equatable {
     return loaded;
   }
 
-  bool get canSubmit => currentQuote != null && !isSubmitting;
+  /// "Cambiar" y "Confirmar" solo con una cotización vigente.
+  bool get canSubmit => currentQuote != null;
 
   ExchangeState copyWith({
     ExchangePair? pair,
@@ -94,8 +88,6 @@ final class ExchangeState extends Equatable {
     ValueGetter<Decimal?>? amount,
     QuoteStatus? quote,
     PairAvailability? availability,
-    bool? isSubmitting,
-    int? submissionCount,
   }) {
     return ExchangeState(
       pair: pair ?? this.pair,
@@ -103,8 +95,6 @@ final class ExchangeState extends Equatable {
       amount: amount != null ? amount() : this.amount,
       quote: quote ?? this.quote,
       availability: availability ?? this.availability,
-      isSubmitting: isSubmitting ?? this.isSubmitting,
-      submissionCount: submissionCount ?? this.submissionCount,
     );
   }
 
@@ -115,7 +105,5 @@ final class ExchangeState extends Equatable {
     amount,
     quote,
     availability,
-    isSubmitting,
-    submissionCount,
   ];
 }

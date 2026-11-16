@@ -82,11 +82,14 @@ class QuoteComparisonView extends StatelessWidget {
                     cubit.pair.to.code,
                   ),
                   excludeSemantics: true,
-                  child: _Subject(
+                  child: DsConversionText(
                     from:
                         '${AmountFormatter.format(cubit.amount)} '
                         '${cubit.pair.from.code}',
                     to: cubit.pair.to.code,
+                    style: AppTypography.bodyStrong.copyWith(
+                      color: colors.textSecondary,
+                    ),
                   ),
                 ),
               ),
@@ -169,40 +172,6 @@ class _Summary extends StatelessWidget {
             color: positive ? colors.success : colors.textPrimary,
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// "5.00 USDT → VES" con la flecha como ícono (Rubik no tiene el glifo).
-class _Subject extends StatelessWidget {
-  const _Subject({required this.from, required this.to});
-
-  final String from;
-  final String to;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final style = AppTypography.bodyStrong.copyWith(
-      color: colors.textSecondary,
-    );
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(from, style: style),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-            child: Icon(
-              Icons.arrow_forward_rounded,
-              size: AppSizes.iconSmall,
-              color: colors.textSecondary,
-            ),
-          ),
-          Text(to, style: style),
-        ],
       ),
     );
   }

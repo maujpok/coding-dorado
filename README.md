@@ -5,7 +5,7 @@ Mini-app en Flutter que calcula cuánto recibes al cambiar un monto entre una cr
 - **El Dorado:** el API público oficial (`api.eldorado.io/api/prices`), con el precio de su libro P2P.
 - **CriptoYa:** la mediana de los exchanges P2P que agrega.
 
-Una tercera función compara las dos cotizaciones lado a lado.
+Una tercera función compara las dos cotizaciones lado a lado, y "Simular" lleva a un flujo de confirmación, proceso y comprobante (simulado: ninguna de las APIs permite operar).
 
 | Mock del diseño (izquierda) y app (derecha) | Selector FIAT: mock y app |
 |---|---|
@@ -13,12 +13,19 @@ Una tercera función compara las dos cotizaciones lado a lado.
 
 ![Pestaña CriptoYa y comparación de cotizaciones](docs/screenshots/criptoya_and_comparison.png)
 
+![Confirmación, proceso y comprobante](docs/screenshots/checkout_flow.png)
+
 La estructura, las medidas y la tipografía (Rubik) se midieron sobre los mocks. La paleta es la de **El Dorado**, tomada de las variables CSS de eldorado.io: amarillo `#FFFF00` como relleno con texto en tinta, que es como la usa la marca ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)).
 
 ## Qué hace
 
-- **Calculadora:** selector TENGO / QUIERO con botón de intercambio, monto con hasta 2 decimales, tasa estimada, monto a recibir y tiempo estimado. "Cambiar" es una confirmación simulada.
-- **Dos fuentes, misma calculadora:** cada pestaña conserva su par y su monto. Las tasas se cachean (60 s en El Dorado, 30 s por par en CriptoYa), así que escribir no genera peticiones.
+- **Calculadora:** título "Calculadora" sobre la tarjeta; selector TENGO / QUIERO con botón de intercambio (la lista FIAT va en orden alfabético por país); monto con hasta 2 decimales, tasa estimada, monto a recibir y tiempo estimado.
+- **Dos fuentes, misma calculadora:** cada pestaña conserva su par y su monto, y tiene su color de fondo (amarillo El Dorado, verde CriptoYa). Las tasas se cachean (60 s en El Dorado, 30 s por par en CriptoYa), así que escribir no genera peticiones.
+- **Simular:**
+  - Confirmación en un bottom sheet con tres filas editables (moneda que entregas, moneda que recibes, cantidad), el detalle de la cotización, "Confirmar" y "Cancelar". Lo que se edita queda en la calculadora.
+  - Proceso a pantalla completa con animación y pasos.
+  - Comprobante con lo recibido y lo enviado, tasa, fuente, fecha, hora, estado e ID copiable.
+  - Al terminar, la calculadora de esa pestaña vuelve a empezar.
 - **Comparación:** las dos cotizaciones para el mismo par y monto, la "Mejor opción" y la diferencia ("Con CriptoYa recibes +1.25 VES (+1.00 %)"). "Usar …" lleva a esa pestaña con el mismo par y monto.
 - **Estados cuidados:**
   - Monto bajo el mínimo de El Dorado.
@@ -68,7 +75,7 @@ Las pruebas `live` y los *goldens* no corren por defecto: unas dependen de la re
 
 ## Arquitectura
 
-Organizada por funcionalidad (`home`, `exchange`, `quote_comparison`), con capas `domain` / `data` / `presentation`. El detalle está en [ARCHITECTURE.md](ARCHITECTURE.md).
+Organizada por funcionalidad (`home`, `exchange`, `quote_comparison`, `checkout`), con capas `domain` / `data` / `presentation`. El detalle está en [ARCHITECTURE.md](ARCHITECTURE.md).
 
 - **Dominio en Dart puro:** entidades, reglas de conversión con `Decimal` (nunca `double` para dinero), mínimo por proveedor y comparación.
 - **Un repositorio por proveedor** (`RateProvider`). `ExchangeBloc` no sabe de qué proveedor es, así que cada pestaña es la misma calculadora con otra fuente. Sumar un proveedor agrega su pestaña y lo incluye en la comparación.
@@ -84,8 +91,9 @@ lib/
 ├── app/                 # App, composition root (get_it)
 ├── core/                # config, red, caché, errores, formateo, design system
 ├── features/
-│   ├── exchange/        # calculadora: domain / data (eldorado, criptoya, orderbook) / presentation
-│   ├── home/            # pestañas por proveedor
+│   ├── checkout/        # ejecución (simulada), proceso y comprobante
+│   ├── exchange/        # calculadora y confirmación: domain / data (eldorado, criptoya, orderbook) / presentation
+│   ├── home/            # pestañas por proveedor; compone las features
 │   └── quote_comparison/
 └── l10n/                # ARB y textos derivados del dominio
 ```
@@ -98,8 +106,11 @@ lib/
 - **Cobertura de El Dorado:** solo cotiza USDT; VES solo se puede vender. Esos pares se muestran como no disponibles, sin inventar tasas.
 - **Precios indicativos:** El Dorado lo aclara en su documentación. CriptoYa es una mediana de mercado; la comparación lo explica en una nota.
 - **Tiempo estimado:** `/api/prices` no lo informa, así que se muestra el del diseño (10 min). CriptoYa no aplica, y la fila se oculta.
+- **Ejecución simulada:** `SimulatedTransactionRepository` aprueba el cambio tras 1.2 s con un ID propio. Un API real reemplaza solo esa clase ([ARCHITECTURE.md §10](ARCHITECTURE.md#10-confirmación-y-ejecución-del-cambio)).
 - **Detalles del diseño:**
-  - Las pestañas y la comparación no están en el diseño; se construyeron con sus tokens.
+  - El título, las pestañas, la comparación, la confirmación y las pantallas de proceso y éxito no están en el diseño; se construyeron con sus tokens.
+  - El selector de monedas se ajusta a la lista en lugar de ocupar el 70 % fijo del mock, y las fiat van por país.
+  - El botón de la tarjeta dice "Simular" (en el mock, "Cambiar"), porque la operación es simulada.
   - El sheet del diseño dice "Boliviano (R$)"; se usa el símbolo correcto, `Bs`.
 - **Fuente Rubik empaquetada** (licencia OFL) para no depender de la red en tiempo de ejecución ni en las pruebas.
 

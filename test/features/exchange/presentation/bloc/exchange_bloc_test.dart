@@ -60,7 +60,6 @@ void main() {
     getQuote: GetExchangeQuote(repository),
     repository: repository,
     quoteDebounce: debounce,
-    submitDelay: Duration.zero,
   );
 
   setUp(() {
@@ -254,29 +253,41 @@ void main() {
     );
   }
 
+  final usdtToCop = PairAvailability.only({
+    PairAvailability.keyOf(ExchangePair(from: usdt, to: cop)),
+  });
   blocTest<ExchangeBloc, ExchangeState>(
-    'Cambiar con cotización vigente confirma el cambio',
+    'reiniciar vuelve al par inicial sin monto y conserva la disponibilidad',
     build: buildBloc,
-    act: (bloc) async {
-      bloc.add(const ExchangeAmountChanged('5'));
-      await Future<void>.delayed(Duration.zero);
-      bloc
-        ..add(const ExchangeSubmitted())
-        ..add(const ExchangeSubmitted());
-    },
-    wait: const Duration(milliseconds: 20),
-    verify: (bloc) {
-      expect(bloc.state.submissionCount, 1, reason: 'droppable');
-      expect(bloc.state.isSubmitting, isFalse);
-    },
+    seed: () => ExchangeState(
+      pair: ExchangePair(from: usdt, to: cop),
+      amountText: '5',
+      amount: dec('5'),
+      availability: usdtToCop,
+    ),
+    act: (bloc) => bloc.add(const ExchangeReset()),
+    expect: () => [
+      ExchangeState(pair: ExchangeBloc.defaultPair(), availability: usdtToCop),
+    ],
+    verify: (_) => expect(repository.calls, isEmpty),
   );
 
-  blocTest<ExchangeBloc, ExchangeState>(
-    'Cambiar sin cotización no hace nada',
-    build: buildBloc,
-    act: (bloc) => bloc.add(const ExchangeSubmitted()),
-    expect: () => <ExchangeState>[],
-  );
+  test('reiniciar descarta una cotización en curso', () async {
+    final pending = Completer<Result<ExchangeRate>>();
+    repository.onGetRate = (_, _) => pending.future;
+    final bloc = buildBloc()..add(const ExchangeAmountChanged('5'));
+    await Future<void>.delayed(Duration.zero);
+    expect(bloc.state.quote, isA<QuoteLoading>());
+
+    bloc.add(const ExchangeReset());
+    await Future<void>.delayed(Duration.zero);
+    pending.complete(Ok(ExchangeRate(fiatPerCrypto: dec('25'))));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(bloc.state.amount, isNull);
+    expect(bloc.state.quote, const QuoteIdle());
+    await bloc.close();
+  });
 
   blocTest<ExchangeBloc, ExchangeState>(
     'al volver a la app recotiza sin forzar la caché',

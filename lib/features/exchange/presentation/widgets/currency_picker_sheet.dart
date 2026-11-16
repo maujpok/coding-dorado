@@ -18,7 +18,7 @@ Future<Currency?> showCurrencyPicker({
   return showDsBottomSheet<Currency>(
     context: context,
     title: l10n.pickerTitle(type),
-    heightFactor: AppSizes.pickerSheetHeightFactor,
+    maxHeightFactor: AppSizes.pickerSheetMaxHeightFactor,
     builder: (context) => CurrencyPickerList(
       currencies: CurrencyCatalog.ofType(type),
       selected: selected,
@@ -45,7 +45,9 @@ class CurrencyPickerList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: EdgeInsets.zero,
+      // Se ajusta a la lista: sin espacio vacío debajo de la última moneda.
+      shrinkWrap: true,
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       children: [
         for (final currency in currencies)
           CurrencyListTile(

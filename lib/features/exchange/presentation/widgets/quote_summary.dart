@@ -79,8 +79,9 @@ class QuoteRow extends StatelessWidget {
   const QuoteRow({
     required this.label,
     required this.value,
-    required this.unit,
+    this.unit = '',
     this.loading = false,
+    this.approximate = true,
     super.key,
   });
 
@@ -90,6 +91,10 @@ class QuoteRow extends StatelessWidget {
   final String? value;
   final String unit;
   final bool loading;
+
+  /// Antepone "≈" (las tasas son indicativas). `false` para valores exactos,
+  /// como el monto que ingresó el usuario.
+  final bool approximate;
 
   @override
   Widget build(BuildContext context) {
@@ -112,22 +117,24 @@ class QuoteRow extends StatelessWidget {
         child: Text.rich(
           TextSpan(
             children: [
-              TextSpan(
-                text: '≈ ',
-                style: AppTypography.caption.copyWith(
-                  color: colors.textPrimary,
+              if (approximate)
+                TextSpan(
+                  text: '≈ ',
+                  style: AppTypography.caption.copyWith(
+                    color: colors.textPrimary,
+                  ),
                 ),
-              ),
               TextSpan(
                 text: value,
                 style: AppTypography.body.copyWith(color: colors.textPrimary),
               ),
-              TextSpan(
-                text: ' $unit',
-                style: AppTypography.caption.copyWith(
-                  color: colors.textPrimary,
+              if (unit.isNotEmpty)
+                TextSpan(
+                  text: ' $unit',
+                  style: AppTypography.caption.copyWith(
+                    color: colors.textPrimary,
+                  ),
                 ),
-              ),
             ],
           ),
           maxLines: 1,
@@ -138,7 +145,9 @@ class QuoteRow extends StatelessWidget {
     return Semantics(
       label: value == null
           ? label
-          : l10n.approxValueSemantics(label, value, unit),
+          : approximate
+          ? l10n.approxValueSemantics(label, value, unit).trim()
+          : l10n.valueSemantics(label, value, unit).trim(),
       excludeSemantics: true,
       child: SizedBox(
         height: AppSizes.quoteRowHeight,

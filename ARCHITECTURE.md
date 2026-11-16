@@ -25,13 +25,13 @@ El diseño de referencia está en `assets/screen_1.jpg` (calculadora), `assets/s
 
 ### Fuera de alcance
 
-Autenticación, ejecución real del cambio (el botón "Cambiar" se simula), persistencia e historial.
+Autenticación, ejecución real del cambio (se simula detrás de `TransactionRepository`, §10), persistencia e historial.
 
 ## 2. Decisiones clave
 
 | # | Decisión | Alternativas descartadas | Motivo |
 |---|---|---|---|
-| D1 | Organización por *feature* (`home`, `exchange`, `quote_comparison`) con capas `domain` / `data` / `presentation` | Por capa técnica, MVC | La feature es la unidad de crecimiento; las capas aíslan el dominio de Flutter y de las APIs. |
+| D1 | Organización por *feature* (`home`, `exchange`, `quote_comparison`, `checkout`) con capas `domain` / `data` / `presentation` | Por capa técnica, MVC | La feature es la unidad de crecimiento; las capas aíslan el dominio de Flutter y de las APIs. |
 | D2 | **Un `ExchangeRepository` por proveedor**, identificado por `RateProvider`. `ExchangeBloc` no sabe de qué proveedor se trata. | Un repositorio con un *flag*; el proveedor elegido globalmente por configuración | Las dos pestañas reutilizan la misma UI y el mismo bloc con estado independiente, y la comparación necesita ambos proveedores a la vez. |
 | D3 | **Tasas independientes del monto y cacheadas** (El Dorado 60 s, CriptoYa 30 s por par), con una sola petición en curso | Una petición por cada cambio del monto | Lo que se recibe se calcula al instante, se respetan los límites de uso de las APIs, y la pestaña y la comparación muestran los mismos números. |
 | D4 | La comparación es una feature aparte que depende solo del **dominio** de `exchange` | Implementarla dentro de la calculadora | Se puede probar y quitar por separado, y la calculadora no crece. |
@@ -43,10 +43,11 @@ Autenticación, ejecución real del cambio (el botón "Cambiar" se simula), pers
 | D10 | `get_it` como *composition root*, con una instancia por proveedor (`instanceName`) | Inyección manual, `injectable` | Simple y sin codegen; un solo lugar arma las dependencias según la configuración. |
 | D11 | Textos en ARB (`flutter gen-l10n`), locale `es` | Strings en el código | Permite sumar idiomas sin refactor. |
 | D12 | Design system propio (`core/design_system`): paleta de El Dorado, tokens semánticos como `ThemeExtension` y componentes `Ds*` | Colores y estilos sueltos en cada widget | Un solo lugar define la marca; el contraste se verifica con pruebas; sumar un tema oscuro no toca los widgets. |
+| D13 | La confirmación edita el **mismo `ExchangeBloc`** de la pestaña; la ejecución es una feature aparte (`checkout`) con un `TransactionRepository` simulado | Un estado propio para el sheet; ejecutar dentro de `exchange` | Lo que se edita al confirmar queda en la calculadora sin sincronizar dos estados; cambiar la simulación por un API real no toca la UI. |
 
 ## 3. Vista general
 
-Regla de dependencias: `presentation → domain ← data`. El dominio es Dart puro: no importa Flutter, `dio` ni nada de `data`. `quote_comparison` solo depende del dominio de `exchange`.
+Regla de dependencias: `presentation → domain ← data`. El dominio es Dart puro: no importa Flutter, `dio` ni nada de `data`. `quote_comparison` y `checkout` solo dependen del dominio de `exchange`; `home` las compone.
 
 ```mermaid
 flowchart TB
@@ -55,17 +56,20 @@ flowchart TB
     V1 --> B1["ExchangeBloc"]
     V2 --> B2["ExchangeBloc"]
     Sheet[QuoteComparisonSheet] --> CC[QuoteComparisonCubit]
+    Checkout["CheckoutProcessingPage<br/>CheckoutCubit"] --> SE
   end
   subgraph domain
     Q1["GetExchangeQuote<br/>(eldorado)"]
     Q2["GetExchangeQuote<br/>(criptoya)"]
     CQ[CompareQuotes]
     RepoI[["ExchangeRepository (interfaz)"]]
+    SE[SubmitExchange] --> TxI[["TransactionRepository (interfaz)"]]
   end
   subgraph data
     RE[EldoradoExchangeRepository] --> EP[EldoradoPricesDataSource]
     RC[CriptoYaExchangeRepository] --> CY[CriptoYaRateDataSource]
     OB["OrderbookRateDataSource<br/>(Fase 10)"]
+    ST[SimulatedTransactionRepository]
   end
   subgraph core
     Cache[TtlCache]
@@ -76,6 +80,7 @@ flowchart TB
   B2 --> Q2 --> RepoI
   CC --> CQ --> Q1 & Q2
   RE & RC -.implementan.-> RepoI
+  ST -.implementa.-> TxI
   EP --> Cache --> D1
   CY --> D2
   OB -.-> D1
@@ -106,11 +111,11 @@ lib/
 └── features/
     ├── home/presentation/
     │   ├── cubit/home_cubit.dart               # pestaña activa (RateProvider)
-    │   ├── pages/home_page.dart                # crea los ExchangeBloc; IndexedStack
+    │   ├── pages/home_page.dart                # crea los ExchangeBloc; fondo por pestaña, checkout
     │   └── widgets/provider_tabs.dart          # una pestaña por RateProvider.values
     ├── exchange/
     │   ├── domain/
-    │   │   ├── catalog/currency_catalog.dart   # las 8 monedas del diseño (regla de negocio)
+    │   │   ├── catalog/currency_catalog.dart   # las 8 monedas del diseño; fiat ordenadas por país
     │   │   ├── entities/                       # currency, exchange_pair, exchange_rate, exchange_quote,
     │   │   │                                   # rate_provider, pair_availability
     │   │   ├── repositories/exchange_repository.dart
@@ -129,7 +134,9 @@ lib/
     │   └── presentation/
     │       ├── bloc/                           # exchange_bloc, exchange_event, exchange_state
     │       ├── views/exchange_view.dart        # la calculadora (una por pestaña)
-    │       └── widgets/                        # ver §8.4
+    │       ├── views/currency_selection.dart   # abre los selectores y aplica la moneda al bloc
+    │       └── widgets/                        # ver §8.4; incluye exchange_confirmation_sheet
+    │                                           # y confirmation_fields (las tres filas)
     └── quote_comparison/
         ├── domain/
         │   ├── entities/quote_comparison.dart
@@ -137,6 +144,15 @@ lib/
         └── presentation/
             ├── cubit/quote_comparison_cubit.dart
             └── widgets/                        # quote_comparison_sheet, provider_quote_card
+    └── checkout/
+        ├── domain/                             # exchange_transaction, transaction_repository,
+        │                                       # submit_exchange
+        ├── data/simulated_transaction_repository.dart
+        └── presentation/
+            ├── cubit/checkout_cubit.dart
+            ├── pages/                          # checkout_processing_page, checkout_success_page
+            └── widgets/                        # processing_animation, processing_steps,
+                                                # success_mark, receipt_card
 test/                                           # misma estructura que lib/
 ├── fixtures/eldorado/                          # respuestas reales capturadas y casos borde
 ├── fixtures/criptoya/
@@ -156,6 +172,7 @@ final class Currency extends Equatable {
   final String symbol;      // 'USDT', 'Bs'
   final CurrencyType type;
   final String? iconAsset;  // ruta del asset; null → avatar con iniciales
+  final String? country;    // país de una fiat; ordena el selector FIAT
 }
 
 enum RateProvider { eldorado, criptoya } // el orden define el de las pestañas
@@ -392,7 +409,7 @@ final class ExchangeState extends Equatable {
   final Decimal? amount;                 // null si está vacío o es inválido
   final QuoteStatus quote;
   final PairAvailability availability;   // para deshabilitar monedas en los sheets
-  bool get canSubmit => quote is QuoteLoaded;
+  bool get canSubmit => currentQuote != null; // cotización del par y monto actuales
 }
 
 sealed class QuoteStatus {}
@@ -412,7 +429,9 @@ final class QuoteFailed extends QuoteStatus { Failure failure; }
 | `ExchangeCurrenciesSwapped` | `SwapButton` | Invierte el par, conserva el monto y cotiza. |
 | `ExchangePrefilled(pair, amount)` | Comparación ("Usar {proveedor}") | Reemplaza el par y el monto y cotiza. |
 | `ExchangeRatesRefreshed` | "Reintentar"; la app vuelve al primer plano | Cotiza con `forceRefresh: true`. |
-| `ExchangeSubmitted` | Botón "Cambiar" | Confirmación simulada (`droppable`: ignora toques repetidos). |
+| `ExchangeReset` | El cambio se completó (§10) | Vuelve al par inicial sin monto, conserva la disponibilidad y descarta cualquier cotización en curso. |
+
+"Simular" no es un evento: abre la confirmación (§10), que edita el bloc con los mismos eventos de esta tabla.
 
 - **Un solo *handler* para cotizar:** todas las cotizaciones pasan por un *handler* interno con `restartable()`. Si llega una petición nueva, la anterior se descarta y nunca se muestra una respuesta obsoleta.
 - **El *debounce* vive en ese mismo *handler*:** el evento interno trae un retardo (300 ms al escribir, 0 al cambiar de par); el *handler* espera y, si mientras tanto llegó otro evento (`emit.isDone`), termina sin consultar. Con un *transformer* de *debounce* separado habría dos *handlers* concurrentes y una respuesta vieja podría pisar a una nueva.
@@ -452,6 +471,8 @@ sequenceDiagram
   - Como hay dos blocs del mismo tipo, no se buscan por tipo en el árbol: cada pestaña se envuelve con su `BlocProvider.value`.
   - Los blocs viven en `HomePage` y las pestañas van en un `IndexedStack`, así cada una conserva su monto y su par al cambiar de una a otra.
 - **`ProviderTabs`:** se genera desde `RateProvider.values`, de modo que un proveedor nuevo agrega su pestaña solo.
+- **Fondo:** el semicírculo del fondo cambia de color según la pestaña (`HomePage.decorationColorOf`: amarillo para El Dorado, verde para CriptoYa) con una transición animada.
+- **Cambio confirmado:** `ExchangeView` avisa con `onConfirmed(quote)`; `HomePage` abre el procesamiento (§10) y, si la ruta devuelve la transacción, envía `ExchangeReset` al bloc de ese proveedor.
 - **"Usar {proveedor}" en la comparación:** `HomePage` cambia de pestaña (`HomeCubit`) y envía `ExchangePrefilled(pair, amount)` al bloc de destino.
 
 ### 8.4 Árbol de widgets
@@ -469,6 +490,7 @@ HomePage                                    # HomeCubit + Map<RateProvider, Exch
 
 ExchangeView
 └── Center → ConstrainedBox(maxWidth: 400) → Column
+    ├── Text("Calculadora")                 # header, alineado con el borde de la tarjeta
     ├── ExchangeCard
     │   ├── CurrencyPairSelector            # píldora con etiquetas TENGO / QUIERO en el borde
     │   │   ├── CurrencySelectorButton (TENGO)  → abre CurrencyPickerSheet
@@ -476,7 +498,7 @@ ExchangeView
     │   │   └── CurrencySelectorButton (QUIERO) → abre CurrencyPickerSheet
     │   ├── AmountField                     # prefijo con el código en amarillo; mínimo debajo
     │   ├── QuoteSummary                    # QuoteRow × 3 (sin tiempo → 2) | skeleton | QuoteError
-    │   └── PrimaryButton("Cambiar")
+    │   └── PrimaryButton("Simular")    # → ExchangeConfirmationSheet
     ├── SourceCaption                       # "Fuente: El Dorado · tasa indicativa"
     └── CompareQuotesLink                   # "Comparar cotizaciones" → QuoteComparisonSheet
 
@@ -484,6 +506,15 @@ CurrencyPickerSheet (showModalBottomSheet)
 ├── handle + título ("FIAT" | "Cripto")
 └── CurrencyListTile × n                    # avatar, código, nombre (símbolo), radio;
                                             # deshabilitado con "No disponible" según PairAvailability
+
+ExchangeConfirmationSheet (showDsBottomSheet, BlocProvider.value del bloc de la pestaña)
+├── título "Confirma tu cambio" + subtítulo
+├── ConfirmationFields                      # 3 filas: moneda que entregas | moneda que recibes
+│                                           # ("Invertir") | cantidad (AmountInput + mínimo)
+├── detalle: QuoteSummary + "Fuente"        # tasa, recibirás, tiempo
+├── QuoteFailureMessage                     # error con "Reintentar"
+├── DsPrimaryButton("Confirmar")            # solo con currentQuote
+└── DsTextButton("Cancelar")
 
 QuoteComparisonSheet (showModalBottomSheet)
 ├── encabezado ("5.00 USDT → VES") + actualizar
@@ -502,7 +533,7 @@ Detallado en [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). En resumen:
 - **Tokens** en `core/design_system/tokens`: paleta primitiva de El Dorado (`AppPalette`), roles semánticos (`AppColors`, un `ThemeExtension` que se lee con `context.colors`), tipografía Rubik medida en los mocks (`AppTypography`), espaciados, radios, tamaños, sombras y movimiento.
 - **Regla de marca:** el amarillo (`#FFFF00`) va como relleno con texto y bordes en tinta (`#121211`); nunca como texto ni como borde sobre blanco.
 - **Tema:** `AppTheme.light()` traduce los tokens a `ThemeData` para los widgets de Material.
-- **Componentes `Ds*`:** botón principal, pestañas, insignia, tarjeta, bottom sheet, radio, skeleton.
+- **Componentes `Ds*`:** botón principal, botón de texto, enlace, pestañas, insignia (marca y éxito), tarjeta, fondo, texto de conversión, bottom sheet, radio, skeleton.
 - **Elementos que no están en el diseño** (pestañas, comparación): se construyen solo con estos tokens y componentes.
 
 Los mocks miden 804×1748 px, es decir 402×874 pt a @2x. La UI se compara con ellos en *goldens* de ese tamaño.
@@ -544,18 +575,54 @@ final class CompareQuotes {
 - **Contenido:** cada `ProviderQuoteCard` muestra su resultado o su propio estado de error ("No disponible en El Dorado", "Sin ofertas", error con reintento).
 - **"Usar {proveedor}":** cierra el sheet y delega en `HomePage` (§8.3).
 
-## 10. Estrategia de pruebas
+## 10. Confirmación y ejecución del cambio
+
+```mermaid
+sequenceDiagram
+  actor U as Usuario
+  participant V as ExchangeView
+  participant S as ExchangeConfirmationSheet
+  participant B as ExchangeBloc
+  participant H as HomePage
+  participant P as CheckoutProcessingPage
+  participant C as CheckoutCubit
+  participant R as SimulatedTransactionRepository
+  U->>V: "Simular"
+  V->>S: abre (mismo bloc)
+  U->>S: edita cantidad / monedas
+  S->>B: ExchangeAmountChanged, …Selected, Swapped
+  U->>S: "Confirmar" (currentQuote)
+  S-->>V: ExchangeQuote
+  V->>H: onConfirmed(quote)
+  H->>P: push(route)
+  P->>C: submit()
+  C->>R: submit(quote) ‖ espera mínima de la animación
+  R-->>C: ExchangeTransaction(id, quote, completedAt)
+  C-->>P: CheckoutSucceeded
+  P->>P: pushReplacement(éxito, result: transaction)
+  P-->>H: transaction
+  H->>B: ExchangeReset
+```
+
+- **Dominio (`checkout/domain`):** `ExchangeTransaction` (ID, cotización, fecha), `TransactionRepository` y `SubmitExchange`, que rechaza cotizaciones sin monto a recibir.
+- **Datos:** `SimulatedTransactionRepository` espera una latencia (1.2 s) y aprueba con un ID `TX-XXXX-XXXX` en base32 de Crockford. El reloj y el generador aleatorio se inyectan, así las pruebas y los *goldens* son deterministas. Un API real reemplaza solo esta clase.
+- **`CheckoutCubit`:** `Processing(attempt)` → `Succeeded(transaction)` o `Failed(failure)`. Espera la respuesta y la duración de la animación en paralelo (`(a, b).wait`), así una respuesta instantánea no corta los pasos. "Reintentar" incrementa `attempt` y reinicia la animación.
+- **Pantalla de proceso:** amarilla y a pantalla completa; `PopScope` impide salir mientras procesa. Muestra el disco de intercambio con ondas y tres pasos que avanzan por tiempo; el último solo se completa con la respuesta.
+- **Pantalla de éxito:** reemplaza a la de proceso (así "atrás" vuelve a la calculadora) y completa su ruta con la transacción. Comprobante con lo recibido y lo enviado, tasa, fuente, fecha y hora (formatos de `MaterialLocalizations`), estado e ID copiable.
+- **Reinicio:** al recibir la transacción, `HomePage` envía `ExchangeReset` al bloc del proveedor de la cotización. Si se sale desde el error, la ruta devuelve `null` y la calculadora conserva lo ingresado.
+
+## 11. Estrategia de pruebas
 
 | Nivel | Qué cubre | Herramientas |
 |---|---|---|
 | Unitarias: dominio | `ExchangePair` (invariantes, swap); `GetExchangeQuote` (ambas direcciones, truncado, mínimo, tasa inválida); `CompareQuotes` (ganador por dirección, resultados parciales, empate, ambos fallan) | `test`, `mocktail` |
 | Unitarias: datos | DTOs contra fixtures reales y casos borde; selección de `SELL`/`BUY`; mediana de CriptoYa (valores en 0, libro invertido); `TtlCache` (TTL, petición en curso compartida, `forceRefresh`); interceptores por escenario; mapeo de errores | `test`, `mocktail` |
-| Bloc | *debounce*, descarte de respuestas obsoletas, swap, selección, `ExchangePrefilled`, mínimo, par no disponible, reintento; `HomeCubit`; `QuoteComparisonCubit` | `bloc_test` |
-| Widgets | Cambiar de pestaña conserva el estado; la tarjeta muestra la cotización; los sheets deshabilitan los pares no disponibles; la comparación marca la "Mejor opción" y "Usar {proveedor}" cambia de pestaña con el mismo par y monto | `flutter_test` |
+| Bloc | *debounce*, descarte de respuestas obsoletas, swap, selección, `ExchangePrefilled`, `ExchangeReset`, mínimo, par no disponible, reintento; `HomeCubit`; `QuoteComparisonCubit`; `CheckoutCubit` (éxito, error y reintento, duración mínima) | `bloc_test` |
+| Widgets | Cambiar de pestaña conserva el estado; título sobre la tarjeta y fondo por pestaña; selector FIAT por país; la tarjeta muestra la cotización; los sheets deshabilitan los pares no disponibles y se ajustan a la lista; la comparación marca la "Mejor opción" y "Usar {proveedor}" cambia de pestaña con el mismo par y monto; la confirmación edita las tres filas, bloquea "Confirmar" sin cotización vigente y "Cancelar" no confirma; proceso (pasos, sin salida), comprobante (datos, ID copiable), error con reintento; flujo completo con reinicio de la pestaña | `flutter_test` |
 | Contrato (`live`) | La forma real de `/api/prices` y de CriptoYa. Excluidas por defecto; se corren con `--dart-define=LIVE_TESTS=true --tags live` | `flutter_test` |
-| Visual (opcional) | *Goldens* de la tarjeta, los sheets y la comparación | `flutter_test` |
+| Visual (opcional) | *Goldens* de ambas pestañas, los selectores, la comparación, la confirmación, el proceso y el comprobante | `flutter_test` |
 
-## 11. Cómo escala
+## 12. Cómo escala
 
 - **Nuevo proveedor:**
   1. Un valor en `RateProvider`.
@@ -564,11 +631,12 @@ final class CompareQuotes {
 
   Con eso la pestaña y la comparación lo incluyen solas. Pasadas 3–4 pestañas, conviene cambiar `ProviderTabs` por un selector.
 - **Nueva moneda:** una entrada en `currency_catalog.dart`, su ícono en `assets/` y sus valores en los mocks.
-- **Nueva funcionalidad** (confirmación, historial, alertas de tasa): una carpeta `features/<nombre>/` con las mismas capas, que dependa solo del dominio de otras features, como `quote_comparison`.
+- **Nueva funcionalidad** (historial, alertas de tasa): una carpeta `features/<nombre>/` con las mismas capas, que dependa solo del dominio de otras features, como `quote_comparison` y `checkout`.
+- **Ejecución real:** una implementación HTTP de `TransactionRepository` registrada en `injection.dart`; la confirmación y las pantallas no cambian.
 - **Nuevo idioma:** un `app_<locale>.arb`.
 - **Más pantallas:** se incorpora `go_router` en `app/`.
 
-## 12. Riesgos y preguntas abiertas
+## 13. Riesgos y preguntas abiertas
 
 | Tema | Impacto | Mitigación |
 |---|---|---|

@@ -6,6 +6,15 @@ import 'package:flutter/painting.dart';
 abstract final class AppTypography {
   static const fontFamily = 'Rubik';
 
+  /// Títulos de pantalla ("Calculadora", "¡Cambio exitoso!").
+  static const display = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 26,
+    fontWeight: FontWeight.w600,
+    height: 1.15,
+    letterSpacing: -0.3,
+  );
+
   /// Títulos de bottom sheets ("FIAT", "Cripto").
   static const title = TextStyle(
     fontFamily: fontFamily,

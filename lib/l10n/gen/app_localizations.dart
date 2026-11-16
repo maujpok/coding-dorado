@@ -100,6 +100,12 @@ abstract class AppLocalizations {
   /// **'Calculadora de cambio'**
   String get appTitle;
 
+  /// Título encima de la tarjeta de la calculadora.
+  ///
+  /// In es, this message translates to:
+  /// **'Calculadora'**
+  String get calculatorTitle;
+
   /// No description provided for @providerEldorado.
   ///
   /// In es, this message translates to:
@@ -184,6 +190,12 @@ abstract class AppLocalizations {
   /// **'{label}: aproximadamente {value} {unit}'**
   String approxValueSemantics(String label, String value, String unit);
 
+  /// No description provided for @valueSemantics.
+  ///
+  /// In es, this message translates to:
+  /// **'{label}: {value} {unit}'**
+  String valueSemantics(String label, String value, String unit);
+
   /// No description provided for @emptyValue.
   ///
   /// In es, this message translates to:
@@ -193,19 +205,212 @@ abstract class AppLocalizations {
   /// No description provided for @exchangeButton.
   ///
   /// In es, this message translates to:
-  /// **'Cambiar'**
+  /// **'Simular'**
   String get exchangeButton;
 
-  /// No description provided for @exchangeConfirmation.
+  /// No description provided for @confirmTitle.
   ///
   /// In es, this message translates to:
-  /// **'Simulación: cambiarías {amount} {from} por ≈ {receive} {to}.'**
-  String exchangeConfirmation(
-    String amount,
-    String from,
-    String receive,
-    String to,
-  );
+  /// **'Confirma tu cambio'**
+  String get confirmTitle;
+
+  /// No description provided for @confirmSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisa los datos antes de confirmar. Puedes editar el monto y las monedas.'**
+  String get confirmSubtitle;
+
+  /// No description provided for @confirmFromLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Moneda que entregas'**
+  String get confirmFromLabel;
+
+  /// No description provided for @confirmToLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Moneda que recibes'**
+  String get confirmToLabel;
+
+  /// No description provided for @confirmAmountLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cantidad'**
+  String get confirmAmountLabel;
+
+  /// No description provided for @swapAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Invertir'**
+  String get swapAction;
+
+  /// No description provided for @sourceLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Fuente'**
+  String get sourceLabel;
+
+  /// No description provided for @confirmAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar'**
+  String get confirmAction;
+
+  /// No description provided for @cancelAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get cancelAction;
+
+  /// No description provided for @simulationNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Operación simulada: no se mueve dinero real.'**
+  String get simulationNote;
+
+  /// No description provided for @exchangeSubject.
+  ///
+  /// In es, this message translates to:
+  /// **'{amount} {from} a {to}'**
+  String exchangeSubject(String amount, String from, String to);
+
+  /// No description provided for @processingTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Procesando tu cambio'**
+  String get processingTitle;
+
+  /// No description provided for @processingStepValidate.
+  ///
+  /// In es, this message translates to:
+  /// **'Validando la cotización'**
+  String get processingStepValidate;
+
+  /// No description provided for @processingStepExchange.
+  ///
+  /// In es, this message translates to:
+  /// **'Ejecutando el cambio'**
+  String get processingStepExchange;
+
+  /// No description provided for @processingStepConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmando la transacción'**
+  String get processingStepConfirm;
+
+  /// No description provided for @processingStepDone.
+  ///
+  /// In es, this message translates to:
+  /// **'{step}: listo'**
+  String processingStepDone(String step);
+
+  /// No description provided for @processingStepActive.
+  ///
+  /// In es, this message translates to:
+  /// **'{step}: en curso'**
+  String processingStepActive(String step);
+
+  /// No description provided for @processingStepPending.
+  ///
+  /// In es, this message translates to:
+  /// **'{step}: pendiente'**
+  String processingStepPending(String step);
+
+  /// No description provided for @processingFailedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'No pudimos completar el cambio'**
+  String get processingFailedTitle;
+
+  /// No description provided for @backAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver'**
+  String get backAction;
+
+  /// No description provided for @successTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Cambio exitoso!'**
+  String get successTitle;
+
+  /// No description provided for @successSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu transacción se completó correctamente.'**
+  String get successSubtitle;
+
+  /// No description provided for @receiptReceived.
+  ///
+  /// In es, this message translates to:
+  /// **'Recibiste'**
+  String get receiptReceived;
+
+  /// No description provided for @receiptSent.
+  ///
+  /// In es, this message translates to:
+  /// **'por {amount} {code}'**
+  String receiptSent(String amount, String code);
+
+  /// No description provided for @receiptRate.
+  ///
+  /// In es, this message translates to:
+  /// **'Tasa'**
+  String get receiptRate;
+
+  /// No description provided for @receiptRateValue.
+  ///
+  /// In es, this message translates to:
+  /// **'1 {crypto} = {rate} {fiat}'**
+  String receiptRateValue(String crypto, String rate, String fiat);
+
+  /// No description provided for @receiptDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha'**
+  String get receiptDate;
+
+  /// No description provided for @receiptTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Hora'**
+  String get receiptTime;
+
+  /// No description provided for @receiptId.
+  ///
+  /// In es, this message translates to:
+  /// **'ID de transacción'**
+  String get receiptId;
+
+  /// No description provided for @receiptStatus.
+  ///
+  /// In es, this message translates to:
+  /// **'Estado'**
+  String get receiptStatus;
+
+  /// No description provided for @receiptStatusCompleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Completada'**
+  String get receiptStatusCompleted;
+
+  /// No description provided for @copyIdAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Copiar ID'**
+  String get copyIdAction;
+
+  /// No description provided for @idCopied.
+  ///
+  /// In es, this message translates to:
+  /// **'ID copiado'**
+  String get idCopied;
+
+  /// No description provided for @successDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver al inicio'**
+  String get successDone;
 
   /// No description provided for @pickerTitleFiat.
   ///

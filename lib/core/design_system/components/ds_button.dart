@@ -129,3 +129,47 @@ class DsLink extends StatelessWidget {
     );
   }
 }
+
+/// Acción secundaria: texto en tinta, sin relleno, con el alto y el ancho de
+/// [DsPrimaryButton] para apilarse debajo de ella ("Cancelar").
+class DsTextButton extends StatelessWidget {
+  const DsTextButton({required this.label, required this.onPressed, super.key});
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final enabled = onPressed != null;
+    final radius = BorderRadius.circular(AppRadius.control);
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      excludeSemantics: true,
+      child: SizedBox(
+        height: AppSizes.buttonHeight,
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: radius,
+            splashColor: colors.surfaceMuted,
+            highlightColor: colors.surfaceMuted,
+            child: Center(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.button.copyWith(
+                  color: enabled ? colors.textPrimary : colors.textDisabled,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

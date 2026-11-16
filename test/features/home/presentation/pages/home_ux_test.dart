@@ -29,13 +29,7 @@ void main() {
     addTearDown(tester.view.reset);
     final getIt = GetIt.asNewInstance();
     configureDependencies(getIt, mockAppConfig());
-    await tester.pumpWidget(
-      App(
-        createExchangeBloc: mockBlocFactory(getIt),
-        compareQuotes: getIt<CompareQuotes>(),
-        showMockBanner: showMockBanner,
-      ),
-    );
+    await tester.pumpWidget(mockApp(getIt, showMockBanner: showMockBanner));
     await tester.pumpAndSettle();
   }
 
@@ -44,7 +38,7 @@ void main() {
   DsPrimaryButton exchangeButton(WidgetTester tester) =>
       tester.widget(find.byType(DsPrimaryButton).hitTestable());
 
-  testWidgets('monto bajo el mínimo: aviso junto al campo y Cambiar '
+  testWidgets('monto bajo el mínimo: aviso junto al campo y Simular '
       'deshabilitado', (tester) async {
     await pumpHome(tester);
 
@@ -118,6 +112,26 @@ void main() {
     await tester.tap(find.text('Comparar cotizaciones').hitTestable());
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+    Navigator.of(tester.element(find.text('Mejor opción'))).pop();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Simular').hitTestable());
+    await tester.pumpAndSettle();
+    expect(find.text('Confirma tu cambio'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    // En pantallas chicas el sheet hace scroll hasta "Confirmar".
+    await tester.ensureVisible(find.text('Confirmar'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Confirmar'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(tester.takeException(), isNull);
+
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(find.text('¡Cambio exitoso!'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('tocar fuera del campo cierra el teclado', (tester) async {
@@ -158,6 +172,7 @@ void main() {
         compareQuotes: CompareQuotes({
           RateProvider.eldorado: GetExchangeQuote(repository),
         }),
+        submitExchange: instantSubmitExchange(),
       ),
     );
     await tester.enterText(visibleField(), '5');

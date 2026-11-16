@@ -12,6 +12,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appTitle => 'Calculadora de cambio';
 
   @override
+  String get calculatorTitle => 'Calculadora';
+
+  @override
   String get providerEldorado => 'El Dorado';
 
   @override
@@ -60,20 +63,130 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String valueSemantics(String label, String value, String unit) {
+    return '$label: $value $unit';
+  }
+
+  @override
   String get emptyValue => '—';
 
   @override
-  String get exchangeButton => 'Cambiar';
+  String get exchangeButton => 'Simular';
 
   @override
-  String exchangeConfirmation(
-    String amount,
-    String from,
-    String receive,
-    String to,
-  ) {
-    return 'Simulación: cambiarías $amount $from por ≈ $receive $to.';
+  String get confirmTitle => 'Confirma tu cambio';
+
+  @override
+  String get confirmSubtitle =>
+      'Revisa los datos antes de confirmar. Puedes editar el monto y las monedas.';
+
+  @override
+  String get confirmFromLabel => 'Moneda que entregas';
+
+  @override
+  String get confirmToLabel => 'Moneda que recibes';
+
+  @override
+  String get confirmAmountLabel => 'Cantidad';
+
+  @override
+  String get swapAction => 'Invertir';
+
+  @override
+  String get sourceLabel => 'Fuente';
+
+  @override
+  String get confirmAction => 'Confirmar';
+
+  @override
+  String get cancelAction => 'Cancelar';
+
+  @override
+  String get simulationNote => 'Operación simulada: no se mueve dinero real.';
+
+  @override
+  String exchangeSubject(String amount, String from, String to) {
+    return '$amount $from a $to';
   }
+
+  @override
+  String get processingTitle => 'Procesando tu cambio';
+
+  @override
+  String get processingStepValidate => 'Validando la cotización';
+
+  @override
+  String get processingStepExchange => 'Ejecutando el cambio';
+
+  @override
+  String get processingStepConfirm => 'Confirmando la transacción';
+
+  @override
+  String processingStepDone(String step) {
+    return '$step: listo';
+  }
+
+  @override
+  String processingStepActive(String step) {
+    return '$step: en curso';
+  }
+
+  @override
+  String processingStepPending(String step) {
+    return '$step: pendiente';
+  }
+
+  @override
+  String get processingFailedTitle => 'No pudimos completar el cambio';
+
+  @override
+  String get backAction => 'Volver';
+
+  @override
+  String get successTitle => '¡Cambio exitoso!';
+
+  @override
+  String get successSubtitle => 'Tu transacción se completó correctamente.';
+
+  @override
+  String get receiptReceived => 'Recibiste';
+
+  @override
+  String receiptSent(String amount, String code) {
+    return 'por $amount $code';
+  }
+
+  @override
+  String get receiptRate => 'Tasa';
+
+  @override
+  String receiptRateValue(String crypto, String rate, String fiat) {
+    return '1 $crypto = $rate $fiat';
+  }
+
+  @override
+  String get receiptDate => 'Fecha';
+
+  @override
+  String get receiptTime => 'Hora';
+
+  @override
+  String get receiptId => 'ID de transacción';
+
+  @override
+  String get receiptStatus => 'Estado';
+
+  @override
+  String get receiptStatusCompleted => 'Completada';
+
+  @override
+  String get copyIdAction => 'Copiar ID';
+
+  @override
+  String get idCopied => 'ID copiado';
+
+  @override
+  String get successDone => 'Volver al inicio';
 
   @override
   String get pickerTitleFiat => 'FIAT';

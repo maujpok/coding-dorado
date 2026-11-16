@@ -1,12 +1,12 @@
 import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/core/error/failure.dart';
-import 'package:coding_dorado/core/formatting/amount_formatter.dart';
-import 'package:coding_dorado/features/exchange/domain/catalog/currency_catalog.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
+import 'package:coding_dorado/features/exchange/domain/entities/exchange_quote.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
 import 'package:coding_dorado/features/exchange/presentation/bloc/exchange_bloc.dart';
-import 'package:coding_dorado/features/exchange/presentation/widgets/currency_picker_sheet.dart';
+import 'package:coding_dorado/features/exchange/presentation/views/currency_selection.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/exchange_card.dart';
+import 'package:coding_dorado/features/exchange/presentation/widgets/exchange_confirmation_sheet.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/quote_message.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/source_caption.dart';
 import 'package:coding_dorado/l10n/gen/app_localizations.dart';
@@ -22,14 +22,15 @@ typedef OpenInProviderCallback =
 
 /// La calculadora de una pestaña. Lee su `ExchangeBloc` del árbol.
 ///
-/// Las acciones que cruzan pestañas (comparar, "Ver en …") las provee quien
-/// compone la pantalla, así `exchange` no depende de `quote_comparison` ni
-/// de `home`.
+/// "Cambiar" abre la confirmación. Las acciones que salen de la calculadora
+/// (comparar, "Ver en …", ejecutar el cambio confirmado) las provee quien
+/// compone la pantalla, así `exchange` no depende de otras features.
 class ExchangeView extends StatelessWidget {
   const ExchangeView({
     required this.provider,
     this.onCompare,
     this.onOpenInProvider,
+    this.onConfirmed,
     super.key,
   });
 
@@ -41,12 +42,12 @@ class ExchangeView extends StatelessWidget {
   /// Lleva el par y el monto a la pestaña de otro proveedor.
   final OpenInProviderCallback? onOpenInProvider;
 
+  /// El usuario confirmó el cambio con esta cotización.
+  final ValueChanged<ExchangeQuote>? onConfirmed;
+
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ExchangeBloc, ExchangeState>(
-      listenWhen: (previous, current) =>
-          current.submissionCount > previous.submissionCount,
-      listener: _showConfirmation,
+    return BlocBuilder<ExchangeBloc, ExchangeState>(
       builder: (context, state) {
         final bloc = context.read<ExchangeBloc>();
         final l10n = AppLocalizations.of(context);
@@ -71,16 +72,29 @@ class ExchangeView extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Semantics(
+                              header: true,
+                              child: Text(
+                                l10n.calculatorTitle,
+                                style: AppTypography.display.copyWith(
+                                  color: context.colors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
                           ExchangeCard(
                             provider: provider,
                             state: state,
-                            onFromTap: () => _pickFrom(context, state),
-                            onToTap: () => _pickTo(context, state),
+                            onFromTap: () => selectFromCurrency(context),
+                            onToTap: () => selectToCurrency(context),
                             onSwap: () =>
                                 bloc.add(const ExchangeCurrenciesSwapped()),
                             onAmountChanged: (text) =>
                                 bloc.add(ExchangeAmountChanged(text)),
-                            onSubmit: () => bloc.add(const ExchangeSubmitted()),
+                            onSubmit: () => _confirm(context),
                             onRetry: () =>
                                 bloc.add(const ExchangeRatesRefreshed()),
                             messageActions: _messageActions(context, state),
@@ -136,7 +150,7 @@ class ExchangeView extends StatelessWidget {
       if (failure is PairUnavailableFailure)
         QuoteMessageAction(
           label: l10n.chooseCurrencyAction,
-          onPressed: () => _pickUnavailableSide(context, state),
+          onPressed: () => selectUnavailableSide(context),
         ),
       if (amount != null && open != null)
         for (final other in RateProvider.values.where((p) => p != provider))
@@ -147,68 +161,13 @@ class ExchangeView extends StatelessWidget {
     ];
   }
 
-  /// Si la fuente no cotiza la crypto con ninguna fiat (USDC en El Dorado),
-  /// el problema es la crypto; si no, la fiat.
-  Future<void> _pickUnavailableSide(
-    BuildContext context,
-    ExchangeState state,
-  ) {
-    final pair = state.pair;
-    final cryptoQuoted = CurrencyCatalog.fiats.any(
-      (fiat) =>
-          state.availability.isAvailable(
-            ExchangePair(from: pair.crypto, to: fiat),
-          ) ||
-          state.availability.isAvailable(
-            ExchangePair(from: fiat, to: pair.crypto),
-          ),
-    );
-    final pickCryptoSide = !cryptoQuoted;
-    final fromIsTarget = pickCryptoSide == pair.from.isCrypto;
-    return fromIsTarget ? _pickFrom(context, state) : _pickTo(context, state);
-  }
-
-  Future<void> _pickFrom(BuildContext context, ExchangeState state) async {
-    final bloc = context.read<ExchangeBloc>();
-    final currency = await showCurrencyPicker(
+  Future<void> _confirm(BuildContext context) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final quote = await showExchangeConfirmationSheet(
       context: context,
-      type: state.pair.from.type,
-      selected: state.pair.from,
-      isAvailable: (candidate) =>
-          state.availability.isAvailable(state.pair.withFrom(candidate)),
+      bloc: context.read<ExchangeBloc>(),
+      provider: provider,
     );
-    if (currency != null) bloc.add(ExchangeFromCurrencySelected(currency));
-  }
-
-  Future<void> _pickTo(BuildContext context, ExchangeState state) async {
-    final bloc = context.read<ExchangeBloc>();
-    final currency = await showCurrencyPicker(
-      context: context,
-      type: state.pair.to.type,
-      selected: state.pair.to,
-      isAvailable: (candidate) =>
-          state.availability.isAvailable(state.pair.withTo(candidate)),
-    );
-    if (currency != null) bloc.add(ExchangeToCurrencySelected(currency));
-  }
-
-  void _showConfirmation(BuildContext context, ExchangeState state) {
-    final quote = state.quote.latestQuote;
-    if (quote == null) return;
-    final l10n = AppLocalizations.of(context);
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.exchangeConfirmation(
-              AmountFormatter.format(quote.amount),
-              quote.pair.from.code,
-              AmountFormatter.format(quote.receiveAmount, truncate: true),
-              quote.pair.to.code,
-            ),
-          ),
-        ),
-      );
+    if (quote != null) onConfirmed?.call(quote);
   }
 }

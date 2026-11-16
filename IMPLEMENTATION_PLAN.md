@@ -1,6 +1,6 @@
 # Plan de implementación
 
-> Estado: fases 0–10 implementadas; la Fase 10 falta verificarla contra el API real (sin URL vigente) · Última actualización: 2026-11-13
+> Estado: fases 0–11 implementadas; la Fase 10 falta verificarla contra el API real (sin URL vigente) · Última actualización: 2026-11-14
 > Documentos relacionados: [ARCHITECTURE.md](ARCHITECTURE.md) · [API_RESEARCH.md](API_RESEARCH.md) · [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)
 
 ## Enfoque
@@ -391,6 +391,32 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 ---
 
+## Fase 11: Confirmación, ejecución simulada y comprobante
+
+**Objetivo:** el botón de la tarjeta (ahora "Simular") deja de ser un aviso y pasa a ser un flujo completo: confirmar (editando si hace falta), ver el proceso y recibir un comprobante. Ninguna de las APIs permite operar, así que la ejecución es simulada detrás de una interfaz.
+
+- [x] Título "Calculadora" encima de la tarjeta de cada pestaña.
+- [x] El botón de la tarjeta dice "Simular" en lugar de "Cambiar".
+- [x] Fondo distinto por pestaña: el semicírculo de CriptoYa usa el verde de acento de El Dorado (`backgroundDecorationSecondary`), con transición animada.
+- [x] "Simular" abre un bottom sheet de confirmación sobre el mismo `ExchangeBloc` de la pestaña:
+  - [x] Lo editable en tres filas: moneda que entregas, moneda que recibes (con "Invertir") y cantidad. Lo que se edita queda también en la calculadora.
+  - [x] Detalle de la cotización vigente (tasa, recibirás, tiempo, fuente) y errores con reintento.
+  - [x] "Confirmar" (`DsPrimaryButton`) solo con una cotización del par y monto actuales; "Cancelar" (`DsTextButton`) cierra sin cambios.
+- [x] Feature `checkout`:
+  - [x] Dominio: `ExchangeTransaction`, `TransactionRepository` y `SubmitExchange`.
+  - [x] Datos: `SimulatedTransactionRepository` (latencia, reloj inyectable, ID `TX-XXXX-XXXX` en base32 de Crockford).
+  - [x] `CheckoutCubit`: el procesamiento dura al menos lo que la animación; error con "Reintentar".
+  - [x] Pantalla de proceso (amarilla, no se puede salir): animación de intercambio y tres pasos que avanzan.
+  - [x] Pantalla de éxito: comprobante con lo recibido y lo enviado, tasa, fuente, fecha, hora, estado e ID copiable. "Volver al inicio" regresa a la calculadora.
+- [x] Al completarse el cambio, la calculadora de esa pestaña vuelve al par inicial y sin monto (`ExchangeReset`); la otra pestaña no cambia.
+- [x] El selector de monedas se ajusta a la lista (hasta el 70 % de la pantalla), sin espacio vacío debajo.
+- [x] Las fiat se ordenan alfabéticamente por país (`Currency.country`, sin distinguir tildes): Argentina, Bolivia, Brasil, Colombia, Perú, Venezuela.
+- [x] Pruebas: bloc (reinicio), sheet de confirmación, `checkout` (repositorio, caso de uso, cubit, pantallas), flujo completo desde la home, texto al 130 % en 320 pt y *goldens* nuevos.
+
+**Aceptación:** `flutter analyze` sin issues, `flutter test` en verde y *goldens* revisados.
+
+---
+
 ## Definition of Done (global)
 
 - `flutter analyze` con 0 issues y `flutter test` en verde.
@@ -417,6 +443,9 @@ Desvíos respecto del plan, todos con el mismo objetivo que la tarea original:
 | `pubspec.lock` | — | Versionado (se quitó del `.gitignore` del template) | Recomendado para aplicaciones: builds reproducibles. |
 | `--org` | `<org>` | `dev.maudev` | Valor por defecto; se cambia con `flutter create --org` o en los proyectos nativos. |
 | Pruebas de widgets | — | El árbol crea y cierra los blocs | En `testWidgets` el tiempo es simulado y `await bloc.close()` no avanza. |
+| Snackbar de "Cambiar" (Fases 4 y 8) | `ExchangeSubmitted` con confirmación simulada en un snackbar | Reemplazado en la Fase 11 por la confirmación y la feature `checkout` | Pedido posterior: confirmar, procesar y mostrar un comprobante. |
+| Selector de monedas | Alto fijo del 70 % y el orden del mock | Alto según la lista, con tope del 70 %; fiat por país | Pedidos posteriores: sin espacio vacío debajo de la última moneda y orden alfabético por país. |
+| Botón de la tarjeta | "Cambiar", como el mock | "Simular" | Pedido posterior: la operación es simulada. |
 | Fase 10 | Verificar con la URL real y guardar respuestas reales | Código, mock y pruebas contra la forma documentada; sin URL ni mock vuelve a `/api/prices` | La ruta sigue respondiendo 404; falta una URL vigente del equipo. |
 
 ## Riesgos y mitigaciones

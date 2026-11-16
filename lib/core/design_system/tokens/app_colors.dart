@@ -12,11 +12,13 @@ final class AppColors extends ThemeExtension<AppColors> {
   const AppColors({
     required this.background,
     required this.backgroundDecoration,
+    required this.backgroundDecorationSecondary,
     required this.surface,
     required this.surfaceMuted,
     required this.primary,
     required this.primaryPressed,
     required this.onPrimary,
+    required this.onPrimarySecondary,
     required this.textPrimary,
     required this.textSecondary,
     required this.textDisabled,
@@ -37,11 +39,13 @@ final class AppColors extends ThemeExtension<AppColors> {
   static const light = AppColors(
     background: AppPalette.grey200,
     backgroundDecoration: AppPalette.yellow,
+    backgroundDecorationSecondary: AppPalette.green,
     surface: AppPalette.grey50,
     surfaceMuted: AppPalette.grey100,
     primary: AppPalette.yellow,
     primaryPressed: AppPalette.yellowDeep,
     onPrimary: AppPalette.ink,
+    onPrimarySecondary: AppPalette.grey700,
     textPrimary: AppPalette.ink,
     textSecondary: AppPalette.grey700,
     textDisabled: AppPalette.grey500,
@@ -65,6 +69,10 @@ final class AppColors extends ThemeExtension<AppColors> {
   /// Forma decorativa del fondo (el semicírculo del diseño).
   final Color backgroundDecoration;
 
+  /// Variante de la forma decorativa para distinguir una sección (la pestaña
+  /// de CriptoYa). Verde de acento del sitio de El Dorado.
+  final Color backgroundDecorationSecondary;
+
   /// Tarjetas y bottom sheets.
   final Color surface;
 
@@ -77,6 +85,9 @@ final class AppColors extends ThemeExtension<AppColors> {
 
   /// Texto e íconos sobre [primary].
   final Color onPrimary;
+
+  /// Texto de menor jerarquía sobre [primary] (pasos pendientes).
+  final Color onPrimarySecondary;
 
   final Color textPrimary;
   final Color textSecondary;
@@ -111,11 +122,13 @@ final class AppColors extends ThemeExtension<AppColors> {
   AppColors copyWith({
     Color? background,
     Color? backgroundDecoration,
+    Color? backgroundDecorationSecondary,
     Color? surface,
     Color? surfaceMuted,
     Color? primary,
     Color? primaryPressed,
     Color? onPrimary,
+    Color? onPrimarySecondary,
     Color? textPrimary,
     Color? textSecondary,
     Color? textDisabled,
@@ -135,11 +148,14 @@ final class AppColors extends ThemeExtension<AppColors> {
     return AppColors(
       background: background ?? this.background,
       backgroundDecoration: backgroundDecoration ?? this.backgroundDecoration,
+      backgroundDecorationSecondary:
+          backgroundDecorationSecondary ?? this.backgroundDecorationSecondary,
       surface: surface ?? this.surface,
       surfaceMuted: surfaceMuted ?? this.surfaceMuted,
       primary: primary ?? this.primary,
       primaryPressed: primaryPressed ?? this.primaryPressed,
       onPrimary: onPrimary ?? this.onPrimary,
+      onPrimarySecondary: onPrimarySecondary ?? this.onPrimarySecondary,
       textPrimary: textPrimary ?? this.textPrimary,
       textSecondary: textSecondary ?? this.textSecondary,
       textDisabled: textDisabled ?? this.textDisabled,
@@ -168,11 +184,16 @@ final class AppColors extends ThemeExtension<AppColors> {
         backgroundDecoration,
         other.backgroundDecoration,
       ),
+      backgroundDecorationSecondary: mix(
+        backgroundDecorationSecondary,
+        other.backgroundDecorationSecondary,
+      ),
       surface: mix(surface, other.surface),
       surfaceMuted: mix(surfaceMuted, other.surfaceMuted),
       primary: mix(primary, other.primary),
       primaryPressed: mix(primaryPressed, other.primaryPressed),
       onPrimary: mix(onPrimary, other.onPrimary),
+      onPrimarySecondary: mix(onPrimarySecondary, other.onPrimarySecondary),
       textPrimary: mix(textPrimary, other.textPrimary),
       textSecondary: mix(textSecondary, other.textSecondary),
       textDisabled: mix(textDisabled, other.textDisabled),

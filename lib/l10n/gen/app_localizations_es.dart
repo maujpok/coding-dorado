@@ -200,9 +200,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get unavailableLabel => 'No disponible';
-
-  @override
   String get sourceEldorado => 'Fuente: El Dorado · tasa indicativa';
 
   @override

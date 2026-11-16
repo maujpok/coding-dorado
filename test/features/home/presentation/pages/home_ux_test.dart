@@ -73,21 +73,19 @@ void main() {
     expect(find.textContaining('≈ 3.88 USDT').hitTestable(), findsOneWidget);
   });
 
-  testWidgets('los sheets de El Dorado deshabilitan USDC; los de CriptoYa no', (
+  testWidgets('los selectores de El Dorado ocultan USDC; los de CriptoYa no', (
     tester,
   ) async {
     await pumpHome(tester);
 
-    CurrencyListTile usdcTile() => tester.widget(
-      find.byWidgetPredicate(
-        (w) => w is CurrencyListTile && w.currency.code == 'USDC',
-      ),
+    Finder usdcTile() => find.byWidgetPredicate(
+      (w) => w is CurrencyListTile && w.currency.code == 'USDC',
     );
 
     await tester.tap(find.byType(CurrencySelectorButton).hitTestable().first);
     await tester.pumpAndSettle();
-    expect(usdcTile().enabled, isFalse);
-    expect(find.textContaining('No disponible'), findsOneWidget);
+    expect(find.text('Cripto'), findsOneWidget);
+    expect(usdcTile(), findsNothing);
     await tester.tapAt(const Offset(200, 40));
     await tester.pumpAndSettle();
 
@@ -95,7 +93,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byType(CurrencySelectorButton).hitTestable().first);
     await tester.pumpAndSettle();
-    expect(usdcTile().enabled, isTrue);
+    expect(usdcTile(), findsOneWidget);
   });
 
   testWidgets('texto al 130 % en una pantalla de 320 pt: sin desbordes', (

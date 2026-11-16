@@ -291,7 +291,7 @@ Sin parámetros ni autenticación, con CORS `*`. Una sola respuesta trae todas l
   - `price` acepta string o número; `limits` es opcional.
   - Si el lado o la fiat no existen, o la crypto no es USDT → `UnsupportedPairException`.
 - **`estimatedTime`:** 10 min fijos, el valor del diseño, porque `/api/prices` no lo informa.
-- **`getAvailability()`:** se calcula con la respuesta cacheada, a partir de los pares que existen en cada lado. Los sheets de esa pestaña lo usan para deshabilitar monedas.
+- **`getAvailability()`:** se calcula con la respuesta cacheada, a partir de los pares que existen en cada lado. Los sheets de esa pestaña lo usan para ocultar las monedas que no cotiza.
 - **Precios:** son **indicativos, no vinculantes**, según la documentación de El Dorado.
 
 ### 6.3 CriptoYa: `GET {CRIPTOYA_API_URL}/{coin}/{fiat}/1`
@@ -408,7 +408,7 @@ final class ExchangeState extends Equatable {
   final ExchangePair pair;               // inicial: USDT → VES (una sola constante)
   final Decimal? amount;                 // null si está vacío o es inválido
   final QuoteStatus quote;
-  final PairAvailability availability;   // para deshabilitar monedas en los sheets
+  final PairAvailability availability;   // para ocultar monedas en los sheets
   bool get canSubmit => currentQuote != null; // cotización del par y monto actuales
 }
 
@@ -505,7 +505,8 @@ ExchangeView
 CurrencyPickerSheet (showModalBottomSheet)
 ├── handle + título ("FIAT" | "Cripto")
 └── CurrencyListTile × n                    # avatar, código, nombre (símbolo), radio;
-                                            # deshabilitado con "No disponible" según PairAvailability
+                                            # solo las disponibles según PairAvailability
+                                            # (la elegida se muestra siempre)
 
 ExchangeConfirmationSheet (showDsBottomSheet, BlocProvider.value del bloc de la pestaña)
 ├── título "Confirma tu cambio" + subtítulo
@@ -618,7 +619,7 @@ sequenceDiagram
 | Unitarias: dominio | `ExchangePair` (invariantes, swap); `GetExchangeQuote` (ambas direcciones, truncado, mínimo, tasa inválida); `CompareQuotes` (ganador por dirección, resultados parciales, empate, ambos fallan) | `test`, `mocktail` |
 | Unitarias: datos | DTOs contra fixtures reales y casos borde; selección de `SELL`/`BUY`; mediana de CriptoYa (valores en 0, libro invertido); `TtlCache` (TTL, petición en curso compartida, `forceRefresh`); interceptores por escenario; mapeo de errores | `test`, `mocktail` |
 | Bloc | *debounce*, descarte de respuestas obsoletas, swap, selección, `ExchangePrefilled`, `ExchangeReset`, mínimo, par no disponible, reintento; `HomeCubit`; `QuoteComparisonCubit`; `CheckoutCubit` (éxito, error y reintento, duración mínima) | `bloc_test` |
-| Widgets | Cambiar de pestaña conserva el estado; título sobre la tarjeta y fondo por pestaña; selector FIAT por país; la tarjeta muestra la cotización; los sheets deshabilitan los pares no disponibles y se ajustan a la lista; la comparación marca la "Mejor opción" y "Usar {proveedor}" cambia de pestaña con el mismo par y monto; la confirmación edita las tres filas, bloquea "Confirmar" sin cotización vigente y "Cancelar" no confirma; proceso (pasos, sin salida), comprobante (datos, ID copiable), error con reintento; flujo completo con reinicio de la pestaña | `flutter_test` |
+| Widgets | Cambiar de pestaña conserva el estado; título sobre la tarjeta y fondo por pestaña; selector FIAT por país; la tarjeta muestra la cotización; los sheets ocultan las monedas no disponibles y se ajustan a la lista; la comparación marca la "Mejor opción" y "Usar {proveedor}" cambia de pestaña con el mismo par y monto; la confirmación edita las tres filas, bloquea "Confirmar" sin cotización vigente y "Cancelar" no confirma; proceso (pasos, sin salida), comprobante (datos, ID copiable), error con reintento; flujo completo con reinicio de la pestaña | `flutter_test` |
 | Contrato (`live`) | La forma real de `/api/prices` y de CriptoYa. Excluidas por defecto; se corren con `--dart-define=LIVE_TESTS=true --tags live` | `flutter_test` |
 | Visual (opcional) | *Goldens* de ambas pestañas, los selectores, la comparación, la confirmación, el proceso y el comprobante | `flutter_test` |
 
@@ -643,7 +644,7 @@ sequenceDiagram
 | `/api/prices` no publica límites de uso ni SLA | Posibles cortes | Caché de 60 s, petición en curso compartida y mock |
 | CriptoYa limita las consultas (120) y no tiene términos formales | Posibles 429 | Caché de 30 s por par; mensaje propio para el 429; mock |
 | Las APIs cambian su forma | El parseo falla | DTOs tolerantes y pruebas `live` de contrato |
-| El Dorado no cubre USDC ni la compra de USDT con VES | Pares no disponibles en su pestaña | Monedas deshabilitadas en los sheets, mensaje claro y acceso directo a CriptoYa |
+| El Dorado no cubre USDC ni la compra de USDT con VES | Pares no disponibles en su pestaña | Monedas ocultas en los sheets, mensaje claro y acceso directo a CriptoYa |
 | La comparación mezcla dos fuentes distintas (libro propio contra mediana de mercado) | Puede malinterpretarse | Nota al pie en el sheet; ambas se presentan como indicativas |
 | La mediana de CriptoYa es ruidosa | Tasa poco representativa en pares con pocas ofertas | Se descartan los 0 y se muestra `sampleSize` |
 | Las pestañas y la comparación no están en el diseño | Fidelidad visual | Se construyen con los tokens del diseño y fuera de la tarjeta |

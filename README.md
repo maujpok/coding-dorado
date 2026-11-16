@@ -29,7 +29,7 @@ La estructura, las medidas y la tipografía (Rubik) se midieron sobre los mocks.
 - **Comparación:** las dos cotizaciones para el mismo par y monto, la "Mejor opción" y la diferencia ("Con CriptoYa recibes +1.25 VES (+1.00 %)"). "Usar …" lleva a esa pestaña con el mismo par y monto.
 - **Estados cuidados:**
   - Monto bajo el mínimo de El Dorado.
-  - Pares que El Dorado no cotiza (USDC, compra de USDT con VES): aparecen deshabilitados en sus selectores y ofrecen "Ver en CriptoYa".
+  - Pares que El Dorado no cotiza (USDC, compra de USDT con VES): no aparecen en sus selectores (la moneda ya elegida sí, para que se vea) y ofrecen "Ver en CriptoYa".
   - Sin ofertas, sin conexión, límite de consultas: cada uno con su mensaje y reintento.
   - Carga con skeletons y el valor anterior atenuado.
 - **Accesibilidad:** contraste WCAG AA verificado por pruebas; etiquetas de lector de pantalla en los controles y los valores; sin desbordes con texto al 130 % en pantallas de 320 pt.

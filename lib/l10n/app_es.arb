@@ -175,7 +175,6 @@
       }
     }
   },
-  "unavailableLabel": "No disponible",
   "sourceEldorado": "Fuente: El Dorado · tasa indicativa",
   "sourceCriptoya": "Fuente: CriptoYa · {count, plural, =1{1 exchange P2P} other{mediana de {count} exchanges P2P}}",
   "@sourceCriptoya": {

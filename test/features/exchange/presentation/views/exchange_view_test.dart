@@ -1,6 +1,7 @@
 import 'package:coding_dorado/app/di/injection.dart';
 import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/features/exchange/domain/catalog/currency_catalog.dart';
+import 'package:coding_dorado/features/exchange/domain/entities/currency.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_quote.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
@@ -265,14 +266,75 @@ void main() {
     }
   });
 
-  testWidgets('el selector TENGO abre Cripto', (tester) async {
+  testWidgets('el selector TENGO abre Cripto solo con lo que la fuente '
+      'cotiza', (tester) async {
     await pumpView(tester, RateProvider.eldorado);
+    bloc.add(const ExchangeStarted());
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byType(CurrencySelectorButton).first);
     await tester.pumpAndSettle();
 
     expect(find.text('Cripto'), findsOneWidget);
-    expect(find.text('USD Coin (USDC)'), findsOneWidget);
+    expect(find.text('Tether (USDT)'), findsOneWidget);
+    expect(find.text('USD Coin (USDC)'), findsNothing);
+  });
+
+  group('CurrencyPickerList', () {
+    Future<List<String>> visibleCodes(
+      WidgetTester tester, {
+      required Currency selected,
+      bool Function(Currency)? isAvailable,
+    }) async {
+      await tester.pumpApp(
+        CurrencyPickerList(
+          currencies: CurrencyCatalog.cryptos,
+          selected: selected,
+          isAvailable: isAvailable,
+          onSelected: (_) {},
+        ),
+      );
+      return tester
+          .widgetList<CurrencyListTile>(find.byType(CurrencyListTile))
+          .map((tile) => tile.currency.code)
+          .toList();
+    }
+
+    testWidgets('sin información de disponibilidad muestra todas', (
+      tester,
+    ) async {
+      expect(await visibleCodes(tester, selected: CurrencyCatalog.usdt), [
+        'USDT',
+        'USDC',
+      ]);
+    });
+
+    testWidgets('oculta las no disponibles, sin la etiqueta "No disponible"', (
+      tester,
+    ) async {
+      expect(
+        await visibleCodes(
+          tester,
+          selected: CurrencyCatalog.usdt,
+          isAvailable: (currency) => currency != CurrencyCatalog.usdc,
+        ),
+        ['USDT'],
+      );
+      expect(find.textContaining('No disponible'), findsNothing);
+    });
+
+    testWidgets('la seleccionada se muestra aunque no esté disponible', (
+      tester,
+    ) async {
+      expect(
+        await visibleCodes(
+          tester,
+          selected: CurrencyCatalog.usdc,
+          isAvailable: (currency) => currency != CurrencyCatalog.usdc,
+        ),
+        ['USDT', 'USDC'],
+      );
+    });
   });
 
   testWidgets('en CriptoYa no hay fila de tiempo estimado', (tester) async {

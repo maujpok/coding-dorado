@@ -430,12 +430,6 @@ abstract class AppLocalizations {
   /// **'{name} ({symbol})'**
   String currencySubtitle(String name, String symbol);
 
-  /// No description provided for @unavailableLabel.
-  ///
-  /// In es, this message translates to:
-  /// **'No disponible'**
-  String get unavailableLabel;
-
   /// No description provided for @sourceEldorado.
   ///
   /// In es, this message translates to:

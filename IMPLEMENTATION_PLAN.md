@@ -161,7 +161,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   - Si la crypto no es USDT → `UnsupportedPairException`.
   - Devuelve `ExchangeRateModel(price, minAmount = limits.in.min, estimatedTime = 10 min)`. Los 10 min son el valor del diseño: `/api/prices` no informa el tiempo.
   - La respuesta de `/prices` se guarda en un `TtlCache` con TTL de 60 s; se invalida con "Reintentar" o al volver a la app (`forceRefresh`).
-- [x] `EldoradoExchangeRepository.getAvailability()` calcula los pares disponibles con la respuesta cacheada; los sheets la usan para marcar las monedas no disponibles (Fase 8).
+- [x] `EldoradoExchangeRepository.getAvailability()` calcula los pares disponibles con la respuesta cacheada; los sheets la usan para ocultar las monedas no disponibles (Fase 8; hasta la Fase 12 se mostraban deshabilitadas).
 - [x] `MockEldoradoPricesInterceptor`:
   - Responde a `GET …/prices` con la forma real y **la misma cobertura**: sin USDC y sin VES en `BUY`.
   - Aplica la latencia y el escenario de `MOCK_SCENARIO_ELDORADO`: `success`, `empty`, `server_error`, `timeout` o `malformed`.
@@ -343,7 +343,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 - [x] **Monto mínimo (El Dorado):** debajo del campo, "Mínimo 5 USDT" (o su equivalente en fiat) cuando el monto no llega; "Cambiar" queda deshabilitado.
 - [x] **Par no disponible (El Dorado):**
   - Un mensaje claro ("Este par no está disponible en El Dorado") con dos accesos: elegir otra moneda, o "Ver en CriptoYa" (cambia de pestaña con el mismo par y monto).
-  - En los sheets de la pestaña El Dorado, las monedas sin cotización para la dirección actual aparecen deshabilitadas con la etiqueta "No disponible". Se calcula con `getAvailability()`.
+  - En los sheets de la pestaña El Dorado, las monedas sin cotización para la dirección actual no se muestran (la elegida sí). Se calcula con `getAvailability()`. *Hasta la Fase 12 aparecían deshabilitadas con la etiqueta "No disponible".*
 - [x] **Sin ofertas (CriptoYa):** mensaje y sugerencia de probar otro par.
 - [x] Error dentro de la tarjeta con "Reintentar" y un mensaje distinto por tipo de `Failure`.
 - [x] Refrescar los precios al volver la app al primer plano si la caché venció.
@@ -457,7 +457,7 @@ Desvíos respecto del plan, todos con el mismo objetivo que la tarea original:
 | Alguna API cambia su forma | Baja | DTO tolerante y pruebas `live` de contrato |
 | La mediana de CriptoYa es ruidosa (libros invertidos, exchanges en 0) | Media | Se descartan los 0, se usa la mediana y no el mejor precio, y se muestra cuántos exchanges entraron |
 | La comparación mezcla dos cosas distintas (el libro de El Dorado contra la mediana del mercado) | Cierta | Nota al pie en el sheet; ambas se muestran como indicativas |
-| El Dorado no cubre USDC ni la compra de USDT con VES | Cierta | Estado "no disponible", monedas deshabilitadas en sus sheets y acceso directo a la pestaña CriptoYa |
+| El Dorado no cubre USDC ni la compra de USDT con VES | Cierta | Estado "no disponible", monedas ocultas en sus sheets y acceso directo a la pestaña CriptoYa |
 | El selector de pestañas no está en el diseño | Cierta | Se construye con el design system y fuera de la tarjeta |
 | El API de órdenes no vuelve | Alta | No bloquea la entrega: la Fase 10 es opcional |
 

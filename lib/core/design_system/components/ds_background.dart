@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 /// Fondo de pantalla con el semicírculo del diseño.
 ///
-/// La geometría se ajustó a los mocks (error < 1 px): centro en
+/// La geometría se ajustó al diseño (error < 1 px): centro en
 /// (1.945·ancho, 0.378·alto) y radio 1.403·ancho.
 class DsBackground extends StatelessWidget {
   const DsBackground({required this.child, this.decorationColor, super.key});

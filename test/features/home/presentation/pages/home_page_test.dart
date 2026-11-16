@@ -1,18 +1,17 @@
-import 'package:coding_dorado/app/di/injection.dart';
 import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/features/checkout/presentation/pages/checkout_processing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../../helpers/fake_apis/fake_criptoya_api.dart';
 import '../../../../helpers/pump_app.dart';
 
 void main() {
   late GetIt getIt;
 
   setUp(() {
-    getIt = GetIt.asNewInstance();
-    configureDependencies(getIt, mockAppConfig());
+    getIt = fakeApiDependencies();
   });
 
   Future<void> pumpHome(WidgetTester tester) async {
@@ -20,7 +19,7 @@ void main() {
       ..physicalSize = const Size(804, 1748)
       ..devicePixelRatio = 2;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(mockApp(getIt));
+    await tester.pumpWidget(testApp(getIt));
     await tester.pumpAndSettle();
   }
 
@@ -84,8 +83,7 @@ void main() {
   testWidgets('comparar con un proveedor caído muestra el resultado parcial', (
     tester,
   ) async {
-    getIt = GetIt.asNewInstance();
-    configureDependencies(getIt, mockAppConfig(criptoya: 'rate_limited'));
+    getIt = fakeApiDependencies(criptoya: CriptoYaScenario.rateLimited);
     await pumpHome(tester);
 
     await tester.enterText(visibleField(), '5');

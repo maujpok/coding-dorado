@@ -14,6 +14,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 
+import 'fake_apis/fake_criptoya_api.dart';
+import 'fake_apis/fake_eldorado_prices_api.dart';
+import 'fake_apis/fake_orderbook_api.dart';
+
 extension PumpApp on WidgetTester {
   /// Monta [child] con el tema, la localización y un Scaffold.
   Future<void> pumpApp(Widget child) => pumpWidget(
@@ -27,23 +31,34 @@ extension PumpApp on WidgetTester {
   );
 }
 
-/// Configuración con ambos proveedores en mock y sin latencia.
-AppConfig mockAppConfig({
-  String eldorado = 'success',
-  String criptoya = 'success',
-}) => AppConfig(
-  eldoradoApiUrl: AppConfig.defaultEldoradoApiUrl,
-  criptoyaApiUrl: AppConfig.defaultCriptoyaApiUrl,
-  useMock: true,
-  mockScenarioEldorado: eldorado,
-  mockScenarioCriptoya: criptoya,
-  mockLatency: Duration.zero,
-  eldoradoSource: EldoradoSource.prices,
-  orderbookApiUrl: '',
-);
+/// Dependencias reales de la app con las APIs de ambos proveedores
+/// reemplazadas por [FakeEldoradoPricesApi] y [FakeCriptoYaApi] (o
+/// [FakeOrderbookApi] si [config] usa el API de órdenes): sin red.
+GetIt fakeApiDependencies({
+  EldoradoPricesScenario eldorado = EldoradoPricesScenario.success,
+  CriptoYaScenario criptoya = CriptoYaScenario.success,
+  OrderbookScenario orderbook = OrderbookScenario.success,
+  AppConfig config = const AppConfig.defaults(),
+}) {
+  final getIt = GetIt.asNewInstance();
+  configureDependencies(
+    getIt,
+    config,
+    httpInterceptors: {
+      RateProvider.eldorado: [
+        if (config.eldoradoSource == EldoradoSource.orderbook)
+          FakeOrderbookApi(scenario: orderbook)
+        else
+          FakeEldoradoPricesApi(scenario: eldorado),
+      ],
+      RateProvider.criptoya: [FakeCriptoYaApi(scenario: criptoya)],
+    },
+  );
+  return getIt;
+}
 
-/// Fábrica de blocs sobre la pila real (DI + mocks HTTP), sin debounce.
-ExchangeBloc Function(RateProvider) mockBlocFactory(GetIt getIt) =>
+/// Fábrica de blocs sobre la pila real de [getIt], sin debounce.
+ExchangeBloc Function(RateProvider) testBlocFactory(GetIt getIt) =>
     (provider) => ExchangeBloc(
       getQuote: getIt.getExchangeQuote(provider),
       repository: getIt.exchangeRepository(provider),
@@ -62,14 +77,9 @@ SubmitExchange instantSubmitExchange() => SubmitExchange(
   ),
 );
 
-/// La app completa sobre la pila mock de [getIt].
-App mockApp(
-  GetIt getIt, {
-  SubmitExchange? submitExchange,
-  bool showMockBanner = false,
-}) => App(
-  createExchangeBloc: mockBlocFactory(getIt),
+/// La app completa sobre las dependencias de [getIt].
+App testApp(GetIt getIt, {SubmitExchange? submitExchange}) => App(
+  createExchangeBloc: testBlocFactory(getIt),
   compareQuotes: getIt<CompareQuotes>(),
   submitExchange: submitExchange ?? instantSubmitExchange(),
-  showMockBanner: showMockBanner,
 );

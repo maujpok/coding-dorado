@@ -1,8 +1,8 @@
 import 'package:decimal/decimal.dart';
 
 /// Precios **ficticios** de El Dorado (fiat por 1 USDT), cercanos al mercado
-/// del 2026-11-13. Los usan los mocks de El Dorado y de CriptoYa.
-abstract final class MockPrices {
+/// del 2026-11-13, para las APIs falsas de las pruebas.
+abstract final class FakePrices {
   /// `SELL`: el usuario vende USDT. VES = 25.00 para que la pantalla coincida
   /// con el diseño (5 USDT → 125.00 VES).
   static final Map<String, Decimal> sell = {

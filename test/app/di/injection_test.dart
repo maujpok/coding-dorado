@@ -7,29 +7,14 @@ import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.da
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../helpers/fake_apis/fake_criptoya_api.dart';
+import '../../helpers/pump_app.dart';
 import '../../helpers/test_currencies.dart';
-
-AppConfig mockConfig({
-  String eldorado = 'success',
-  String criptoya = 'success',
-}) => AppConfig(
-  eldoradoApiUrl: AppConfig.defaultEldoradoApiUrl,
-  criptoyaApiUrl: AppConfig.defaultCriptoyaApiUrl,
-  useMock: true,
-  mockScenarioEldorado: eldorado,
-  mockScenarioCriptoya: criptoya,
-  mockLatency: Duration.zero,
-  eldoradoSource: EldoradoSource.prices,
-  orderbookApiUrl: '',
-);
 
 void main() {
   late GetIt getIt;
 
-  setUp(() {
-    getIt = GetIt.asNewInstance();
-    configureDependencies(getIt, mockConfig());
-  });
+  setUp(() => getIt = fakeApiDependencies());
 
   test('registra un repositorio y un caso de uso por proveedor', () {
     for (final provider in RateProvider.values) {
@@ -39,7 +24,15 @@ void main() {
     expect(getIt.allQuoteUseCases().keys, RateProvider.values);
   });
 
-  group('integración de datos en modo mock', () {
+  test('con la configuración por defecto arma todo sin pedir nada', () {
+    final real = GetIt.asNewInstance();
+    configureDependencies(real, const AppConfig.defaults());
+
+    expect(real<AppConfig>(), const AppConfig.defaults());
+    expect(real.allQuoteUseCases().keys, RateProvider.values);
+  });
+
+  group('integración de datos con las APIs falsas', () {
     test('5 USDT → VES: El Dorado 125.00 y CriptoYa 126.25', () async {
       final pair = ExchangePair(
         from: CurrencyCatalog.usdt,
@@ -87,9 +80,8 @@ void main() {
       expect(result.failureOrNull, BelowMinimumFailure(dec('5')));
     });
 
-    test('los escenarios del mock se configuran por proveedor', () async {
-      final other = GetIt.asNewInstance();
-      configureDependencies(other, mockConfig(criptoya: 'rate_limited'));
+    test('httpInterceptors se aplican por proveedor', () async {
+      final other = fakeApiDependencies(criptoya: CriptoYaScenario.rateLimited);
       final pair = ExchangePair(
         from: CurrencyCatalog.usdt,
         to: CurrencyCatalog.ves,

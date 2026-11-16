@@ -14,22 +14,14 @@ final class AppConfig extends Equatable {
   const AppConfig({
     required this.eldoradoApiUrl,
     required this.criptoyaApiUrl,
-    required this.useMock,
-    required this.mockScenarioEldorado,
-    required this.mockScenarioCriptoya,
-    required this.mockLatency,
     required this.eldoradoSource,
     required this.orderbookApiUrl,
   });
 
-  /// Valores por defecto: APIs reales, sin mock.
+  /// Valores por defecto: las APIs públicas de cada proveedor.
   const AppConfig.defaults()
     : eldoradoApiUrl = defaultEldoradoApiUrl,
       criptoyaApiUrl = defaultCriptoyaApiUrl,
-      useMock = false,
-      mockScenarioEldorado = 'success',
-      mockScenarioCriptoya = 'success',
-      mockLatency = const Duration(milliseconds: 600),
       eldoradoSource = EldoradoSource.prices,
       orderbookApiUrl = '';
 
@@ -43,21 +35,6 @@ final class AppConfig extends Equatable {
         'CRIPTOYA_API_URL',
         defaultValue: defaultCriptoyaApiUrl,
       ),
-      useMock: const bool.fromEnvironment('USE_MOCK'),
-      mockScenarioEldorado: const String.fromEnvironment(
-        'MOCK_SCENARIO_ELDORADO',
-        defaultValue: 'success',
-      ),
-      mockScenarioCriptoya: const String.fromEnvironment(
-        'MOCK_SCENARIO_CRIPTOYA',
-        defaultValue: 'success',
-      ),
-      mockLatency: const Duration(
-        milliseconds: int.fromEnvironment(
-          'MOCK_LATENCY_MS',
-          defaultValue: 600,
-        ),
-      ),
       eldoradoSource: parseEldoradoSource(
         const String.fromEnvironment('ELDORADO_SOURCE'),
       ),
@@ -70,10 +47,6 @@ final class AppConfig extends Equatable {
 
   final String eldoradoApiUrl;
   final String criptoyaApiUrl;
-  final bool useMock;
-  final String mockScenarioEldorado;
-  final String mockScenarioCriptoya;
-  final Duration mockLatency;
   final EldoradoSource eldoradoSource;
 
   /// URL completa del endpoint `recommendations` (Fase 10).
@@ -91,10 +64,6 @@ final class AppConfig extends Equatable {
   List<Object?> get props => [
     eldoradoApiUrl,
     criptoyaApiUrl,
-    useMock,
-    mockScenarioEldorado,
-    mockScenarioCriptoya,
-    mockLatency,
     eldoradoSource,
     orderbookApiUrl,
   ];

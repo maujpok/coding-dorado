@@ -1,6 +1,6 @@
 # Design system
 
-> Estado: tokens y componentes implementados · Última actualización: 2026-11-13
+> Estado: tokens y componentes implementados · Última actualización: 2026-11-16
 > Código: [`lib/core/design_system/`](lib/core/design_system/) · Documentos relacionados: [ARCHITECTURE.md](ARCHITECTURE.md) · [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
 
 Un design system mínimo para la calculadora: tokens, un tema de Material construido sobre ellos y un puñado de componentes reutilizables.

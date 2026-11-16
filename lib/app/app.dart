@@ -10,16 +10,12 @@ class App extends StatelessWidget {
     required this.createExchangeBloc,
     required this.compareQuotes,
     required this.submitExchange,
-    this.showMockBanner = false,
     super.key,
   });
 
   final ExchangeBlocFactory createExchangeBloc;
   final CompareQuotes compareQuotes;
   final SubmitExchange submitExchange;
-
-  /// Banner "MOCK" en debug cuando los datos son simulados.
-  final bool showMockBanner;
 
   @override
   Widget build(BuildContext context) {
@@ -30,17 +26,6 @@ class App extends StatelessWidget {
       locale: const Locale('es'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      builder: (context, child) => showMockBanner
-          ? Banner(
-              message: AppLocalizations.of(context).mockBanner,
-              location: BannerLocation.topEnd,
-              color: context.colors.inverseSurface,
-              textStyle: AppTypography.label.copyWith(
-                color: context.colors.primary,
-              ),
-              child: child ?? const SizedBox.shrink(),
-            )
-          : child ?? const SizedBox.shrink(),
       home: HomePage(
         createExchangeBloc: createExchangeBloc,
         compareQuotes: compareQuotes,

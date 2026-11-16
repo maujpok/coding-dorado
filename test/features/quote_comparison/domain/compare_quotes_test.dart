@@ -1,4 +1,3 @@
-import 'package:coding_dorado/app/di/injection.dart';
 import 'package:coding_dorado/core/error/failure.dart';
 import 'package:coding_dorado/core/error/result.dart';
 import 'package:coding_dorado/features/exchange/domain/catalog/currency_catalog.dart';
@@ -9,7 +8,6 @@ import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.da
 import 'package:coding_dorado/features/exchange/domain/usecases/get_exchange_quote.dart';
 import 'package:coding_dorado/features/quote_comparison/domain/usecases/compare_quotes.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 
 import '../../../helpers/fake_exchange_repository.dart';
 import '../../../helpers/pump_app.dart';
@@ -20,12 +18,11 @@ void main() {
   const ves = CurrencyCatalog.ves;
   const cop = CurrencyCatalog.cop;
 
-  group('con los datos del mock (pila real)', () {
+  group('con las APIs falsas (pila real)', () {
     late CompareQuotes compare;
 
     setUp(() {
-      final getIt = GetIt.asNewInstance();
-      configureDependencies(getIt, mockAppConfig());
+      final getIt = fakeApiDependencies();
       compare = getIt<CompareQuotes>();
     });
 

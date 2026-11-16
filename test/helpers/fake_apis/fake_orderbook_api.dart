@@ -1,8 +1,10 @@
-import 'package:coding_dorado/features/exchange/data/eldorado/mock/mock_prices.dart';
 import 'package:decimal/decimal.dart';
 import 'package:dio/dio.dart';
 
-enum OrderbookMockScenario {
+import 'fake_prices.dart';
+
+/// Cómo responde [FakeOrderbookApi].
+enum OrderbookScenario {
   success,
 
   /// `{"data": {}}`.
@@ -16,35 +18,19 @@ enum OrderbookMockScenario {
   timeout,
 
   /// HTML en lugar de JSON.
-  malformed
-  ;
-
-  /// Comparte la clave `MOCK_SCENARIO_ELDORADO` con el mock de `/prices`.
-  static OrderbookMockScenario parse(String raw) =>
-      switch (raw.trim().toLowerCase()) {
-        'no_offers' || 'empty' => noOffers,
-        'invalid_request' => invalidRequest,
-        'server_error' => serverError,
-        'timeout' => timeout,
-        'malformed' => malformed,
-        _ => success,
-      };
+  malformed,
 }
 
-/// Responde como el API de órdenes documentado (API_RESEARCH.md §2): HTTP
-/// 200 siempre, `data: {}` sin ofertas y `error` en el body.
+/// API de órdenes falsa: responde como el documentado (API_RESEARCH.md §2),
+/// sin red. HTTP 200 siempre, `data: {}` sin ofertas y `error` en el body.
 ///
-/// Usa los mismos precios que el mock de `/prices` (USDT→VES = 25.00, como
-/// el diseño), límites de 5 a 500 USDT, `marketMakerOrderTime` de 10 min y
-/// ninguna oferta para USDC (deshabilitado en El Dorado).
-class MockOrderbookInterceptor extends Interceptor {
-  MockOrderbookInterceptor({
-    this.scenario = OrderbookMockScenario.success,
-    this.latency = Duration.zero,
-  });
+/// Usa los precios de [FakePrices] (USDT→VES = 25.00, como el diseño),
+/// límites de 5 a 500 USDT, `marketMakerOrderTime` de 10 min y ninguna
+/// oferta para USDC (deshabilitado en El Dorado).
+class FakeOrderbookApi extends Interceptor {
+  FakeOrderbookApi({this.scenario = OrderbookScenario.success});
 
-  final OrderbookMockScenario scenario;
-  final Duration latency;
+  final OrderbookScenario scenario;
 
   static const _required = [
     'type',
@@ -57,14 +43,9 @@ class MockOrderbookInterceptor extends Interceptor {
   static final Decimal _maxUsdt = Decimal.fromInt(500);
 
   @override
-  Future<void> onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    if (latency > Duration.zero) await Future<void>.delayed(latency);
-
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     switch (scenario) {
-      case OrderbookMockScenario.serverError:
+      case OrderbookScenario.serverError:
         return handler.reject(
           DioException.badResponse(
             statusCode: 502,
@@ -72,20 +53,20 @@ class MockOrderbookInterceptor extends Interceptor {
             response: Response(requestOptions: options, statusCode: 502),
           ),
         );
-      case OrderbookMockScenario.timeout:
+      case OrderbookScenario.timeout:
         return handler.reject(
           DioException.receiveTimeout(
             timeout: options.receiveTimeout ?? Duration.zero,
             requestOptions: options,
           ),
         );
-      case OrderbookMockScenario.malformed:
+      case OrderbookScenario.malformed:
         return handler.resolve(_ok(options, '<html>Bad gateway</html>'));
-      case OrderbookMockScenario.invalidRequest:
+      case OrderbookScenario.invalidRequest:
         return handler.resolve(_ok(options, _error('Invalid request format')));
-      case OrderbookMockScenario.noOffers:
+      case OrderbookScenario.noOffers:
         return handler.resolve(_ok(options, _noOffers));
-      case OrderbookMockScenario.success:
+      case OrderbookScenario.success:
         return handler.resolve(_ok(options, _respond(options.queryParameters)));
     }
   }
@@ -111,8 +92,8 @@ class MockOrderbookInterceptor extends Interceptor {
 
     if (crypto != 'TATUM-TRON-USDT') return _noOffers; // USDC deshabilitado.
     final rate = type == '0'
-        ? MockPrices.sellPrice(fiat)
-        : MockPrices.buyPrice(fiat);
+        ? FakePrices.sellPrice(fiat)
+        : FakePrices.buyPrice(fiat);
     if (rate == null) return _noOffers;
 
     final amountInUsdt = amountCurrency == crypto
@@ -131,7 +112,7 @@ class MockOrderbookInterceptor extends Interceptor {
     String fiat,
     Decimal rate,
   ) => {
-    'offerId': 'mock-offer',
+    'offerId': 'fake-offer',
     'offerType': int.parse(type),
     'cryptoCurrencyId': crypto,
     'fiatCurrencyId': fiat,

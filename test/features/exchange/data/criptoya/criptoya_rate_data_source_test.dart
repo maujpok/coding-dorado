@@ -3,7 +3,6 @@ import 'package:coding_dorado/core/error/result.dart';
 import 'package:coding_dorado/features/exchange/data/common/data_exceptions.dart';
 import 'package:coding_dorado/features/exchange/data/criptoya/criptoya_exchange_repository.dart';
 import 'package:coding_dorado/features/exchange/data/criptoya/criptoya_rate_data_source.dart';
-import 'package:coding_dorado/features/exchange/data/criptoya/mock/mock_criptoya_interceptor.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/currency.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_rate.dart';
@@ -12,6 +11,7 @@ import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.da
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/data_test_utils.dart';
+import '../../../../helpers/fake_apis/fake_criptoya_api.dart';
 import '../../../../helpers/test_currencies.dart';
 
 void main() {
@@ -23,19 +23,19 @@ void main() {
   late RequestCounter counter;
 
   CriptoYaRateDataSource dataSourceWith(Object? data) => CriptoYaRateDataSource(
-    mockedDio(StaticResponseInterceptor(data), counter: counter),
+    fakeDio(StaticResponseInterceptor(data), counter: counter),
   );
 
-  CriptoYaRateDataSource mockDataSource([
-    CriptoYaMockScenario scenario = CriptoYaMockScenario.success,
+  CriptoYaRateDataSource fakeDataSource([
+    CriptoYaScenario scenario = CriptoYaScenario.success,
   ]) => CriptoYaRateDataSource(
-    mockedDio(MockCriptoYaInterceptor(scenario: scenario), counter: counter),
+    fakeDio(FakeCriptoYaApi(scenario: scenario), counter: counter),
   );
 
   setUp(() => counter = RequestCounter());
 
   test('pide /{coin}/{fiat}/1 en minúsculas', () async {
-    await mockDataSource().fetchRate(
+    await fakeDataSource().fetchRate(
       pair: ExchangePair(from: usdc, to: cop),
       amount: dec('5'),
     );
@@ -75,7 +75,7 @@ void main() {
   });
 
   test('una petición por par dentro de los 30 s', () async {
-    final dataSource = mockDataSource();
+    final dataSource = fakeDataSource();
     final usdtVes = ExchangePair(from: usdt, to: ves);
 
     await dataSource.fetchRate(pair: usdtVes, amount: dec('5'));
@@ -91,14 +91,14 @@ void main() {
 
   test('availability es desconocida', () async {
     expect(
-      await mockDataSource().availability(),
+      await fakeDataSource().availability(),
       const PairAvailability.unknown(),
     );
   });
 
-  group('mock', () {
+  group('API falsa', () {
     test('mediana = SELL de El Dorado × 1.01 al vender', () async {
-      final rate = await mockDataSource().fetchRate(
+      final rate = await fakeDataSource().fetchRate(
         pair: ExchangePair(from: usdt, to: ves),
         amount: dec('5'),
       );
@@ -108,7 +108,7 @@ void main() {
     });
 
     test('mediana = BUY de El Dorado × 1.01 al comprar', () async {
-      final rate = await mockDataSource().fetchRate(
+      final rate = await fakeDataSource().fetchRate(
         pair: ExchangePair(from: cop, to: usdt),
         amount: dec('33660'),
       );
@@ -117,11 +117,11 @@ void main() {
     });
 
     test('VES al comprar y USDC también cotizan', () async {
-      final ves2usdt = await mockDataSource().fetchRate(
+      final ves2usdt = await fakeDataSource().fetchRate(
         pair: ExchangePair(from: ves, to: usdt),
         amount: dec('100'),
       );
-      final usdc2ves = await mockDataSource().fetchRate(
+      final usdc2ves = await fakeDataSource().fetchRate(
         pair: ExchangePair(from: usdc, to: ves),
         amount: dec('5'),
       );
@@ -129,41 +129,29 @@ void main() {
       expect(ves2usdt.rate, dec('25.75'));
       expect(usdc2ves.rate, dec('25.1995'));
     });
-
-    test('parse reconoce los escenarios', () {
-      expect(
-        CriptoYaMockScenario.parse('rate_limited'),
-        CriptoYaMockScenario.rateLimited,
-      );
-      expect(
-        CriptoYaMockScenario.parse('no_offers'),
-        CriptoYaMockScenario.noOffers,
-      );
-      expect(CriptoYaMockScenario.parse(''), CriptoYaMockScenario.success);
-    });
   });
 
   group('CriptoYaExchangeRepository', () {
     final usdtToVes = ExchangePair(from: usdt, to: ves);
 
-    Future<Result<ExchangeRate>> rateFor(CriptoYaMockScenario scenario) =>
+    Future<Result<ExchangeRate>> rateFor(CriptoYaScenario scenario) =>
         CriptoYaExchangeRepository(
-          mockDataSource(scenario),
+          fakeDataSource(scenario),
         ).getRate(pair: usdtToVes, amount: dec('5'));
 
     test('identifica al proveedor', () {
       expect(
-        CriptoYaExchangeRepository(mockDataSource()).provider,
+        CriptoYaExchangeRepository(fakeDataSource()).provider,
         RateProvider.criptoya,
       );
     });
 
-    final expectations = <CriptoYaMockScenario, Failure>{
-      CriptoYaMockScenario.noOffers: const NoOffersFailure(),
-      CriptoYaMockScenario.rateLimited: const ServerFailure(429),
-      CriptoYaMockScenario.serverError: const ServerFailure(500),
-      CriptoYaMockScenario.timeout: const TimeoutFailure(),
-      CriptoYaMockScenario.malformed: const ParsingFailure(),
+    final expectations = <CriptoYaScenario, Failure>{
+      CriptoYaScenario.noOffers: const NoOffersFailure(),
+      CriptoYaScenario.rateLimited: const ServerFailure(429),
+      CriptoYaScenario.serverError: const ServerFailure(500),
+      CriptoYaScenario.timeout: const TimeoutFailure(),
+      CriptoYaScenario.malformed: const ParsingFailure(),
     };
     for (final MapEntry(key: scenario, value: failure)
         in expectations.entries) {
@@ -174,9 +162,9 @@ void main() {
 
     test('par desconocido (404 Invalid pair) → PairUnavailableFailure', () {
       final repository = CriptoYaExchangeRepository(
-        CriptoYaRateDataSource(mockedDio(MockCriptoYaInterceptor())),
+        CriptoYaRateDataSource(fakeDio(FakeCriptoYaApi())),
       );
-      // El mock solo conoce las fiat del catálogo.
+      // La API falsa solo conoce las fiat del catálogo.
       const unknownFiat = Currency(
         code: 'XYZ',
         name: 'Desconocida',

@@ -2,13 +2,13 @@ import 'package:coding_dorado/core/cache/ttl_cache.dart';
 import 'package:coding_dorado/features/exchange/data/common/data_exceptions.dart';
 import 'package:coding_dorado/features/exchange/data/common/exchange_rate_model.dart';
 import 'package:coding_dorado/features/exchange/data/eldorado/eldorado_prices_data_source.dart';
-import 'package:coding_dorado/features/exchange/data/eldorado/mock/mock_eldorado_prices_interceptor.dart';
 import 'package:coding_dorado/features/exchange/data/eldorado/prices_response.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/data_test_utils.dart';
+import '../../../../helpers/fake_apis/fake_eldorado_prices_api.dart';
 import '../../../../helpers/test_currencies.dart';
 
 void main() {
@@ -23,7 +23,7 @@ void main() {
   setUp(() {
     counter = RequestCounter();
     dataSource = EldoradoPricesDataSource(
-      mockedDio(MockEldoradoPricesInterceptor(), counter: counter),
+      fakeDio(FakeEldoradoPricesApi(), counter: counter),
     );
   });
 
@@ -33,7 +33,7 @@ void main() {
   test('pide GET {base}/prices', () async {
     await fetch(ExchangePair(from: usdt, to: ves));
 
-    expect(counter.requests.single.toString(), 'https://mock.local/api/prices');
+    expect(counter.requests.single.toString(), 'https://api.test/api/prices');
   });
 
   test('crypto → fiat usa SELL, con mínimo en USDT y tiempo fijo', () async {
@@ -98,7 +98,7 @@ void main() {
     test('al vencer el TTL se vuelve a pedir', () async {
       var now = DateTime(2026, 11, 13, 12);
       dataSource = EldoradoPricesDataSource(
-        mockedDio(MockEldoradoPricesInterceptor(), counter: counter),
+        fakeDio(FakeEldoradoPricesApi(), counter: counter),
         cache: TtlCache<String, PricesResponse>(
           ttl: EldoradoPricesDataSource.cacheTtl,
           now: () => now,
@@ -141,9 +141,9 @@ void main() {
 
   test('propaga los errores HTTP como DioException', () async {
     dataSource = EldoradoPricesDataSource(
-      mockedDio(
-        MockEldoradoPricesInterceptor(
-          scenario: EldoradoMockScenario.serverError,
+      fakeDio(
+        FakeEldoradoPricesApi(
+          scenario: EldoradoPricesScenario.serverError,
         ),
       ),
     );

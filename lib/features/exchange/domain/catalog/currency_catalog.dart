@@ -56,7 +56,7 @@ abstract final class CurrencyCatalog {
     iconAsset: 'assets/fiat_currencies/BRL.png',
   );
 
-  /// El mock del diseño dice "Boliviano (R$)", un error de copia: el símbolo
+  /// El diseño dice "Boliviano (R$)", un error de copia: el símbolo
   /// del boliviano es Bs.
   static const bob = Currency(
     code: 'BOB',

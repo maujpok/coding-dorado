@@ -1,4 +1,3 @@
-import 'package:coding_dorado/app/di/injection.dart';
 import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/features/exchange/domain/catalog/currency_catalog.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/currency.dart';
@@ -29,11 +28,10 @@ void main() {
       ..physicalSize = const Size(804, 1748)
       ..devicePixelRatio = 2;
     addTearDown(tester.view.reset);
-    getIt = GetIt.asNewInstance();
-    configureDependencies(getIt, mockAppConfig());
+    getIt = fakeApiDependencies();
     // El árbol crea y cierra el bloc: en testWidgets el tiempo es simulado y
     // un `await bloc.close()` directo no avanza.
-    bloc = mockBlocFactory(getIt)(provider);
+    bloc = testBlocFactory(getIt)(provider);
     await tester.pumpApp(
       BlocProvider(
         create: (_) => bloc,

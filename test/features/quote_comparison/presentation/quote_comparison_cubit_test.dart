@@ -1,24 +1,20 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:coding_dorado/app/di/injection.dart';
 import 'package:coding_dorado/features/exchange/domain/catalog/currency_catalog.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_pair.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/rate_provider.dart';
 import 'package:coding_dorado/features/quote_comparison/domain/usecases/compare_quotes.dart';
 import 'package:coding_dorado/features/quote_comparison/presentation/cubit/quote_comparison_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 
+import '../../../helpers/fake_apis/fake_criptoya_api.dart';
 import '../../../helpers/pump_app.dart';
 import '../../../helpers/test_currencies.dart';
 
 void main() {
   late CompareQuotes compareQuotes;
 
-  CompareQuotes compareWith(String criptoyaScenario) {
-    final getIt = GetIt.asNewInstance();
-    configureDependencies(getIt, mockAppConfig(criptoya: criptoyaScenario));
-    return getIt<CompareQuotes>();
-  }
+  CompareQuotes compareWith(CriptoYaScenario criptoya) =>
+      fakeApiDependencies(criptoya: criptoya)<CompareQuotes>();
 
   QuoteComparisonCubit build() => QuoteComparisonCubit(
     compareQuotes: compareQuotes,
@@ -26,7 +22,7 @@ void main() {
     amount: dec('5'),
   );
 
-  setUp(() => compareQuotes = compareWith('success'));
+  setUp(() => compareQuotes = compareWith(CriptoYaScenario.success));
 
   test('arranca cargando', () {
     expect(build().state, const ComparisonLoading());
@@ -61,7 +57,7 @@ void main() {
 
   blocTest<QuoteComparisonCubit, QuoteComparisonState>(
     'resultado parcial: CriptoYa limitado, El Dorado responde',
-    setUp: () => compareQuotes = compareWith('rate_limited'),
+    setUp: () => compareQuotes = compareWith(CriptoYaScenario.rateLimited),
     build: build,
     act: (cubit) => cubit.load(),
     verify: (cubit) {

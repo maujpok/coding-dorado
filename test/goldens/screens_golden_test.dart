@@ -4,19 +4,17 @@ library;
 import 'dart:io';
 
 import 'package:coding_dorado/app/app.dart';
-import 'package:coding_dorado/app/di/injection.dart';
 import 'package:coding_dorado/features/checkout/presentation/pages/checkout_processing_page.dart';
 import 'package:coding_dorado/features/exchange/presentation/widgets/currency_pair_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 
 import '../helpers/pump_app.dart';
 
-/// Capturas a 402×874 pt @2x (el tamaño de los mocks) con las fuentes reales
-/// y datos del mock HTTP. El render de fuentes cambia según el sistema
-/// operativo, así que no corren por defecto:
+/// Capturas a 402×874 pt @2x (el tamaño del diseño) con las fuentes reales
+/// y las APIs falsas de las pruebas. El render de fuentes cambia según el
+/// sistema operativo, así que no corren por defecto:
 ///
 /// flutter test --dart-define=GOLDENS=true --tags golden [--update-goldens]
 void main() {
@@ -29,9 +27,7 @@ void main() {
       ..physicalSize = const Size(804, 1748)
       ..devicePixelRatio = 2;
     addTearDown(tester.view.reset);
-    final getIt = GetIt.asNewInstance();
-    configureDependencies(getIt, mockAppConfig());
-    await tester.pumpWidget(mockApp(getIt));
+    await tester.pumpWidget(testApp(fakeApiDependencies()));
     await tester.pumpAndSettle();
   }
 

@@ -15,7 +15,7 @@ abstract final class AppSpacing {
   static const double huge = 40;
 }
 
-/// Radios de esquina, medidos en los mocks.
+/// Radios de esquina, medidos en el diseño.
 abstract final class AppRadius {
   static const double badge = 4; // insignias, prefijo del monto
   static const double icon = 5; // íconos de moneda
@@ -25,7 +25,7 @@ abstract final class AppRadius {
   static const double pill = 999;
 }
 
-/// Tamaños de controles, medidos en los mocks (402×874 pt).
+/// Tamaños de controles, medidos en el diseño (402×874 pt).
 abstract final class AppSizes {
   static const double pillHeight = 33;
   static const double fieldHeight = 38;
@@ -56,19 +56,19 @@ abstract final class AppSizes {
   static const double pickerSheetMaxHeightFactor = 0.7;
 
   /// Alto de referencia del bloque de la calculadora (título, tarjeta con
-  /// sus tres filas, fuente y enlace) en el teléfono del mock.
+  /// sus tres filas, fuente y enlace) en el teléfono del diseño.
   static const double calculatorBlockHeight = 450;
 }
 
 /// Reglas de layout responsive.
 abstract final class AppLayout {
-  /// Margen lateral del contenido: 48 pt en teléfonos como el del mock
+  /// Margen lateral del contenido: 48 pt en teléfonos como el del diseño
   /// (402 pt → tarjeta de ~306 pt) y 16 pt en pantallas angostas.
   static double horizontalMargin(double width) => width >= 380 ? 48 : 16;
 
   /// Espacio sobre el título de la calculadora: el que la dejaría centrada
   /// si midiera [AppSizes.calculatorBlockHeight] (138 pt en el teléfono del
-  /// mock). No depende del contenido real: el título y la tarjeta quedan en
+  /// diseño). No depende del contenido real: el título y la tarjeta quedan en
   /// el mismo lugar en todas las pestañas y no se mueven cuando aparece un
   /// mensaje o falta una fila; lo que cambia de alto crece hacia abajo.
   static double calculatorTopInset(double height) =>

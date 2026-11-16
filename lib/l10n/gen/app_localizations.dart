@@ -614,12 +614,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'El Dorado muestra el precio de su propio libro P2P y CriptoYa la mediana de varios exchanges. Ambas tasas son indicativas.'**
   String get compareFootnote;
-
-  /// No description provided for @mockBanner.
-  ///
-  /// In es, this message translates to:
-  /// **'MOCK'**
-  String get mockBanner;
 }
 
 class _AppLocalizationsDelegate

@@ -1,8 +1,10 @@
-import 'package:coding_dorado/features/exchange/data/eldorado/mock/mock_prices.dart';
 import 'package:decimal/decimal.dart';
 import 'package:dio/dio.dart';
 
-enum CriptoYaMockScenario {
+import 'fake_prices.dart';
+
+/// Cómo responde [FakeCriptoYaApi].
+enum CriptoYaScenario {
   success,
 
   /// Todos los exchanges en 0.
@@ -16,21 +18,11 @@ enum CriptoYaMockScenario {
   timeout,
 
   /// HTML en lugar de JSON.
-  malformed
-  ;
-
-  static CriptoYaMockScenario parse(String raw) =>
-      switch (raw.trim().toLowerCase()) {
-        'no_offers' => noOffers,
-        'rate_limited' => rateLimited,
-        'server_error' => serverError,
-        'timeout' => timeout,
-        'malformed' => malformed,
-        _ => success,
-      };
+  malformed,
 }
 
-/// Responde `GET …/{coin}/{fiat}/{volumen}` con la forma real de CriptoYa:
+/// API de CriptoYa falsa: responde `GET …/{coin}/{fiat}/{volumen}` con la
+/// forma real, sin red:
 /// 4 exchanges, tres alrededor del valor objetivo y uno sin ofertas (0).
 ///
 /// Valores objetivo (la mediana), elegidos para que la comparación tenga un
@@ -39,14 +31,10 @@ enum CriptoYaMockScenario {
 /// - `ask` = `BUY` de El Dorado × 1.01 (El Dorado conviene al comprar);
 ///   VES `ask` = 25.75, porque El Dorado no tiene VES en `BUY`.
 /// - USDC = USDT × 0.998.
-class MockCriptoYaInterceptor extends Interceptor {
-  MockCriptoYaInterceptor({
-    this.scenario = CriptoYaMockScenario.success,
-    this.latency = Duration.zero,
-  });
+class FakeCriptoYaApi extends Interceptor {
+  FakeCriptoYaApi({this.scenario = CriptoYaScenario.success});
 
-  final CriptoYaMockScenario scenario;
-  final Duration latency;
+  final CriptoYaScenario scenario;
 
   static final Decimal _criptoyaSpread = Decimal.parse('1.01');
   static final Decimal _usdcFactor = Decimal.parse('0.998');
@@ -58,11 +46,11 @@ class MockCriptoYaInterceptor extends Interceptor {
   ];
   static const _exchanges = ['binancep2p', 'bybitp2p', 'okexp2p', 'bitgetp2p'];
 
-  /// Mediana que el mock devuelve para `bid` (vender) y `ask` (comprar).
+  /// Mediana que devuelve para `bid` (vender) y `ask` (comprar).
   static ({Decimal bid, Decimal ask})? targetsFor(String coin, String fiat) {
-    final sell = MockPrices.sellPrice(fiat);
+    final sell = FakePrices.sellPrice(fiat);
     if (sell == null || (coin != 'USDT' && coin != 'USDC')) return null;
-    final buy = MockPrices.buyPrice(fiat);
+    final buy = FakePrices.buyPrice(fiat);
     final factor = coin == 'USDC' ? _usdcFactor : Decimal.one;
     final bid = sell * _criptoyaSpread * factor;
     final ask = (buy == null ? _vesAsk : buy * _criptoyaSpread) * factor;
@@ -70,12 +58,7 @@ class MockCriptoYaInterceptor extends Interceptor {
   }
 
   @override
-  Future<void> onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    if (latency > Duration.zero) await Future<void>.delayed(latency);
-
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final segments = options.uri.pathSegments;
     final targets = segments.length >= 3
         ? targetsFor(
@@ -90,22 +73,22 @@ class MockCriptoYaInterceptor extends Interceptor {
     }
 
     switch (scenario) {
-      case CriptoYaMockScenario.success:
+      case CriptoYaScenario.success:
         handler.resolve(_ok(options, _body(targets.bid, targets.ask)));
-      case CriptoYaMockScenario.noOffers:
+      case CriptoYaScenario.noOffers:
         handler.resolve(_ok(options, _body(Decimal.zero, Decimal.zero)));
-      case CriptoYaMockScenario.rateLimited:
+      case CriptoYaScenario.rateLimited:
         handler.reject(_badResponse(options, 429, 'Too Many Requests'));
-      case CriptoYaMockScenario.serverError:
+      case CriptoYaScenario.serverError:
         handler.reject(_badResponse(options, 500, 'Internal Server Error'));
-      case CriptoYaMockScenario.timeout:
+      case CriptoYaScenario.timeout:
         handler.reject(
           DioException.receiveTimeout(
             timeout: options.receiveTimeout ?? Duration.zero,
             requestOptions: options,
           ),
         );
-      case CriptoYaMockScenario.malformed:
+      case CriptoYaScenario.malformed:
         handler.resolve(_ok(options, '<html>Service unavailable</html>'));
     }
   }

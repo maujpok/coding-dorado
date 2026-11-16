@@ -4,7 +4,6 @@ import 'package:coding_dorado/core/error/failure.dart';
 import 'package:coding_dorado/core/error/result.dart';
 import 'package:coding_dorado/features/exchange/data/common/data_exceptions.dart';
 import 'package:coding_dorado/features/exchange/data/eldorado/eldorado_exchange_repository.dart';
-import 'package:coding_dorado/features/exchange/data/orderbook/mock/mock_orderbook_interceptor.dart';
 import 'package:coding_dorado/features/exchange/data/orderbook/orderbook_rate_data_source.dart';
 import 'package:coding_dorado/features/exchange/data/orderbook/recommendation_response.dart';
 import 'package:coding_dorado/features/exchange/domain/catalog/currency_catalog.dart';
@@ -15,9 +14,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../../helpers/data_test_utils.dart';
+import '../../../../helpers/fake_apis/fake_eldorado_prices_api.dart';
+import '../../../../helpers/fake_apis/fake_orderbook_api.dart';
+import '../../../../helpers/pump_app.dart';
 import '../../../../helpers/test_currencies.dart';
 
-const endpoint = 'https://mock.local/stage/orderbook/public/recommendations';
+const endpoint =
+    'https://orderbook.test/stage/orderbook/public/recommendations';
 
 void main() {
   const usdt = CurrencyCatalog.usdt;
@@ -126,7 +129,7 @@ void main() {
       'tiempo estimado redondeado hacia arriba y mínimo del lado TENGO',
       () async {
         final dataSource = OrderbookRateDataSource(
-          mockedDio(
+          fakeDio(
             StaticResponseInterceptor(
               readJsonFixture('eldorado/recommendation_documented.json'),
             ),
@@ -154,7 +157,7 @@ void main() {
     test('la caché distingue montos (la tasa depende del monto)', () async {
       final counter = RequestCounter();
       final dataSource = OrderbookRateDataSource(
-        mockedDio(MockOrderbookInterceptor(), counter: counter, baseUrl: ''),
+        fakeDio(FakeOrderbookApi(), counter: counter, baseUrl: ''),
         endpoint: endpoint,
       );
       final pair = ExchangePair(from: usdt, to: ves);
@@ -167,21 +170,21 @@ void main() {
     });
   });
 
-  group('mock del API de órdenes vía repositorio', () {
+  group('API de órdenes falsa vía repositorio', () {
     Future<Result<ExchangeRate>> rateWith(
-      OrderbookMockScenario scenario, {
+      OrderbookScenario scenario, {
       required ExchangePair pair,
       String amount = '5',
     }) => EldoradoExchangeRepository(
       OrderbookRateDataSource(
-        mockedDio(MockOrderbookInterceptor(scenario: scenario), baseUrl: ''),
+        fakeDio(FakeOrderbookApi(scenario: scenario), baseUrl: ''),
         endpoint: endpoint,
       ),
     ).getRate(pair: pair, amount: dec(amount));
 
     test('success: precio del diseño y 10 min', () async {
       final result = await rateWith(
-        OrderbookMockScenario.success,
+        OrderbookScenario.success,
         pair: ExchangePair(from: usdt, to: ves),
       );
 
@@ -191,11 +194,11 @@ void main() {
 
     test('USDC y montos fuera de límites → sin ofertas', () async {
       final usdcResult = await rateWith(
-        OrderbookMockScenario.success,
+        OrderbookScenario.success,
         pair: ExchangePair(from: usdc, to: ves),
       );
       final tooBig = await rateWith(
-        OrderbookMockScenario.success,
+        OrderbookScenario.success,
         pair: ExchangePair(from: usdt, to: ves),
         amount: '600',
       );
@@ -204,14 +207,14 @@ void main() {
       expect(tooBig.failureOrNull, const NoOffersFailure());
     });
 
-    final expectations = <OrderbookMockScenario, Failure>{
-      OrderbookMockScenario.noOffers: const NoOffersFailure(),
-      OrderbookMockScenario.invalidRequest: const InvalidRequestFailure(
+    final expectations = <OrderbookScenario, Failure>{
+      OrderbookScenario.noOffers: const NoOffersFailure(),
+      OrderbookScenario.invalidRequest: const InvalidRequestFailure(
         'INVALID_REQUEST',
       ),
-      OrderbookMockScenario.serverError: const ServerFailure(502),
-      OrderbookMockScenario.timeout: const TimeoutFailure(),
-      OrderbookMockScenario.malformed: const ParsingFailure(),
+      OrderbookScenario.serverError: const ServerFailure(502),
+      OrderbookScenario.timeout: const TimeoutFailure(),
+      OrderbookScenario.malformed: const ParsingFailure(),
     };
     for (final MapEntry(key: scenario, value: failure)
         in expectations.entries) {
@@ -226,8 +229,8 @@ void main() {
     }
 
     test('parámetros faltantes → error en el body', () async {
-      final response = await mockedDio(
-        MockOrderbookInterceptor(),
+      final response = await fakeDio(
+        FakeOrderbookApi(),
         baseUrl: '',
       ).get<Object?>(endpoint, queryParameters: {'type': 0});
 
@@ -238,32 +241,50 @@ void main() {
     });
   });
 
-  test('ELDORADO_SOURCE=orderbook en modo mock: la pestaña El Dorado usa el '
-      'API de órdenes', () async {
-    final getIt = GetIt.asNewInstance();
-    configureDependencies(
-      getIt,
-      const AppConfig(
-        eldoradoApiUrl: AppConfig.defaultEldoradoApiUrl,
-        criptoyaApiUrl: AppConfig.defaultCriptoyaApiUrl,
-        useMock: true,
-        mockScenarioEldorado: 'success',
-        mockScenarioCriptoya: 'success',
-        mockLatency: Duration.zero,
-        eldoradoSource: EldoradoSource.orderbook,
-        orderbookApiUrl: '',
-      ),
+  group('ELDORADO_SOURCE=orderbook', () {
+    const orderbookConfig = AppConfig(
+      eldoradoApiUrl: AppConfig.defaultEldoradoApiUrl,
+      criptoyaApiUrl: AppConfig.defaultCriptoyaApiUrl,
+      eldoradoSource: EldoradoSource.orderbook,
+      orderbookApiUrl: endpoint,
     );
-    final getQuote = getIt.getExchangeQuote(RateProvider.eldorado);
+    final usdtToVes = ExchangePair(from: usdt, to: ves);
 
-    final quote = await getQuote(ExchangePair(from: usdt, to: ves), dec('5'));
-    // /api/prices no tiene máximo; el API de órdenes sí (500 USDT).
-    final tooBig = await getQuote(
-      ExchangePair(from: usdt, to: ves),
-      dec('600'),
-    );
+    test('con API_URL, la pestaña El Dorado usa el API de órdenes', () async {
+      final getQuote = fakeApiDependencies(
+        config: orderbookConfig,
+      ).getExchangeQuote(RateProvider.eldorado);
 
-    expect(quote.valueOrNull?.receiveAmount, dec('125'));
-    expect(tooBig.failureOrNull, const NoOffersFailure());
+      final quote = await getQuote(usdtToVes, dec('5'));
+      // /api/prices no tiene máximo; el API de órdenes sí (500 USDT).
+      final tooBig = await getQuote(usdtToVes, dec('600'));
+
+      expect(quote.valueOrNull?.receiveAmount, dec('125'));
+      expect(tooBig.failureOrNull, const NoOffersFailure());
+    });
+
+    test('sin API_URL vuelve a /api/prices', () async {
+      final getIt = GetIt.asNewInstance();
+      configureDependencies(
+        getIt,
+        const AppConfig(
+          eldoradoApiUrl: AppConfig.defaultEldoradoApiUrl,
+          criptoyaApiUrl: AppConfig.defaultCriptoyaApiUrl,
+          eldoradoSource: EldoradoSource.orderbook,
+          orderbookApiUrl: '',
+        ),
+        // Solo responde GET …/prices; cualquier otra ruta da 404.
+        httpInterceptors: {
+          RateProvider.eldorado: [FakeEldoradoPricesApi()],
+        },
+      );
+
+      final quote = await getIt.getExchangeQuote(RateProvider.eldorado)(
+        usdtToVes,
+        dec('600'),
+      );
+
+      expect(quote.valueOrNull?.receiveAmount, dec('15000'));
+    });
   });
 }

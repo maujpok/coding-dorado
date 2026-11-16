@@ -41,32 +41,27 @@ Requisitos: Flutter 3.41 (Dart 3.11).
 ```bash
 flutter pub get
 flutter run                                    # APIs reales: El Dorado y CriptoYa
-flutter run --dart-define=USE_MOCK=true        # sin red, con datos del mock
 ```
+
+La app siempre consulta las APIs reales: no tiene modo de datos simulados.
 
 ### Configuración (`--dart-define`)
 
 | Clave | Default | Uso |
 |---|---|---|
-| `USE_MOCK` | `false` | `true`: un mock en el borde HTTP responde por cada API, con su forma real |
-| `MOCK_SCENARIO_ELDORADO` | `success` | `empty`, `server_error`, `timeout`, `malformed` |
-| `MOCK_SCENARIO_CRIPTOYA` | `success` | `no_offers`, `rate_limited`, `server_error`, `timeout`, `malformed` |
-| `MOCK_LATENCY_MS` | `600` | Latencia simulada |
 | `ELDORADO_API_URL` / `CRIPTOYA_API_URL` | APIs públicas | URL base de cada proveedor |
 | `ELDORADO_SOURCE` | `prices` | `orderbook`: la pestaña El Dorado usa el API de órdenes del enunciado |
-| `API_URL` | *(vacío)* | URL del endpoint `recommendations` (con `USE_MOCK=true` no hace falta) |
+| `API_URL` | *(vacío)* | URL del endpoint `recommendations`; sin ella, `orderbook` vuelve a `/api/prices` |
 
 ```bash
-flutter run --dart-define=USE_MOCK=true --dart-define=MOCK_SCENARIO_CRIPTOYA=rate_limited
-flutter run --dart-define=USE_MOCK=true --dart-define=MOCK_LATENCY_MS=2000
-flutter run --dart-define=USE_MOCK=true --dart-define=ELDORADO_SOURCE=orderbook   # API de órdenes (mock)
+flutter run --dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>   # API de órdenes
 ```
 
 ### Pruebas
 
 ```bash
 flutter analyze
-flutter test                                               # unitarias, bloc y widgets, sin red
+flutter test                                               # unitarias, bloc y widgets, sin red (APIs falsas)
 flutter test --dart-define=LIVE_TESTS=true --tags live     # contrato contra las APIs reales
 flutter test --dart-define=GOLDENS=true --tags golden      # capturas a 402×874 pt (macOS)
 ```
@@ -79,7 +74,7 @@ Organizada por funcionalidad (`home`, `exchange`, `quote_comparison`, `checkout`
 
 - **Dominio en Dart puro:** entidades, reglas de conversión con `Decimal` (nunca `double` para dinero), mínimo por proveedor y comparación.
 - **Un repositorio por proveedor** (`RateProvider`). `ExchangeBloc` no sabe de qué proveedor es, así que cada pestaña es la misma calculadora con otra fuente. Sumar un proveedor agrega su pestaña y lo incluye en la comparación.
-- **Mock en el borde HTTP** (interceptores de `dio`): en modo mock corre el mismo código de red, parseo, caché y errores que en producción.
+- **APIs falsas solo en las pruebas** (interceptores de `dio` en `test/helpers/fake_apis`): responden con la forma real de cada API, así las pruebas corren el mismo código de red, parseo, caché y errores que la app, sin red. La app no incluye datos simulados.
 - **Concurrencia:** todas las cotizaciones pasan por un único handler `restartable`, con el *debounce* adentro, así nunca se muestra una respuesta vieja.
 - **Design system propio** ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)): tokens semánticos como `ThemeExtension`, componentes `Ds*` y contraste verificado.
 - **Textos en ARB** (es) y dependencias con `get_it` en un *composition root*.
@@ -101,7 +96,7 @@ lib/
 ## Decisiones y limitaciones
 
 - **El endpoint del enunciado ya no existe.** `…/stage/orderbook/public/recommendations` responde `404` (la ruta fue eliminada; el host sigue activo). Por eso la pestaña El Dorado usa el **API público oficial de El Dorado**.
-  - El código para el endpoint original está implementado y probado contra su forma documentada y su mock: `--dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>`. Falta verificarlo con una URL vigente.
+  - El código para el endpoint original está implementado y probado contra su forma documentada con una API falsa en las pruebas: `--dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>`. Falta verificarlo con una URL vigente.
   - La investigación completa está en [API_RESEARCH.md](API_RESEARCH.md).
 - **Cobertura de El Dorado:** solo cotiza USDT; VES solo se puede vender. Esos pares se muestran como no disponibles, sin inventar tasas.
 - **Precios indicativos:** El Dorado lo aclara en su documentación. CriptoYa es una mediana de mercado; la comparación lo explica en una nota.

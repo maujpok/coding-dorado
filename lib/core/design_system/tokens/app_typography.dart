@@ -1,6 +1,6 @@
 import 'package:flutter/painting.dart';
 
-/// Escala tipográfica. Los tamaños se midieron en los mocks (804×1748 px a
+/// Escala tipográfica. Los tamaños se midieron en el diseño (804×1748 px a
 /// @2x) con la altura de mayúsculas de Rubik (0.7 em). Los estilos no llevan
 /// color: lo pone cada componente con los tokens de `AppColors`.
 abstract final class AppTypography {

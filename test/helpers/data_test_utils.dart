@@ -22,15 +22,15 @@ class RequestCounter extends Interceptor {
   }
 }
 
-/// Dio sin red: [mock] responde todas las peticiones; [counter] las cuenta.
-Dio mockedDio(
-  Interceptor mock, {
+/// Dio sin red: [api] responde todas las peticiones; [counter] las cuenta.
+Dio fakeDio(
+  Interceptor api, {
   RequestCounter? counter,
-  String baseUrl = 'https://mock.local/api',
+  String baseUrl = 'https://api.test/api',
 }) {
   final dio = Dio(BaseOptions(baseUrl: baseUrl));
   if (counter != null) dio.interceptors.add(counter);
-  dio.interceptors.add(mock);
+  dio.interceptors.add(api);
   return dio;
 }
 

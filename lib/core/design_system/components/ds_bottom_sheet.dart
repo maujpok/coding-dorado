@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// Abre un bottom sheet del design system: handle, título centrado y
 /// contenido. El alto se ajusta al contenido; con [maxHeightFactor] no pasa
 /// de esa fracción de la pantalla y el contenido hace scroll (los selectores
-/// de moneda usan 0.7, el alto del mock).
+/// de moneda usan 0.7, el alto del diseño).
 Future<T?> showDsBottomSheet<T>({
   required BuildContext context,
   required String title,

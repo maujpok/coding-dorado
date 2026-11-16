@@ -1,6 +1,6 @@
 # Plan de implementación
 
-> Estado: fases 0–11 implementadas; la Fase 10 falta verificarla contra el API real (sin URL vigente) · Última actualización: 2026-11-14
+> Estado: fases 0–12 implementadas; la Fase 10 falta verificarla contra el API real (sin URL vigente) · Última actualización: 2026-11-16
 > Documentos relacionados: [ARCHITECTURE.md](ARCHITECTURE.md) · [API_RESEARCH.md](API_RESEARCH.md) · [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)
 
 ## Enfoque
@@ -17,7 +17,7 @@ La ruta `orderbook/public/recommendations` del README sigue respondiendo `404`, 
 **Principios:**
 1. **Una calculadora, dos proveedores.** Las pestañas reutilizan los mismos widgets y el mismo `ExchangeBloc`; solo cambia el `ExchangeRepository` que recibe cada una (`RateProvider.eldorado` o `RateProvider.criptoya`). Sumar un tercer proveedor es sumar un *data source* y una pestaña.
 2. **Las tasas no dependen del monto y se cachean.** El Dorado trae todas las fiat en una llamada (caché de 60 s) y CriptoYa se consulta por par con volumen 1 (caché de 30 s). Escribir el monto no genera peticiones: lo que se recibe se calcula localmente.
-3. **Mock en el borde HTTP para cada proveedor.** Con `USE_MOCK=true`, `MockEldoradoPricesInterceptor` y `MockCriptoYaInterceptor` responden con la forma real de cada API. Se usan en las pruebas, para trabajar sin red y para forzar errores por proveedor.
+3. **APIs falsas en el borde HTTP, solo en las pruebas.** `FakeEldoradoPricesApi` y `FakeCriptoYaApi` (en `test/helpers/fake_apis`) responden con la forma real de cada API, sin red, y fuerzan errores por proveedor. La app siempre consulta las APIs reales. *Hasta la Fase 12 la app tenía un modo `USE_MOCK` con estos mismos interceptores.*
 4. **Los huecos de cobertura no se inventan.** El Dorado no tiene USDC ni la compra de USDT con VES; esos pares se muestran como "no disponibles" en su pestaña. CriptoYa los cubre, y la comparación lo deja a la vista.
 
 | Dirección | El Dorado `/api/prices` | CriptoYa | Recibirás |
@@ -35,8 +35,8 @@ lib/features/
 ├── exchange/                   # la calculadora, parametrizada por RateProvider
 │   ├── domain/                 # entidades, RateProvider, GetExchangeQuote
 │   ├── data/
-│   │   ├── eldorado/           # EldoradoPricesDataSource, PricesResponse, EldoradoExchangeRepository, MockEldoradoPricesInterceptor
-│   │   └── criptoya/           # CriptoYaRateDataSource, CriptoYaResponse, CriptoYaExchangeRepository, MockCriptoYaInterceptor
+│   │   ├── eldorado/           # EldoradoPricesDataSource, PricesResponse, EldoradoExchangeRepository
+│   │   └── criptoya/           # CriptoYaRateDataSource, CriptoYaResponse, CriptoYaExchangeRepository
 │   └── presentation/           # ExchangeBloc, ExchangeView, widgets de la tarjeta y los sheets
 └── quote_comparison/           # CompareQuotes, QuoteComparison, QuoteComparisonCubit, QuoteComparisonSheet
 ```
@@ -61,7 +61,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 - [x] Revisar con `git diff` que no se hayan sobrescrito `README.md` ni `.gitignore`.
 - [x] Agregar dependencias:
   - runtime: `flutter_bloc`, `bloc_concurrency`, `dio`, `get_it`, `equatable`, `decimal`, `intl`, `google_fonts`, `flutter_localizations`
-  - dev: `very_good_analysis`, `bloc_test`, `mocktail`
+  - dev: `very_good_analysis`, `bloc_test` (`mocktail` se quitó en la Fase 12: ninguna prueba lo usaba)
 - [x] `analysis_options.yaml` con `very_good_analysis`.
 - [x] En `pubspec.yaml`, registrar **solo** `assets/cripto_currencies/` y `assets/fiat_currencies/`. Los `.jpg` de diseño no se empaquetan.
 - [x] Configurar l10n: `generate: true`, `l10n.yaml`, `lib/l10n/app_es.arb`.
@@ -81,12 +81,10 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   |---|---|---|
   | `ELDORADO_API_URL` | `https://api.eldorado.io/api` | URL base de `/prices` |
   | `CRIPTOYA_API_URL` | `https://criptoya.com/api` | URL base de CriptoYa |
-  | `USE_MOCK` | `false` | `true` instala los mocks de ambos proveedores |
-  | `MOCK_SCENARIO_ELDORADO` | `success` | escenario del mock de El Dorado |
-  | `MOCK_SCENARIO_CRIPTOYA` | `success` | escenario del mock de CriptoYa |
-  | `MOCK_LATENCY_MS` | `600` | latencia simulada |
   | `ELDORADO_SOURCE` | `prices` | `orderbook` se suma en la Fase 10 |
   | `API_URL` | *(vacío)* | endpoint `recommendations` (Fase 10) |
+
+  *Hasta la Fase 12 también existían `USE_MOCK`, `MOCK_SCENARIO_ELDORADO`, `MOCK_SCENARIO_CRIPTOYA` y `MOCK_LATENCY_MS`.*
 
 - [x] `dio_factory.dart`: crea un `Dio` por proveedor (con su URL base), timeouts de 10 s y `LogInterceptor` solo en debug.
 - [x] `TtlCache<K, V>` en `core/cache`: TTL por entrada, petición en curso compartida, los errores no se cachean e invalidación con `forceRefresh` ([ARCHITECTURE.md §6.5](ARCHITECTURE.md#65-caché-ttlcache)).
@@ -162,10 +160,10 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   - Devuelve `ExchangeRateModel(price, minAmount = limits.in.min, estimatedTime = 10 min)`. Los 10 min son el valor del diseño: `/api/prices` no informa el tiempo.
   - La respuesta de `/prices` se guarda en un `TtlCache` con TTL de 60 s; se invalida con "Reintentar" o al volver a la app (`forceRefresh`).
 - [x] `EldoradoExchangeRepository.getAvailability()` calcula los pares disponibles con la respuesta cacheada; los sheets la usan para ocultar las monedas no disponibles (Fase 8; hasta la Fase 12 se mostraban deshabilitadas).
-- [x] `MockEldoradoPricesInterceptor`:
+- [x] `MockEldoradoPricesInterceptor` *(desde la Fase 12, `FakeEldoradoPricesApi`, solo en las pruebas)*:
   - Responde a `GET …/prices` con la forma real y **la misma cobertura**: sin USDC y sin VES en `BUY`.
   - Aplica la latencia y el escenario de `MOCK_SCENARIO_ELDORADO`: `success`, `empty`, `server_error`, `timeout` o `malformed`.
-- [x] `mock_prices.dart` con precios **ficticios**, en fiat por 1 USDT, cerca del mercado del 2026-11-13:
+- [x] `mock_prices.dart` (hoy `FakePrices`, en las pruebas) con precios **ficticios**, en fiat por 1 USDT, cerca del mercado del 2026-11-13:
 
   | Fiat | `SELL` (USDT→fiat) | `BUY` (fiat→USDT) | Mínimo |
   |---|---|---|---|
@@ -206,7 +204,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   - Devuelve `ExchangeRateModel(rate, minAmount = null, estimatedTime = null)`, más `sampleSize` (cuántos exchanges entraron en la mediana) para mostrarlo en la UI.
 - [x] `TtlCache` por par (`coin`, `fiat`) con TTL de 30 s, el mismo que indica `cache-control: max-age=30`.
 - [x] `CriptoYaExchangeRepository.getAvailability()` devuelve `PairAvailability.unknown()`; la falta de ofertas se informa al cotizar.
-- [x] `MockCriptoYaInterceptor`:
+- [x] `MockCriptoYaInterceptor` *(desde la Fase 12, `FakeCriptoYaApi`, solo en las pruebas)*:
   - Responde a `GET …/{coin}/{fiat}/{volumen}` con 4 exchanges: tres alrededor del valor objetivo y uno en 0.
   - Valores objetivo (mediana):
     - `bid` = `SELL` de El Dorado × 1.01: CriptoYa conviene al **vender** USDT.
@@ -216,7 +214,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   - Así la comparación muestra un ganador distinto según la dirección.
   - Aplica la latencia y el escenario de `MOCK_SCENARIO_CRIPTOYA`: `success`, `no_offers`, `rate_limited` (429), `server_error`, `timeout` o `malformed`.
 - [x] `CriptoYaExchangeRepository`: `NoOffersException` → `NoOffersFailure`; HTTP 429 → `ServerFailure(429)`, con su propio mensaje ("Demasiadas consultas, espera un momento").
-- [x] `injection.dart`: registra un `ExchangeRepository` por `RateProvider` (get_it con `instanceName`) y un `GetExchangeQuote` para cada uno. Con `USE_MOCK=true` instala ambos interceptores.
+- [x] `injection.dart`: registra un `ExchangeRepository` por `RateProvider` (get_it con `instanceName`) y un `GetExchangeQuote` para cada uno. Con `USE_MOCK=true` instala ambos interceptores *(desde la Fase 12, las pruebas los pasan con `httpInterceptors`)*.
 
 **Pruebas:**
 - Mediana: número de valores impar y par, valores en 0 descartados, caso invertido, todos en 0 → `NoOffersException`.
@@ -351,7 +349,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 - [x] Tocar fuera del campo cierra el teclado.
 - [x] Layout responsive: ancho máximo de la tarjeta y del sheet de comparación en tablet y web.
 - [x] `Semantics` en las pestañas, los selectores, el swap, los valores y la insignia "Mejor opción"; sin *overflow* con `textScaler` hasta 1.3.
-- [x] Banner "MOCK" en debug cuando `USE_MOCK=true`.
+- [x] Banner "MOCK" en debug cuando `USE_MOCK=true`. *(Retirado en la Fase 12: la app ya no tiene modo mock.)*
 
 **Commit:** `feat: limits, availability, loading and error states`
 
@@ -359,7 +357,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 - [x] Actualizar `README.md`:
   - Cómo ejecutar, las pestañas y sus fuentes, y la comparación.
-  - El modo mock y sus escenarios por proveedor.
+  - El modo mock y sus escenarios por proveedor. *(Retirado en la Fase 12: la app ya no tiene modo mock.)*
   - Un resumen de la arquitectura y las decisiones tomadas.
   - Las limitaciones: precios indicativos; El Dorado sin USDC ni VES al comprar; CriptoYa sin mínimos ni tiempo estimado.
   - Capturas.
@@ -380,7 +378,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   - `error` en el body → `ApiErrorException`.
   - La tasa (`fiatToCryptoExchangeRate`) llega como string.
 - [x] `OrderbookRateDataSource`: arma `type`, `cryptoCurrencyId`, `fiatCurrencyId`, `amount` y `amountCurrencyId` a partir del `ExchangePair`.
-- [x] `MockOrderbookInterceptor` con esa misma forma.
+- [x] `MockOrderbookInterceptor` con esa misma forma *(desde la Fase 12, `FakeOrderbookApi`, solo en las pruebas)*.
 - [x] `injection.dart`: con `ELDORADO_SOURCE=orderbook`, el repositorio de `RateProvider.eldorado` usa `OrderbookRateDataSource` contra `API_URL`.
 - [ ] Verificar con `curl` ambas direcciones con COP, ARS, PEN, BRL y BOB. Para VES y USDC, esperar `data: {}` (están deshabilitadas en El Dorado). *Pendiente: el 2026-11-13 la ruta sigue respondiendo 404.*
 - [ ] Guardar las respuestas reales en `test/fixtures/eldorado/recommendation_*.json` y escribir pruebas de contrato. *Parcial: hay fixtures y pruebas con la forma documentada (`recommendation_documented.json`, `_no_offers`, `_invalid_request`); falta reemplazarlos por respuestas reales.*
@@ -417,6 +415,24 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 ---
 
+## Fase 12: Ajustes de la calculadora y retiro del modo mock
+
+**Objetivo:** pedidos posteriores a la Fase 11. La app solo usa datos reales, los selectores muestran solo lo que se puede elegir y la calculadora no se mueve entre pestañas.
+
+- [x] Selectores de moneda: las monedas que la fuente no cotiza para la dirección actual (USDC en El Dorado, VES al comprar) se ocultan en lugar de mostrarse deshabilitadas. La elegida se muestra siempre.
+- [x] La calculadora queda anclada arriba, a la distancia que la centraría si midiera `AppSizes.calculatorBlockHeight` (`AppLayout.calculatorTopInset`). El título y la tarjeta quedan en el mismo lugar en ambas pestañas aunque la de CriptoYa no tenga "Tiempo estimado", y los mensajes alargan la tarjeta hacia abajo.
+- [x] Sin modo mock en la app:
+  - [x] Se quitan `USE_MOCK`, `MOCK_SCENARIO_ELDORADO`, `MOCK_SCENARIO_CRIPTOYA`, `MOCK_LATENCY_MS`, el banner "MOCK" y su texto.
+  - [x] Los interceptores pasan a `test/helpers/fake_apis` como `FakeEldoradoPricesApi`, `FakeCriptoYaApi` y `FakeOrderbookApi`, con los precios de `FakePrices`.
+  - [x] `configureDependencies` recibe `httpInterceptors` por proveedor; `fakeApiDependencies()` arma la app completa sobre las APIs falsas en las pruebas.
+  - [x] `ELDORADO_SOURCE=orderbook` necesita `API_URL`; sin ella vuelve a `/api/prices`.
+  - [x] Se quita `mocktail`, que no se usaba.
+- [x] Las diferencias de los *goldens* fallidos (`test/goldens/failures/`) dejan de versionarse.
+
+**Aceptación:** `flutter analyze` sin issues, `flutter test`, las pruebas `live` y los *goldens* en verde; `lib/` sin código de datos simulados.
+
+---
+
 ## Definition of Done (global)
 
 - `flutter analyze` con 0 issues y `flutter test` en verde.
@@ -424,7 +440,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 - El dominio no importa Flutter ni `dio`; `quote_comparison` solo depende del dominio de `exchange`.
 - La calculadora y los sheets se compararon con los mocks en 402×874 pt.
 - Ningún widget usa colores, tamaños de fuente ni radios sueltos: todo sale de los tokens del design system.
-- Ambas pestañas funcionan contra las APIs reales y con `USE_MOCK=true` en todos los escenarios de cada proveedor.
+- Ambas pestañas funcionan contra las APIs reales, y las pruebas cubren todos los escenarios de cada proveedor con APIs falsas.
 - La comparación muestra resultados parciales cuando un proveedor falla.
 - Los pares no disponibles, la falta de ofertas y los montos bajo el mínimo tienen un estado claro, nunca un error genérico.
 
@@ -446,14 +462,17 @@ Desvíos respecto del plan, todos con el mismo objetivo que la tarea original:
 | Snackbar de "Cambiar" (Fases 4 y 8) | `ExchangeSubmitted` con confirmación simulada en un snackbar | Reemplazado en la Fase 11 por la confirmación y la feature `checkout` | Pedido posterior: confirmar, procesar y mostrar un comprobante. |
 | Selector de monedas | Alto fijo del 70 % y el orden del mock | Alto según la lista, con tope del 70 %; fiat por país | Pedidos posteriores: sin espacio vacío debajo de la última moneda y orden alfabético por país. |
 | Botón de la tarjeta | "Cambiar", como el mock | "Simular" | Pedido posterior: la operación es simulada. |
-| Fase 10 | Verificar con la URL real y guardar respuestas reales | Código, mock y pruebas contra la forma documentada; sin URL ni mock vuelve a `/api/prices` | La ruta sigue respondiendo 404; falta una URL vigente del equipo. |
+| Fase 10 | Verificar con la URL real y guardar respuestas reales | Código y pruebas contra la forma documentada, con una API falsa; sin `API_URL` vuelve a `/api/prices` | La ruta sigue respondiendo 404; falta una URL vigente del equipo. |
+| Modo mock (Fases 1–10) | `USE_MOCK` con escenarios, latencia y banner | Retirado en la Fase 12; los interceptores pasaron a `test/helpers/fake_apis` como APIs falsas | Pedido posterior: la app solo debe usar datos reales. |
+| Monedas no disponibles (Fase 8) | Deshabilitadas con "No disponible" | Ocultas en los selectores (la elegida se muestra siempre) | Pedido posterior. |
+| Posición de la calculadora | Centrada en vertical | Anclada arriba a una distancia fija | Pedido posterior: el título y la tarjeta deben verse en el mismo lugar en ambas pestañas. |
 
 ## Riesgos y mitigaciones
 
 | Riesgo | Probabilidad | Mitigación |
 |---|---|---|
-| `/api/prices` no publica límites de uso ni SLA | Media | Caché de 60 s, una sola petición en curso y el mock para desarrollo y pruebas |
-| CriptoYa limita las consultas (`x-ratelimit-limit: 120`) y no tiene términos formales | Media | Caché de 30 s por par y una sola petición en curso; el 429 tiene su propio mensaje; el mock para pruebas |
+| `/api/prices` no publica límites de uso ni SLA | Media | Caché de 60 s, una sola petición en curso y APIs falsas en las pruebas |
+| CriptoYa limita las consultas (`x-ratelimit-limit: 120`) y no tiene términos formales | Media | Caché de 30 s por par y una sola petición en curso; el 429 tiene su propio mensaje; APIs falsas en las pruebas |
 | Alguna API cambia su forma | Baja | DTO tolerante y pruebas `live` de contrato |
 | La mediana de CriptoYa es ruidosa (libros invertidos, exchanges en 0) | Media | Se descartan los 0, se usa la mediana y no el mejor precio, y se muestra cuántos exchanges entraron |
 | La comparación mezcla dos cosas distintas (el libro de El Dorado contra la mediana del mercado) | Cierta | Nota al pie en el sheet; ambas se muestran como indicativas |
@@ -465,11 +484,8 @@ Desvíos respecto del plan, todos con el mismo objetivo que la tarea original:
 
 ```bash
 flutter run                                                    # APIs reales: El Dorado y CriptoYa
-flutter run --dart-define=USE_MOCK=true                        # ambos proveedores en mock
-flutter run --dart-define=USE_MOCK=true --dart-define=MOCK_SCENARIO_CRIPTOYA=rate_limited   # comparación con un proveedor caído
-flutter run --dart-define=USE_MOCK=true --dart-define=MOCK_LATENCY_MS=2000                  # estados de carga
 flutter run --dart-define=ELDORADO_SOURCE=orderbook --dart-define=API_URL=<url>             # Fase 10
-flutter test                                                   # pruebas, sin red
+flutter test                                                   # pruebas, sin red (APIs falsas)
 flutter test --dart-define=LIVE_TESTS=true --tags live         # contrato contra las APIs reales
 flutter test --coverage                                        # pruebas + cobertura
 ```

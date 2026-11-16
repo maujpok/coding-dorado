@@ -1,7 +1,9 @@
-import 'package:coding_dorado/features/exchange/data/eldorado/mock/mock_prices.dart';
 import 'package:dio/dio.dart';
 
-enum EldoradoMockScenario {
+import 'fake_prices.dart';
+
+/// Cómo responde [FakeEldoradoPricesApi].
+enum EldoradoPricesScenario {
   success,
 
   /// `{"SELL": {}, "BUY": {}}`: ningún par disponible.
@@ -12,59 +14,41 @@ enum EldoradoMockScenario {
   timeout,
 
   /// HTML en lugar de JSON.
-  malformed
-  ;
-
-  static EldoradoMockScenario parse(String raw) =>
-      switch (raw.trim().toLowerCase()) {
-        'empty' => empty,
-        'server_error' => serverError,
-        'timeout' => timeout,
-        'malformed' => malformed,
-        _ => success,
-      };
+  malformed,
 }
 
-/// Responde `GET …/prices` con la forma y la cobertura del API real, sin red.
-class MockEldoradoPricesInterceptor extends Interceptor {
-  MockEldoradoPricesInterceptor({
-    this.scenario = EldoradoMockScenario.success,
-    this.latency = Duration.zero,
-  });
+/// API de precios de El Dorado falsa: responde `GET …/prices` con la forma
+/// y la cobertura del API real, sin red. Cualquier otra ruta da 404.
+class FakeEldoradoPricesApi extends Interceptor {
+  FakeEldoradoPricesApi({this.scenario = EldoradoPricesScenario.success});
 
-  final EldoradoMockScenario scenario;
-  final Duration latency;
+  final EldoradoPricesScenario scenario;
 
   @override
-  Future<void> onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    if (latency > Duration.zero) await Future<void>.delayed(latency);
-
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (!options.uri.path.endsWith('/prices')) {
       return handler.reject(_badResponse(options, 404));
     }
     switch (scenario) {
-      case EldoradoMockScenario.success:
-        handler.resolve(_ok(options, MockPrices.pricesJson()));
-      case EldoradoMockScenario.empty:
+      case EldoradoPricesScenario.success:
+        handler.resolve(_ok(options, FakePrices.pricesJson()));
+      case EldoradoPricesScenario.empty:
         handler.resolve(
           _ok(options, {
             'SELL': <String, Object?>{},
             'BUY': <String, Object?>{},
           }),
         );
-      case EldoradoMockScenario.serverError:
+      case EldoradoPricesScenario.serverError:
         handler.reject(_badResponse(options, 503));
-      case EldoradoMockScenario.timeout:
+      case EldoradoPricesScenario.timeout:
         handler.reject(
           DioException.receiveTimeout(
             timeout: options.receiveTimeout ?? Duration.zero,
             requestOptions: options,
           ),
         );
-      case EldoradoMockScenario.malformed:
+      case EldoradoPricesScenario.malformed:
         handler.resolve(_ok(options, '<html>Service unavailable</html>'));
     }
   }
@@ -79,7 +63,7 @@ class MockEldoradoPricesInterceptor extends Interceptor {
         response: Response(
           requestOptions: options,
           statusCode: status,
-          data: {'message': 'mock $status'},
+          data: {'message': 'HTTP $status'},
         ),
       );
 }

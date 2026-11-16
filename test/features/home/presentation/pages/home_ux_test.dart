@@ -1,5 +1,4 @@
 import 'package:coding_dorado/app/app.dart';
-import 'package:coding_dorado/app/di/injection.dart';
 import 'package:coding_dorado/core/design_system/design_system.dart';
 import 'package:coding_dorado/core/error/result.dart';
 import 'package:coding_dorado/features/exchange/domain/entities/exchange_rate.dart';
@@ -11,7 +10,6 @@ import 'package:coding_dorado/features/exchange/presentation/widgets/currency_pi
 import 'package:coding_dorado/features/quote_comparison/domain/usecases/compare_quotes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 
 import '../../../../helpers/fake_exchange_repository.dart';
 import '../../../../helpers/pump_app.dart';
@@ -21,15 +19,12 @@ void main() {
   Future<void> pumpHome(
     WidgetTester tester, {
     Size size = const Size(804, 1748),
-    bool showMockBanner = false,
   }) async {
     tester.view
       ..physicalSize = size
       ..devicePixelRatio = 2;
     addTearDown(tester.view.reset);
-    final getIt = GetIt.asNewInstance();
-    configureDependencies(getIt, mockAppConfig());
-    await tester.pumpWidget(mockApp(getIt, showMockBanner: showMockBanner));
+    await tester.pumpWidget(testApp(fakeApiDependencies()));
     await tester.pumpAndSettle();
   }
 
@@ -147,12 +142,6 @@ void main() {
     await tester.pump();
 
     expect(FocusManager.instance.primaryFocus, isNot(focusedBefore));
-  });
-
-  testWidgets('banner MOCK cuando se pide', (tester) async {
-    await pumpHome(tester, showMockBanner: true);
-
-    expect(find.byType(Banner), findsOneWidget);
   });
 
   testWidgets('al volver a la app se recotiza', (tester) async {

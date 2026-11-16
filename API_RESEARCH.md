@@ -10,7 +10,7 @@
    - `…/stage/currencies` responde `200` hoy, con `generatedAt` del 2026-11-13 [curl].
    - Lo que no existe es la ruta `/orderbook/public/recommendations`: API Gateway devuelve `MissingAuthenticationTokenException`, que es el error que da ante una ruta o método inexistente.
    - Según un fork, la ruta seguía funcionando el 2026-04-16 [src].
-2. **La forma real del response está documentada públicamente** por forks del template `eldoradoio/coding-interview-frontend`. El mock y el DTO pueden seguirla desde ya (§2).
+2. **La forma real del response está documentada públicamente** por forks del template `eldoradoio/coding-interview-frontend`. El DTO y la API falsa de las pruebas pueden seguirla desde ya (§2).
 3. **Aunque la ruta volviera, USDT→VES (el par por defecto del diseño) probablemente no traería ofertas.**
    - En el catálogo de El Dorado, VES figura con `p2pDisabled: true` y `apiDisabled: true` [curl].
    - USDC es `TATUM-MATIC-USDC`, también con `p2pDisabled: true` [curl].
@@ -179,7 +179,7 @@ Ejemplo: `https://criptoya.com/api/usdc/bob/1`. [Documentación](https://docs.cr
 
 ## 7. Impacto en la arquitectura y el plan
 
-- **Forma del response:** el DTO y `MockOrderbookInterceptor` siguen la forma documentada en §2. Siempre HTTP 200, `data: {}` y `error` en el body ([ARCHITECTURE.md §6](ARCHITECTURE.md#6-datos)).
+- **Forma del response:** el DTO y `FakeOrderbookApi` (la API falsa de las pruebas) siguen la forma documentada en §2. Siempre HTTP 200, `data: {}` y `error` en el body ([ARCHITECTURE.md §6](ARCHITECTURE.md#6-datos)).
 - **USDC:** el catálogo usa `TATUM-MATIC-USDC`.
 - **Proveedores:** la app usa ambos, cada uno en su propia pestaña (El Dorado `/api/prices` y CriptoYa), y los compara lado a lado ([IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md#enfoque), Fases 3, 4 y 7).
 - **Riesgo nuevo:** con el API oficial, USDT→VES y todo lo de USDC probablemente devolverían `data: {}`. La UI tiene que tratar bien el estado "sin ofertas".

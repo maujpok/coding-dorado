@@ -330,7 +330,4 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get compareFootnote =>
       'El Dorado muestra el precio de su propio libro P2P y CriptoYa la mediana de varios exchanges. Ambas tasas son indicativas.';
-
-  @override
-  String get mockBanner => 'MOCK';
 }

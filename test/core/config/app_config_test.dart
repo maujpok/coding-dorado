@@ -7,15 +7,11 @@ void main() {
       expect(AppConfig.fromEnvironment(), const AppConfig.defaults());
     });
 
-    test('los valores por defecto apuntan a las APIs reales, sin mock', () {
+    test('los valores por defecto apuntan a las APIs reales', () {
       const config = AppConfig.defaults();
 
       expect(config.eldoradoApiUrl, 'https://api.eldorado.io/api');
       expect(config.criptoyaApiUrl, 'https://criptoya.com/api');
-      expect(config.useMock, isFalse);
-      expect(config.mockScenarioEldorado, 'success');
-      expect(config.mockScenarioCriptoya, 'success');
-      expect(config.mockLatency, const Duration(milliseconds: 600));
       expect(config.eldoradoSource, EldoradoSource.prices);
       expect(config.orderbookApiUrl, isEmpty);
     });

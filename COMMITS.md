@@ -1,9 +1,9 @@
 # Commits de la rama `feat/challenge`
 
-> 19 commits sobre `main` (`7f6f56b`), del más antiguo al más reciente · Última actualización: 2026-11-16
+> 22 commits sobre `main` (`7f6f56b`), del más antiguo al más reciente · Última actualización: 2026-11-16
 > Documentos relacionados: [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) (fases) · [ARCHITECTURE.md](ARCHITECTURE.md) · [README.md](README.md)
 
-Cada commit corresponde a una fase del [plan de implementación](IMPLEMENTATION_PLAN.md), salvo el primero (documentación previa) y un `chore` de limpieza.
+Cada commit corresponde a una fase del [plan de implementación](IMPLEMENTATION_PLAN.md), salvo el primero (documentación previa), un `chore` de limpieza y este documento.
 
 Hasta el commit 16, la app tenía un **modo mock** (`USE_MOCK=true`) que respondía con datos simulados. El commit 17 lo quitó: la app siempre consulta las APIs reales, y los datos simulados quedaron solo en las pruebas. Desde el commit 19, las URLs de las APIs tampoco están en el código: se leen de un `.env`. Los commits anteriores describen el estado de su momento.
 
@@ -30,6 +30,9 @@ Hasta el commit 16, la app tenía un **modo mock** (`USE_MOCK=true`) que respond
 | 17 | `33b572a` | 2026-11-16 | 12 | Retiro del modo mock de la app |
 | 18 | `93654a8` | 2026-11-16 | 12 | QUIERO arranca en BOB |
 | 19 | `17b7633` | 2026-11-16 | 12 | URLs de las APIs en `.env` |
+| 20 | `7641f8c` | 2026-11-16 | — | Este documento |
+| 21 | `6c5738b` | 2026-11-16 | 12 | Pantalla de configuración faltante y permiso de red en release |
+| 22 | `c47107f` | 2026-11-16 | 12 | `Makefile` para ejecutar y compilar por plataforma |
 
 ## Detalle
 
@@ -217,6 +220,27 @@ Hasta el commit 16, la app tenía un **modo mock** (`USE_MOCK=true`) que respond
 
 - Ninguna URL de API queda en el código: los valores van en `.env`, que no se versiona, y llegan con `--dart-define-from-file=.env`.
 - `.env.example` documenta las claves: `ELDORADO_API_URL` y `CRIPTOYA_API_URL` (obligatorias), `ELDORADO_SOURCE` y `API_URL` (opcionales).
-- Sin las claves obligatorias, la app no arranca y `MissingConfigException` dice cuáles faltan y cómo pasar el `.env`.
+- Sin las claves obligatorias, la app no arranca y `MissingConfigException` dice cuáles faltan y cómo pasar el `.env` (desde el commit 21, también en pantalla).
 - `.vscode/launch.json` pasa el `.env` al ejecutar desde VS Code.
 - Las pruebas no necesitan el `.env`: usan URLs de mentira sobre las APIs falsas. Las pruebas `live` leen el `.env`.
+
+### 20. `7641f8c` docs: list the branch commits and their changes
+
+*2 archivos · +223 −1*
+
+- Este documento: un resumen de los commits de la rama y el detalle de cada uno. El README lo enlaza.
+
+### 21. `6c5738b` fix(app): show missing configuration on screen and allow network in release
+
+*10 archivos · +257 −18*
+
+- Con un `flutter run` sin el `.env`, la app fallaba antes de dibujar y se quedaba en el splash; el error solo se veía en la consola. Ahora muestra una pantalla con las claves que faltan y el comando para ejecutarla.
+- El permiso `INTERNET` de Android estaba solo en el manifiesto de debug, así que un build de release no podía consultar las APIs. Ahora está en el principal.
+
+### 22. `c47107f` build: makefile to run and build per platform
+
+*5 archivos · +116 −2*
+
+- `make run-android` y `make run-ios`: `flutter run` en el primer emulador o simulador de la plataforma (`DEVICE=<id>` para elegir otro).
+- `make build-android` (APK), `make build-android-bundle` (AAB), `make build-ios` (sin firmar) y `make build-ipa` (firmada).
+- Todos verifican que el `.env` exista con las claves obligatorias y lo pasan con `--dart-define-from-file`. Aceptan `MODE`, `ENV_FILE` y `FLUTTER` (por ejemplo, `FLUTTER="fvm flutter"`). `make` solo lista los comandos.

@@ -41,10 +41,25 @@ Requisitos: Flutter 3.41 (Dart 3.11).
 ```bash
 flutter pub get
 cp .env.example .env                           # y completar los valores (ver abajo)
-flutter run --dart-define-from-file=.env       # APIs reales: El Dorado y CriptoYa
+make run-android                               # o make run-ios
 ```
 
 La app siempre consulta las APIs reales: no tiene modo de datos simulados. En VS Code, la configuración de `.vscode/launch.json` ya pasa el `.env`.
+
+### Comandos (`make`)
+
+Todos verifican el `.env` antes de empezar y lo pasan con `--dart-define-from-file`. `make` sin argumentos lista los comandos.
+
+| Comando | Qué hace |
+|---|---|
+| `make run-android` / `make run-ios` | `flutter run` en el primer emulador o simulador de esa plataforma (si no hay, en un dispositivo físico) |
+| `make build-android` | APK (`build/app/outputs/flutter-apk/`) |
+| `make build-android-bundle` | App bundle (`.aab`) para Google Play |
+| `make build-ios` | App de iOS sin firmar, para verificar que compila |
+| `make build-ipa` | IPA firmada para distribución (necesita el equipo de firma en Xcode) |
+| `make devices` / `make check-env` | Lista los dispositivos / verifica el `.env` |
+
+Variables: `MODE=debug|profile|release` (los *builds* son release por defecto), `DEVICE=<id>` para elegir un dispositivo, `ENV_FILE=<archivo>` para otro `.env` y `FLUTTER="fvm flutter"` si se usa fvm. Por ejemplo, `make run-ios MODE=release DEVICE=<id>`.
 
 ### Configuración (`.env`)
 

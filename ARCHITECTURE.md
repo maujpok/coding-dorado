@@ -365,7 +365,7 @@ La pestaña, el bloc y la comparación no cambian. Sin `API_URL`, la app vuelve 
 
 ## 7. Configuración por entorno
 
-`AppConfig` la lee con `String.fromEnvironment`. Los valores viven en `.env` (no versionado; las claves están en `.env.example`) y se pasan con `--dart-define-from-file=.env`; un `--dart-define` suelto pisa el valor del archivo. El código no tiene URLs. Si la app se ejecuta sin el `.env`, `rootApp` (en `bootstrap.dart`) no arma las dependencias: muestra `ConfigErrorApp`, con las claves que faltan y el comando para ejecutarla, y deja `MissingConfigException` en la consola. Sin esa pantalla, la app quedaría en el splash. Las pruebas no lo necesitan: usan URLs de mentira y APIs falsas.
+`AppConfig` la lee con `String.fromEnvironment`. Los valores viven en `.env` (no versionado; las claves están en `.env.example`) y se pasan con `--dart-define-from-file=.env`; un `--dart-define` suelto pisa el valor del archivo. El código no tiene URLs. Si la app se ejecuta sin el `.env`, `rootApp` (en `bootstrap.dart`) no arma las dependencias: muestra `ConfigErrorApp`, con las claves que faltan y el comando para ejecutarla, y deja `MissingConfigException` en la consola. Sin esa pantalla, la app quedaría en el splash. Las pruebas no lo necesitan: usan URLs de mentira y APIs falsas. El `Makefile` (`make run-android`, `make build-ios`, …) verifica el `.env` y lo pasa en cada comando.
 
 | Clave | Obligatoria | Efecto |
 |---|---|---|

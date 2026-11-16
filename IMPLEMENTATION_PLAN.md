@@ -427,7 +427,8 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   - [x] `configureDependencies` recibe `httpInterceptors` por proveedor; `fakeApiDependencies()` arma la app completa sobre las APIs falsas en las pruebas.
   - [x] `ELDORADO_SOURCE=orderbook` necesita `API_URL`; sin ella vuelve a `/api/prices`.
   - [x] Se quita `mocktail`, que no se usaba.
-- [x] Configuración en `.env`: las URLs de las APIs salen del código. `.env.example` (versionado) lista las claves y `.env` (ignorado) tiene los valores; se pasa con `--dart-define-from-file=.env`, también desde `.vscode/launch.json`. Sin las claves obligatorias la app falla al inicio con `MissingConfigException`; las pruebas usan URLs de mentira y las `live` leen el `.env`.
+- [x] Configuración en `.env`: las URLs de las APIs salen del código. `.env.example` (versionado) lista las claves y `.env` (ignorado) tiene los valores; se pasa con `--dart-define-from-file=.env`, también desde `.vscode/launch.json`. Sin las claves obligatorias, la app muestra `ConfigErrorApp` (qué falta y cómo ejecutarla) en lugar de quedarse en el splash; las pruebas usan URLs de mentira y las `live` leen el `.env`.
+- [x] `AndroidManifest.xml` principal con el permiso `INTERNET`: estaba solo en el de debug, así que un build de release no podía consultar las APIs.
 - [x] QUIERO arranca en BOB: el par inicial (y el del reinicio tras un cambio) pasa a USDT → BOB en ambas pestañas.
 - [x] Las diferencias de los *goldens* fallidos (`test/goldens/failures/`) dejan de versionarse.
 

@@ -330,4 +330,19 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get compareFootnote =>
       'El Dorado muestra el precio de su propio libro P2P y CriptoYa la mediana de varios exchanges. Ambas tasas son indicativas.';
+
+  @override
+  String get configErrorTitle => 'Falta la configuración';
+
+  @override
+  String configErrorMissing(String keys) {
+    return 'La app necesita estas claves del archivo .env: $keys.';
+  }
+
+  @override
+  String get configErrorHint =>
+      'Copia .env.example a .env, completa los valores y vuelve a ejecutar con:';
+
+  @override
+  String get configErrorCommand => 'flutter run --dart-define-from-file=.env';
 }

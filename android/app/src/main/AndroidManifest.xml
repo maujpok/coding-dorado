@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Las cotizaciones vienen de las APIs de El Dorado y CriptoYa. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="coding_dorado"
         android:name="${applicationName}"

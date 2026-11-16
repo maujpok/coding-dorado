@@ -93,9 +93,10 @@ flowchart TB
 ```
 lib/
 ├── main.dart                                   # lee AppConfig y llama a bootstrap
-├── bootstrap.dart                              # DI, manejo global de errores, runApp
+├── bootstrap.dart                              # rootApp: configuración, DI y runApp
 ├── app/
 │   ├── app.dart                                # MaterialApp: tema, l10n, home
+│   ├── config_error_app.dart                   # pantalla si falta el .env
 │   └── di/injection.dart                       # Dio, data source, repositorio y GetExchangeQuote por RateProvider
 ├── core/
 │   ├── config/app_config.dart                  # claves de --dart-define (§7)
@@ -364,7 +365,7 @@ La pestaña, el bloc y la comparación no cambian. Sin `API_URL`, la app vuelve 
 
 ## 7. Configuración por entorno
 
-`AppConfig` la lee con `String.fromEnvironment`. Los valores viven en `.env` (no versionado; las claves están en `.env.example`) y se pasan con `--dart-define-from-file=.env`; un `--dart-define` suelto pisa el valor del archivo. El código no tiene URLs: `bootstrap` llama a `AppConfig.ensureComplete()`, que lanza `MissingConfigException` con las claves que faltan si la app se ejecuta sin el `.env`. Las pruebas no lo necesitan: usan URLs de mentira y APIs falsas.
+`AppConfig` la lee con `String.fromEnvironment`. Los valores viven en `.env` (no versionado; las claves están en `.env.example`) y se pasan con `--dart-define-from-file=.env`; un `--dart-define` suelto pisa el valor del archivo. El código no tiene URLs. Si la app se ejecuta sin el `.env`, `rootApp` (en `bootstrap.dart`) no arma las dependencias: muestra `ConfigErrorApp`, con las claves que faltan y el comando para ejecutarla, y deja `MissingConfigException` en la consola. Sin esa pantalla, la app quedaría en el splash. Las pruebas no lo necesitan: usan URLs de mentira y APIs falsas.
 
 | Clave | Obligatoria | Efecto |
 |---|---|---|

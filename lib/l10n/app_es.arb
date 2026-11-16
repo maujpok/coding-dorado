@@ -305,5 +305,16 @@
     }
   },
   "compareNone": "Ningún proveedor tiene cotización para este par.",
-  "compareFootnote": "El Dorado muestra el precio de su propio libro P2P y CriptoYa la mediana de varios exchanges. Ambas tasas son indicativas."
+  "compareFootnote": "El Dorado muestra el precio de su propio libro P2P y CriptoYa la mediana de varios exchanges. Ambas tasas son indicativas.",
+  "configErrorTitle": "Falta la configuración",
+  "configErrorMissing": "La app necesita estas claves del archivo .env: {keys}.",
+  "@configErrorMissing": {
+    "placeholders": {
+      "keys": {
+        "type": "String"
+      }
+    }
+  },
+  "configErrorHint": "Copia .env.example a .env, completa los valores y vuelve a ejecutar con:",
+  "configErrorCommand": "flutter run --dart-define-from-file=.env"
 }

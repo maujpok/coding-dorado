@@ -48,7 +48,7 @@ La app siempre consulta las APIs reales: no tiene modo de datos simulados. En VS
 
 ### Configuración (`.env`)
 
-Las URLs de las APIs no están en el código: viven en `.env`, que no se versiona. [`.env.example`](.env.example) lista las claves. Sin las obligatorias, la app no arranca y lo explica con `MissingConfigException`.
+Las URLs de las APIs no están en el código: viven en `.env`, que no se versiona. [`.env.example`](.env.example) lista las claves. Sin las obligatorias (por ejemplo, con un `flutter run` sin `--dart-define-from-file=.env`), la app muestra una pantalla con las claves que faltan y el comando para ejecutarla, en lugar de la calculadora.
 
 | Clave | Obligatoria | Uso |
 |---|---|---|

@@ -614,6 +614,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'El Dorado muestra el precio de su propio libro P2P y CriptoYa la mediana de varios exchanges. Ambas tasas son indicativas.'**
   String get compareFootnote;
+
+  /// No description provided for @configErrorTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta la configuración'**
+  String get configErrorTitle;
+
+  /// No description provided for @configErrorMissing.
+  ///
+  /// In es, this message translates to:
+  /// **'La app necesita estas claves del archivo .env: {keys}.'**
+  String configErrorMissing(String keys);
+
+  /// No description provided for @configErrorHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia .env.example a .env, completa los valores y vuelve a ejecutar con:'**
+  String get configErrorHint;
+
+  /// No description provided for @configErrorCommand.
+  ///
+  /// In es, this message translates to:
+  /// **'flutter run --dart-define-from-file=.env'**
+  String get configErrorCommand;
 }
 
 class _AppLocalizationsDelegate

@@ -48,6 +48,11 @@ void main() {
   testWidgets('par no disponible en El Dorado: "Ver en CriptoYa" lleva el '
       'mismo par y monto', (tester) async {
     await pumpHome(tester);
+    // El Dorado vende VES pero no lo compra: VES → USDT no está disponible.
+    await tester.tap(find.byType(CurrencySelectorButton).hitTestable().last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('VES'));
+    await tester.pumpAndSettle();
     await tester.enterText(visibleField(), '100');
     await tester.pumpAndSettle();
 

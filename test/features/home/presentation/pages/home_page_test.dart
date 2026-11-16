@@ -40,18 +40,19 @@ void main() {
 
     await tester.enterText(visibleField(), '5');
     await tester.pumpAndSettle();
-    expect(find.textContaining('125.00').hitTestable(), findsOneWidget);
+    expect(find.textContaining('59.25').hitTestable(), findsOneWidget);
 
     await tester.tap(find.text('CriptoYa'));
     await tester.pumpAndSettle();
     await tester.enterText(visibleField(), '10');
     await tester.pumpAndSettle();
-    expect(find.textContaining('252.50').hitTestable(), findsOneWidget);
+    // 10 × 11.9685 = 119.685 BOB.
+    expect(find.textContaining('119.68').hitTestable(), findsOneWidget);
 
     await tester.tap(find.text('El Dorado'));
     await tester.pumpAndSettle();
     expect(find.text('5').hitTestable(), findsOneWidget);
-    expect(find.textContaining('125.00').hitTestable(), findsOneWidget);
+    expect(find.textContaining('59.25').hitTestable(), findsOneWidget);
   });
 
   testWidgets('comparar: insignia en el ganador y "Usar CriptoYa" cambia de '
@@ -69,15 +70,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Mejor opción'), findsOneWidget);
-    expect(find.textContaining('≈ 126.25 VES'), findsOneWidget);
-    expect(find.textContaining('+1.25 VES (+1.00 %)'), findsOneWidget);
+    // CriptoYa: 5 × 11.9685 = 59.8425 BOB; El Dorado: 59.25 BOB.
+    expect(find.textContaining('≈ 59.84 BOB'), findsOneWidget);
+    expect(find.textContaining('+0.59 BOB (+1.00 %)'), findsOneWidget);
 
     await tester.tap(find.text('Usar CriptoYa'));
     await tester.pumpAndSettle();
 
     expect(find.text('Mejor opción'), findsNothing);
     expect(find.text('5').hitTestable(), findsOneWidget);
-    expect(find.textContaining('126.25').hitTestable(), findsOneWidget);
+    expect(find.textContaining('59.84').hitTestable(), findsOneWidget);
   });
 
   testWidgets('comparar con un proveedor caído muestra el resultado parcial', (
@@ -196,9 +198,9 @@ void main() {
     await tester.pump(CheckoutProcessingPage.successHold);
     await tester.pumpAndSettle();
     expect(find.text('¡Cambio exitoso!'), findsOneWidget);
-    expect(find.text('125.00 VES'), findsOneWidget);
+    expect(find.text('59.25 BOB'), findsOneWidget);
     expect(find.text('por 5.00 USDT'), findsOneWidget);
-    expect(find.text('1 USDT = 25.00 VES'), findsOneWidget);
+    expect(find.text('1 USDT = 11.85 BOB'), findsOneWidget);
 
     await tester.tap(find.text('Volver al inicio'));
     await tester.pumpAndSettle();
@@ -207,7 +209,8 @@ void main() {
     // La calculadora vuelve a empezar: sin monto y con el par inicial.
     final field = tester.widget<TextField>(visibleField());
     expect(field.controller!.text, isEmpty);
-    expect(find.text('125.00').hitTestable(), findsNothing);
+    expect(find.text('59.25').hitTestable(), findsNothing);
+    expect(find.text('BOB').hitTestable(), findsOneWidget);
     expect(find.text('—').hitTestable(), findsNWidgets(3));
   });
 
@@ -255,6 +258,6 @@ void main() {
 
     expect(find.text('¡Cambio exitoso!'), findsOneWidget);
     expect(find.text('CriptoYa'), findsOneWidget);
-    expect(find.text('126.25 VES'), findsOneWidget);
+    expect(find.text('59.84 BOB'), findsOneWidget);
   });
 }

@@ -45,9 +45,9 @@ class ExchangeBloc extends Bloc<ExchangeEvent, ExchangeState> {
     on<_QuoteRequested>(_onQuoteRequested, transformer: restartable());
   }
 
-  /// Par inicial del diseño: USDT → VES.
+  /// Par inicial: USDT → BOB (el diseño mostraba USDT → VES).
   static ExchangePair defaultPair() =>
-      ExchangePair(from: CurrencyCatalog.usdt, to: CurrencyCatalog.ves);
+      ExchangePair(from: CurrencyCatalog.usdt, to: CurrencyCatalog.bob);
 
   final Duration quoteDebounce;
   final GetExchangeQuote _getQuote;

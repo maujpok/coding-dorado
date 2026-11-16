@@ -19,7 +19,7 @@ La estructura, las medidas y la tipografía (Rubik) se midieron sobre los mocks.
 
 ## Qué hace
 
-- **Calculadora:** título "Calculadora" sobre la tarjeta; selector TENGO / QUIERO con botón de intercambio (la lista FIAT va en orden alfabético por país); monto con hasta 2 decimales, tasa estimada, monto a recibir y tiempo estimado.
+- **Calculadora:** título "Calculadora" sobre la tarjeta; selector TENGO / QUIERO con botón de intercambio, que arranca en USDT → BOB (la lista FIAT va en orden alfabético por país); monto con hasta 2 decimales, tasa estimada, monto a recibir y tiempo estimado.
 - **Dos fuentes, misma calculadora:** cada pestaña conserva su par y su monto, y tiene su color de fondo (amarillo El Dorado, verde CriptoYa). Las tasas se cachean (60 s en El Dorado, 30 s por par en CriptoYa), así que escribir no genera peticiones.
 - **Simular:**
   - Confirmación en un bottom sheet con tres filas editables (moneda que entregas, moneda que recibes, cantidad), el detalle de la cotización, "Confirmar" y "Cancelar". Lo que se edita queda en la calculadora.
@@ -106,6 +106,7 @@ lib/
   - El título, las pestañas, la comparación, la confirmación y las pantallas de proceso y éxito no están en el diseño; se construyeron con sus tokens.
   - El selector de monedas se ajusta a la lista en lugar de ocupar el 70 % fijo del mock, y las fiat van por país.
   - El botón de la tarjeta dice "Simular" (en el mock, "Cambiar"), porque la operación es simulada.
+  - QUIERO arranca en BOB (en el mock, VES).
   - El sheet del diseño dice "Boliviano (R$)"; se usa el símbolo correcto, `Bs`.
 - **Fuente Rubik empaquetada** (licencia OFL) para no depender de la red en tiempo de ejecución ni en las pruebas.
 

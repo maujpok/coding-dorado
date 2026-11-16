@@ -66,10 +66,10 @@ void main() {
     repository = FakeExchangeRepository(onGetRate: eldoradoLike);
   });
 
-  test('estado inicial: USDT → VES, sin monto, QuoteIdle', () {
+  test('estado inicial: USDT → BOB, sin monto, QuoteIdle', () {
     final bloc = buildBloc();
 
-    expect(bloc.state.pair, ExchangePair(from: usdt, to: ves));
+    expect(bloc.state.pair, ExchangePair(from: usdt, to: CurrencyCatalog.bob));
     expect(bloc.state.amount, isNull);
     expect(bloc.state.quote, const QuoteIdle());
     expect(bloc.state.canSubmit, isFalse);

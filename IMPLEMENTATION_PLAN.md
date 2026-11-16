@@ -234,7 +234,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
 
 - [x] `ExchangeBloc` recibe por constructor el `GetExchangeQuote` y el `ExchangeRepository` de su proveedor (este último para `getAvailability()`); no sabe de qué proveedor se trata.
 - [x] `ExchangeState`, `QuoteStatus` (`Idle`, `Loading(previous)`, `Loaded`, `Failed`) y los eventos de [ARCHITECTURE.md §8.2](ARCHITECTURE.md#82-eventos-y-concurrencia).
-- [x] Estado inicial: USDT → VES (como en el diseño), monto vacío y `QuoteIdle`. El par inicial vive en una sola constante.
+- [x] Estado inicial: USDT → VES (como en el diseño), monto vacío y `QuoteIdle`. El par inicial vive en una sola constante. *Desde la Fase 12, USDT → BOB.*
 - [x] *Debounce* de 300 ms para el monto; cambios de par inmediatos; un único *handler* `restartable` para cotizar, con el retardo dentro del propio *handler* ([ARCHITECTURE.md §8.2](ARCHITECTURE.md#82-eventos-y-concurrencia)).
   - La tasa sale de la caché, así que escribir no genera peticiones.
   - El *debounce* se mantiene porque en la Fase 10 la tasa sí depende del monto.
@@ -427,6 +427,7 @@ Cada fase termina con `flutter analyze` sin issues, `flutter test` en verde y un
   - [x] `configureDependencies` recibe `httpInterceptors` por proveedor; `fakeApiDependencies()` arma la app completa sobre las APIs falsas en las pruebas.
   - [x] `ELDORADO_SOURCE=orderbook` necesita `API_URL`; sin ella vuelve a `/api/prices`.
   - [x] Se quita `mocktail`, que no se usaba.
+- [x] QUIERO arranca en BOB: el par inicial (y el del reinicio tras un cambio) pasa a USDT → BOB en ambas pestañas.
 - [x] Las diferencias de los *goldens* fallidos (`test/goldens/failures/`) dejan de versionarse.
 
 **Aceptación:** `flutter analyze` sin issues, `flutter test`, las pruebas `live` y los *goldens* en verde; `lib/` sin código de datos simulados.
@@ -465,6 +466,7 @@ Desvíos respecto del plan, todos con el mismo objetivo que la tarea original:
 | Fase 10 | Verificar con la URL real y guardar respuestas reales | Código y pruebas contra la forma documentada, con una API falsa; sin `API_URL` vuelve a `/api/prices` | La ruta sigue respondiendo 404; falta una URL vigente del equipo. |
 | Modo mock (Fases 1–10) | `USE_MOCK` con escenarios, latencia y banner | Retirado en la Fase 12; los interceptores pasaron a `test/helpers/fake_apis` como APIs falsas | Pedido posterior: la app solo debe usar datos reales. |
 | Monedas no disponibles (Fase 8) | Deshabilitadas con "No disponible" | Ocultas en los selectores (la elegida se muestra siempre) | Pedido posterior. |
+| Par inicial | USDT → VES, como el diseño | USDT → BOB | Pedido posterior. |
 | Posición de la calculadora | Centrada en vertical | Anclada arriba a una distancia fija | Pedido posterior: el título y la tarjeta deben verse en el mismo lugar en ambas pestañas. |
 
 ## Riesgos y mitigaciones

@@ -395,7 +395,7 @@ Cada pestaña tiene su propia instancia de `ExchangeBloc`. El bloc recibe por co
 
 ```dart
 final class ExchangeState extends Equatable {
-  final ExchangePair pair;               // inicial: USDT → VES (una sola constante)
+  final ExchangePair pair;               // inicial: USDT → BOB (una sola constante)
   final Decimal? amount;                 // null si está vacío o es inválido
   final QuoteStatus quote;
   final PairAvailability availability;   // para ocultar monedas en los sheets

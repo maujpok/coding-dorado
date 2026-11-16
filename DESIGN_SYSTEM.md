@@ -132,7 +132,7 @@ Los widgets propios de la calculadora (selector de par, campo de monto, filas de
 
 ## Validación visual
 
-Los *goldens* de [`test/goldens/`](test/goldens/) renderizan la app a 402×874 pt @2x, con Rubik y los íconos reales y con datos del mock HTTP, para compararlos con los mocks. Dependen del sistema operativo, así que no corren por defecto:
+Los *goldens* de [`test/goldens/`](test/goldens/) renderizan la app a 402×874 pt @2x, con Rubik y los íconos reales y con las APIs falsas de las pruebas, para compararlos con los mocks. Dependen del sistema operativo, así que no corren por defecto:
 
 ```bash
 flutter test --dart-define=GOLDENS=true --tags golden [--update-goldens]
@@ -151,5 +151,6 @@ flutter test --dart-define=GOLDENS=true --tags golden [--update-goldens]
 | Título | — | "Calculadora" encima de la tarjeta, alineado con su borde |
 | Posición de la calculadora | centrada en la pantalla | anclada arriba a una distancia fija (`AppLayout.calculatorTopInset`): el título y la tarjeta quedan en el mismo lugar en ambas pestañas aunque la de CriptoYa no tenga "Tiempo estimado", y los mensajes alargan la tarjeta hacia abajo sin moverla |
 | Orden del selector FIAT | VES, COP, ARS, PEN, BRL, BOB | alfabético por país: ARS, BOB, BRL, COP, PEN, VES |
+| Moneda QUIERO inicial | VES | BOB (sin ícono en los assets del challenge: se muestran sus iniciales) |
 
 La estructura, las medidas y la tipografía no cambian.

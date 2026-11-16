@@ -42,7 +42,7 @@ void main() {
     await expectLater(find.byType(App), matchesGoldenFile('screens/$name'));
   }
 
-  testWidgets('calculadora El Dorado: 5.00 USDT → VES', (tester) async {
+  testWidgets('calculadora El Dorado: 5.00 USDT → BOB', (tester) async {
     await pumpHome(tester);
     await typeAmount(tester, '5.00');
     await expectGolden(tester, 'home_eldorado.png');
@@ -106,7 +106,7 @@ void main() {
     await expectGolden(tester, 'success.png');
   }, skip: !enabled);
 
-  testWidgets('calculadora CriptoYa: 5.00 USDT → VES', (tester) async {
+  testWidgets('calculadora CriptoYa: 5.00 USDT → BOB', (tester) async {
     await pumpHome(tester);
     await tester.tap(find.text('CriptoYa'));
     await tester.pumpAndSettle();

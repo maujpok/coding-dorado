@@ -50,7 +50,7 @@ void main() {
       'TENGO',
       'QUIERO',
       'USDT',
-      'VES',
+      'BOB',
       'Tasa estimada',
       'Recibirás',
       'Tiempo estimado',
@@ -62,14 +62,15 @@ void main() {
     expect(exchangeButton(tester).onPressed, isNull);
   });
 
-  testWidgets('5 USDT → VES muestra tasa, monto y tiempo', (tester) async {
+  testWidgets('5 USDT → BOB muestra tasa, monto y tiempo', (tester) async {
     await pumpView(tester, RateProvider.eldorado);
 
     await tester.enterText(find.byType(TextField), '5');
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('≈ 25.00 VES'), findsOneWidget);
-    expect(find.textContaining('≈ 125.00 VES'), findsOneWidget);
+    // SELL de BOB en la API falsa: 11.85.
+    expect(find.textContaining('≈ 11.85 BOB'), findsOneWidget);
+    expect(find.textContaining('≈ 59.25 BOB'), findsOneWidget);
     expect(find.textContaining('≈ 10 Min'), findsOneWidget);
     expect(exchangeButton(tester).onPressed, isNotNull);
   });
@@ -119,12 +120,12 @@ void main() {
       );
       expect(fields.map((f) => f.currency), [
         CurrencyCatalog.usdt,
-        CurrencyCatalog.ves,
+        CurrencyCatalog.bob,
       ]);
       expect(find.text('Tether').hitTestable(), findsOneWidget);
-      expect(find.text('Bolívares').hitTestable(), findsOneWidget);
+      expect(find.text('Boliviano').hitTestable(), findsOneWidget);
       expect(find.text('5').hitTestable(), findsOneWidget);
-      expect(find.textContaining('≈ 125.00 VES').hitTestable(), findsOneWidget);
+      expect(find.textContaining('≈ 59.25 BOB').hitTestable(), findsOneWidget);
       expect(find.text('El Dorado').hitTestable(), findsOneWidget);
       expect(confirmButton(tester).onPressed, isNotNull);
     });
@@ -137,7 +138,7 @@ void main() {
       await tester.enterText(sheetField(), '8');
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('≈ 200.00 VES').hitTestable(), findsOneWidget);
+      expect(find.textContaining('≈ 94.80 BOB').hitTestable(), findsOneWidget);
       expect(bloc.state.amount, dec('8'));
       expect(bloc.state.amountText, '8');
     });
@@ -167,12 +168,12 @@ void main() {
 
       expect(
         bloc.state.pair,
-        ExchangePair(from: CurrencyCatalog.ves, to: CurrencyCatalog.usdt),
+        ExchangePair(from: CurrencyCatalog.bob, to: CurrencyCatalog.usdt),
       );
       final fields = tester.widgetList<CurrencyField>(
         find.byType(CurrencyField),
       );
-      expect(fields.first.currency, CurrencyCatalog.ves);
+      expect(fields.first.currency, CurrencyCatalog.bob);
     });
 
     testWidgets('bajo el mínimo no se puede confirmar', (tester) async {
@@ -204,7 +205,7 @@ void main() {
       expect(find.text('Confirma tu cambio'), findsNothing);
       expect(confirmed, hasLength(1));
       expect(confirmed.single.amount, dec('5'));
-      expect(confirmed.single.receiveAmount, dec('125'));
+      expect(confirmed.single.receiveAmount, dec('59.25'));
       expect(confirmed.single.provider, RateProvider.eldorado);
     });
   });
@@ -227,7 +228,7 @@ void main() {
     );
     final selectedTile = tester.widget<CurrencyListTile>(
       find.byWidgetPredicate(
-        (w) => w is CurrencyListTile && w.currency == CurrencyCatalog.ves,
+        (w) => w is CurrencyListTile && w.currency == CurrencyCatalog.bob,
       ),
     );
     expect(selectedTile.selected, isTrue);
@@ -341,7 +342,8 @@ void main() {
     await tester.enterText(find.byType(TextField), '5');
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('126.25'), findsOneWidget);
+    // Mediana de CriptoYa en la API falsa: 11.85 × 1.01 = 11.9685.
+    expect(find.textContaining('59.84'), findsOneWidget);
     expect(find.text('Tiempo estimado'), findsNothing);
     expect(find.textContaining('mediana de 3 exchanges'), findsOneWidget);
   });

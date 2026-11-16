@@ -40,3 +40,6 @@ tmp
 /keys
 
 /web/firebase-messaging-sw.js
+
+# Diferencias de goldens fallidos (las genera flutter test)
+test/goldens/failures/

@@ -102,7 +102,7 @@ Fuente **Rubik** (OFL), empaquetada en `assets/fonts/` para no depender de la re
 | `AppSpacing` | `xxs` 2 · `xs` 4 · `sm` 8 · `md` 12 · `lg` 16 · `xl` 20 · `xxl` 24 · `xxxl` 32 · `huge` 40 |
 | `AppRadius` | `badge` 4 · `icon` 5 · `control` 10 (campos y botones) · `card` 17 · `sheet` 20 · `pill` |
 | `AppSizes` | selector 33 · campo 38 · botón 41 · swap 41 · pestañas 40 · íconos de UI 16/18/22 · íconos de moneda 20/24 · radio 22 (anillo 2, punto 8) · fila de lista 62 · fila del resumen 28 · handle 62×4 · ancho máximo 400 (contenido) y 520 (sheets) · selector de monedas: alto según la lista, hasta el 70 % de la pantalla |
-| `AppLayout` | margen lateral 48 pt desde 380 pt de ancho (tarjeta de ~306 pt en el teléfono del mock), 16 pt en pantallas angostas |
+| `AppLayout` | margen lateral 48 pt desde 380 pt de ancho (tarjeta de ~306 pt en el teléfono del mock), 16 pt en pantallas angostas; `calculatorTopInset`: espacio sobre el título de la calculadora, el que la centraría si midiera `AppSizes.calculatorBlockHeight` (450 pt), mínimo 24 pt |
 | `AppShadows` | `card` (ambiente suave + borde inferior marcado, como el mock) · `raised` (botón de swap) |
 | `AppMotion` | `fast` 150 ms · `normal` 250 ms · `slow` 400 ms · curva `easeOutCubic` |
 
@@ -149,6 +149,7 @@ flutter test --dart-define=GOLDENS=true --tags golden [--update-goldens]
 | Prefijo del monto ("USDT") | texto ámbar | código en tinta sobre amarillo |
 | Selector de monedas | 70 % de la pantalla | alto según la lista (tope del 70 %) |
 | Título | — | "Calculadora" encima de la tarjeta, alineado con su borde |
+| Posición de la calculadora | centrada en la pantalla | anclada arriba a una distancia fija (`AppLayout.calculatorTopInset`): el título y la tarjeta quedan en el mismo lugar en ambas pestañas aunque la de CriptoYa no tenga "Tiempo estimado", y los mensajes alargan la tarjeta hacia abajo sin moverla |
 | Orden del selector FIAT | VES, COP, ARS, PEN, BRL, BOB | alfabético por país: ARS, BOB, BRL, COP, PEN, VES |
 
 La estructura, las medidas y la tipografía no cambian.

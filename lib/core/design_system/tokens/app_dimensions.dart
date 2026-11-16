@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 
 /// Espaciados en una escala de 4 pt.
@@ -52,6 +54,10 @@ abstract final class AppSizes {
   /// Alto máximo del selector de monedas, como fracción de la pantalla. Con
   /// pocas monedas el sheet se ajusta a la lista.
   static const double pickerSheetMaxHeightFactor = 0.7;
+
+  /// Alto de referencia del bloque de la calculadora (título, tarjeta con
+  /// sus tres filas, fuente y enlace) en el teléfono del mock.
+  static const double calculatorBlockHeight = 450;
 }
 
 /// Reglas de layout responsive.
@@ -59,6 +65,14 @@ abstract final class AppLayout {
   /// Margen lateral del contenido: 48 pt en teléfonos como el del mock
   /// (402 pt → tarjeta de ~306 pt) y 16 pt en pantallas angostas.
   static double horizontalMargin(double width) => width >= 380 ? 48 : 16;
+
+  /// Espacio sobre el título de la calculadora: el que la dejaría centrada
+  /// si midiera [AppSizes.calculatorBlockHeight] (138 pt en el teléfono del
+  /// mock). No depende del contenido real: el título y la tarjeta quedan en
+  /// el mismo lugar en todas las pestañas y no se mueven cuando aparece un
+  /// mensaje o falta una fila; lo que cambia de alto crece hacia abajo.
+  static double calculatorTopInset(double height) =>
+      math.max(AppSpacing.xxl, (height - AppSizes.calculatorBlockHeight) / 2);
 }
 
 /// Sombras.

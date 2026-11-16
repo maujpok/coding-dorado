@@ -107,6 +107,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
 
+    // La calculadora no entra entera: se llega al enlace con scroll.
+    await tester.ensureVisible(find.text('Comparar cotizaciones').first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Comparar cotizaciones').hitTestable());
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);

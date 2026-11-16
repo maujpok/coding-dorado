@@ -484,12 +484,13 @@ HomePage                                    # HomeCubit + Map<RateProvider, Exch
         ├── ExchangeBackground              # semicírculo amarillo (CustomPainter)
         └── SafeArea → Column
             ├── ProviderTabs                # "El Dorado" | "CriptoYa"
-            └── Expanded → IndexedStack
+            └── Expanded → Stack                # pestañas superpuestas con fundido
                 ├── BlocProvider.value(eldorado) → ExchangeView
                 └── BlocProvider.value(criptoya) → ExchangeView
 
 ExchangeView
-└── Center → ConstrainedBox(maxWidth: 400) → Column
+└── Align(topCenter) + AppLayout.calculatorTopInset → ConstrainedBox(maxWidth: 400) → Column
+    │                                       # anclada arriba: misma posición en ambas pestañas
     ├── Text("Calculadora")                 # header, alineado con el borde de la tarjeta
     ├── ExchangeCard
     │   ├── CurrencyPairSelector            # píldora con etiquetas TENGO / QUIERO en el borde

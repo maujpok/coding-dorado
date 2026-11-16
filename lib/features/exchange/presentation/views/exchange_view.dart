@@ -22,7 +22,7 @@ typedef OpenInProviderCallback =
 
 /// La calculadora de una pestaña. Lee su `ExchangeBloc` del árbol.
 ///
-/// "Cambiar" abre la confirmación. Las acciones que salen de la calculadora
+/// "Simular" abre la confirmación. Las acciones que salen de la calculadora
 /// (comparar, "Ver en …", ejecutar el cambio confirmado) las provee quien
 /// compone la pantalla, así `exchange` no depende de otras features.
 class ExchangeView extends StatelessWidget {
@@ -57,13 +57,16 @@ class ExchangeView extends StatelessWidget {
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Center(
+                // Anclada arriba, no centrada: así queda en el mismo lugar en
+                // ambas pestañas aunque sus tarjetas midan distinto.
+                child: Align(
+                  alignment: Alignment.topCenter,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppLayout.horizontalMargin(
-                        constraints.maxWidth,
-                      ),
-                      vertical: AppSpacing.xxl,
+                    padding: EdgeInsets.fromLTRB(
+                      AppLayout.horizontalMargin(constraints.maxWidth),
+                      AppLayout.calculatorTopInset(constraints.maxHeight),
+                      AppLayout.horizontalMargin(constraints.maxWidth),
+                      AppSpacing.xxl,
                     ),
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(

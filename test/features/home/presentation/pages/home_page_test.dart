@@ -127,6 +127,37 @@ void main() {
     expect(find.text('Calculadora').hitTestable(), findsOneWidget);
   });
 
+  testWidgets('título y tarjeta en el mismo lugar en ambas pestañas, aunque '
+      'la tarjeta de CriptoYa no tenga tiempo estimado', (tester) async {
+    await pumpHome(tester);
+    Rect titleRect() => tester.getRect(find.text('Calculadora').hitTestable());
+    Rect cardRect() => tester.getRect(find.byType(DsCard).hitTestable().first);
+
+    await tester.enterText(visibleField(), '5');
+    await tester.pumpAndSettle();
+    expect(find.text('Tiempo estimado').hitTestable(), findsOneWidget);
+    final eldoradoTitle = titleRect();
+    final eldoradoCard = cardRect();
+
+    await tester.tap(find.text('CriptoYa'));
+    await tester.pumpAndSettle();
+    await tester.enterText(visibleField(), '5');
+    await tester.pumpAndSettle();
+    expect(find.text('Tiempo estimado').hitTestable(), findsNothing);
+    expect(titleRect(), eldoradoTitle);
+    expect(cardRect().topLeft, eldoradoCard.topLeft);
+    expect(cardRect().height, lessThan(eldoradoCard.height));
+
+    // Un mensaje dentro de la tarjeta la alarga hacia abajo sin moverla.
+    await tester.tap(find.text('El Dorado'));
+    await tester.pumpAndSettle();
+    await tester.enterText(visibleField(), '1');
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Mínimo').hitTestable(), findsOneWidget);
+    expect(titleRect(), eldoradoTitle);
+    expect(cardRect().topLeft, eldoradoCard.topLeft);
+  });
+
   testWidgets('el fondo de CriptoYa tiene otro color que el de El Dorado', (
     tester,
   ) async {

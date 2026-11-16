@@ -85,7 +85,7 @@ Organizada por funcionalidad (`home`, `exchange`, `quote_comparison`, `checkout`
 - **Design system propio** ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)): tokens semánticos como `ThemeExtension`, componentes `Ds*` y contraste verificado.
 - **Textos en ARB** (es) y dependencias con `get_it` en un *composition root*.
 
-Otros documentos: [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) (fases y notas de implementación) y [API_RESEARCH.md](API_RESEARCH.md) (evaluación de las APIs).
+Otros documentos: [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) (fases y notas de implementación), [API_RESEARCH.md](API_RESEARCH.md) (evaluación de las APIs) y [COMMITS.md](COMMITS.md) (qué cambió en cada commit de la rama).
 
 ```
 lib/
